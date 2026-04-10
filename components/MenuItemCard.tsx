@@ -71,20 +71,20 @@ export default function MenuItemCard({
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              className="flex items-center gap-0 border border-primary rounded-lg overflow-hidden"
+              className="flex items-center gap-0 border border-[#e25f28] rounded-lg overflow-hidden"
             >
               <button
                 onClick={onRemove}
-                className="p-1 text-primary hover:bg-primary/10 transition-colors"
+                className="p-1 text-[#e25f28] hover:bg-primary/10 transition-colors"
               >
                 <Minus className="w-3.5 h-3.5" />
               </button>
-              <span className="px-2.5 text-xs font-semibold text-primary min-w-[24px] text-center">
+              <span className="px-2.5 text-xs font-semibold text-[#e25f28] min-w-[24px] text-center">
                 {quantity}
               </span>
               <button
                 onClick={onAdd}
-                className="p-1 text-primary hover:bg-primary/10 transition-colors"
+                className="p-1 text-[#e25f28] hover:bg-primary/10 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
               </button>

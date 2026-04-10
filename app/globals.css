@@ -156,3 +156,37 @@
 .bg-non-veg {
     background-color: #dc2828;
 }
+
+/* 🔥 Thin Orange Scrollbar */
+.scrollbar-thin-orange {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #e25f28 transparent;
+}
+
+/* Chrome / Edge / Safari */
+.scrollbar-thin-orange::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* ❌ Force remove arrows */
+.scrollbar-thin-orange::-webkit-scrollbar-button:single-button {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
+/* Extra safety (some browsers) */
+.scrollbar-thin-orange::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Track */
+.scrollbar-thin-orange::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Thumb */
+.scrollbar-thin-orange::-webkit-scrollbar-thumb {
+  background-color: #e25f28;
+  border-radius: 10px;
+}

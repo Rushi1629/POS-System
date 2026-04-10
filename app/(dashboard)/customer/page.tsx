@@ -4,10 +4,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import {
-  Field,
-  FieldGroup,
-} from "@/components/ui/field";
+import { Field, FieldGroup } from "@/components/ui/field";
 import {
   Select,
   SelectContent,
@@ -16,11 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  ChevronDown,
-  ChevronUp,
-  Search,
-} from "lucide-react";
+import { ChevronDown, ChevronRightCircleIcon, ChevronUp, Search } from "lucide-react";
 import { categories, menuItems } from "@/lib/data";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -62,16 +55,16 @@ export default function CustomerDashboard() {
 
   return (
     <>
-      <div className="flex gap-5">
-        <InputGroup className="max-w-xl">
+      <div className="flex gap-5 flex-wrap">
+        <InputGroup className="max-w-xl sm:w-full">
           <InputGroupInput className="bg-white" placeholder="Search..." />
-          <InputGroupAddon>
+          <InputGroupAddon className="bg-white">
             <Search />
           </InputGroupAddon>
           {/* <InputGroupAddon align="inline-end">12 results</InputGroupAddon> */}
         </InputGroup>
 
-        <FieldGroup className="w-full max-w-xs bg-white">
+        <FieldGroup className="w-full max-w-xl bg-white md:max-w-xl sm:w-full">
           <Field>
             <Select defaultValue="banana">
               <SelectTrigger>
@@ -168,7 +161,7 @@ export default function CustomerDashboard() {
               exit={{ y: 80 }}
               className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-lg px-4 z-40"
             >
-              <div className="bg-primary text-primary-foreground rounded-2xl px-5 py-3.5 flex items-center justify-between shadow-lg shadow-primary/25">
+              <div className="bg-[#e25f28] text-primary-foreground rounded-2xl px-5 py-3.5 flex items-center justify-between shadow-lg shadow-primary/25">
                 <div>
                   <p className="text-xs font-medium opacity-80">
                     {totalCartItems} item{totalCartItems > 1 ? "s" : ""}
@@ -180,9 +173,9 @@ export default function CustomerDashboard() {
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="font-semibold text-primary"
+                  className="font-semibold text-[#e25f28] bg-[#f1edea]"
                 >
-                  View Cart →
+                  View Cart <ChevronRightCircleIcon/>
                 </Button>
               </div>
             </motion.div>
