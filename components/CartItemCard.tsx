@@ -2,6 +2,7 @@
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import React from "react";
 
 export interface CartItem {
   id: string;
@@ -15,9 +16,9 @@ export interface CartItem {
 
 interface CartItemCardProps {
   item: CartItem;
-  onIncrement: (id: string) => void;
-  onDecrement: (id: string) => void;
-  onRemove: (id: string) => void;
+  onIncrement: () => void;
+  onDecrement: () => void;
+  onRemove: () => void;
 }
 
 const CartItemCard = ({ item, onIncrement, onDecrement, onRemove }: CartItemCardProps) => {
@@ -51,7 +52,7 @@ const CartItemCard = ({ item, onIncrement, onDecrement, onRemove }: CartItemCard
 
       <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/60">
         <button
-          onClick={() => onRemove(item.id)}
+          onClick={onRemove}
           className="text-sm text-muted-foreground hover:text-destructive transition-colors font-medium flex items-center gap-1"
         >
           <Trash2 className="h-3.5 w-3.5" />
@@ -63,7 +64,7 @@ const CartItemCard = ({ item, onIncrement, onDecrement, onRemove }: CartItemCard
             size="icon"
             variant="ghost"
             className="h-8 w-8 rounded-md hover:bg-[#e66b19] hover:text-primary-foreground transition-colors"
-            onClick={() => onDecrement(item.id)}
+            onClick={onDecrement}
           >
             <Minus className="h-3.5 w-3.5" />
           </Button>
@@ -71,7 +72,7 @@ const CartItemCard = ({ item, onIncrement, onDecrement, onRemove }: CartItemCard
           <Button
             size="icon"
             className="h-8 w-8 rounded-md bg-[#e66b19] text-primary-foreground hover:bg-primary/90"
-            onClick={() => onIncrement(item.id)}
+            onClick={onIncrement}
           >
             <Plus className="h-3.5 w-3.5" />
           </Button>
@@ -81,4 +82,4 @@ const CartItemCard = ({ item, onIncrement, onDecrement, onRemove }: CartItemCard
   );
 };
 
-export default CartItemCard;
+export default React.memo(CartItemCard);

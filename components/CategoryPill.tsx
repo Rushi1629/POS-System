@@ -1,6 +1,15 @@
+import React from "react";
 import { Category } from "@/lib/data";
 
-export default function CategoryPill({ category, isActive, onClick }: { category: Category; isActive: boolean; onClick: () => void }) {
+function CategoryPill({
+  category,
+  isActive,
+  onClick,
+}: {
+  category: Category;
+  isActive: boolean;
+  onClick: () => void;
+}) {
   return (
     <button
       onClick={onClick}
@@ -11,9 +20,15 @@ export default function CategoryPill({ category, isActive, onClick }: { category
       }`}
     >
       <span className="text-2xl">{category.icon}</span>
-      <span className={`text-xs font-medium text-center leading-tight ${isActive ? "text-primary" : "text-muted-foreground"}`}>
+      <span
+        className={`text-xs font-medium text-center leading-tight ${
+          isActive ? "text-primary" : "text-muted-foreground"
+        }`}
+      >
         {category.name}
       </span>
     </button>
   );
 }
+
+export default React.memo(CategoryPill);

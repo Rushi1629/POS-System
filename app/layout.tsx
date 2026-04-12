@@ -1,7 +1,9 @@
+
 import React from "react";
 import type { Metadata, Viewport } from "next";
 import QueryProvider from "@/components/QueryProvider";
 import "./globals.css";
+import Providers from "./providers";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -23,7 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <QueryProvider>{children}</QueryProvider>
+        <Providers>
+          <QueryProvider>{children}</QueryProvider>
+        </Providers>
       </body>
     </html>
   );

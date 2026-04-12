@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Percent,
   ChevronRight,
@@ -243,4 +243,4 @@ const OrderSummary = ({
   );
 };
 
-export default OrderSummary;
+export default React.memo(OrderSummary);

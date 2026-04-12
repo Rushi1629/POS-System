@@ -1,4 +1,5 @@
 "use client";
+
 import {
   InputGroup,
   InputGroupAddon,
@@ -13,55 +14,94 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronDown, ChevronRightCircleIcon, ChevronUp, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRightCircleIcon,
+  ChevronUp,
+  Search,
+} from "lucide-react";
 import { categories, menuItems } from "@/lib/data";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import CategoryPill from "@/components/CategoryPill";
 import MenuItemCard from "@/components/MenuItemCard";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/store/store";
+import { addItemAction, removeItemAction } from "@/store/cart/cartSlice";
+import { useRouter } from "next/navigation";
 
 export default function CustomerDashboard() {
   const [activeCategory, setActiveCategory] = useState("chef-special");
   const [searchQuery, setSearchQuery] = useState("");
-  const [cart, setCart] = useState<Record<string, number>>({});
   const [expandedSection, setExpandedSection] = useState(true);
   const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  const filteredItems = menuItems.filter((item) => {
-    const matchesCategory = item.category === activeCategory;
-    const matchesSearch = item.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    return searchQuery ? matchesSearch : matchesCategory;
-  });
+  // ✅ redux state
+  const dispatch = useDispatch();
 
-  const activeCategoryData = categories.find((c) => c.id === activeCategory);
-  const totalCartItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
-  const totalCartPrice = Object.entries(cart).reduce((sum, [id, qty]) => {
-    const item = menuItems.find((i) => i.id === id);
-    return sum + (item ? item.price * qty : 0);
-  }, 0);
+  const cart = useSelector((state: RootState) => state.cart.cart);
 
-  const addToCart = (id: string) =>
-    setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
-  const removeFromCart = (id: string) =>
-    setCart((prev) => {
-      const next = { ...prev };
-      if (next[id] > 1) next[id]--;
-      else delete next[id];
-      return next;
+  const addToCart = useCallback(
+    (id: string) => {
+      dispatch(addItemAction(id));
+    },
+    [dispatch],
+  );
+
+  const removeFromCart = useCallback(
+    (id: string) => {
+      dispatch(removeItemAction(id));
+    },
+    [dispatch],
+  );
+
+  const totalCartItems = useMemo(() => {
+    return Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+  }, [cart]);
+
+  const menuMap = useMemo(() => {
+    return Object.fromEntries(menuItems.map((i) => [i.id, i]));
+  }, []);
+
+  const totalCartPrice = useMemo(() => {
+    return Object.entries(cart).reduce((sum, [id, qty]) => {
+      const item = menuMap[id];
+      return sum + (item ? item.price * qty : 0);
+    }, 0);
+  }, [cart, menuMap]);
+
+  // ✅ Filter logic
+  const filteredItems = useMemo(() => {
+    return menuItems.filter((item) => {
+      const matchesCategory = item.category === activeCategory;
+      const matchesSearch = item.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+
+      return searchQuery ? matchesSearch : matchesCategory;
     });
+  }, [activeCategory, searchQuery]);
+
+  const activeCategoryData = useMemo(() => {
+    return categories.find((c) => c.id === activeCategory);
+  }, [activeCategory]);
 
   return (
     <>
+      {/* 🔍 Search + Filter */}
       <div className="flex gap-5 flex-wrap">
         <InputGroup className="max-w-xl sm:w-full">
-          <InputGroupInput className="bg-white" placeholder="Search..." />
+          <InputGroupInput
+            className="bg-white"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           <InputGroupAddon className="bg-white">
             <Search />
           </InputGroupAddon>
-          {/* <InputGroupAddon align="inline-end">12 results</InputGroupAddon> */}
         </InputGroup>
 
         <FieldGroup className="w-full max-w-xl bg-white md:max-w-xl sm:w-full">
@@ -85,7 +125,7 @@ export default function CustomerDashboard() {
       </div>
 
       <div className="bg-[#f9f7f5] flex flex-col w-full relative">
-        {/* Category Scroll */}
+        {/* 📂 Category Scroll */}
         {!searchQuery && (
           <div className="sticky z-20 bg-[#f9f7f5] backdrop-blur-xl border-b border-border/30">
             <div
@@ -104,7 +144,7 @@ export default function CustomerDashboard() {
           </div>
         )}
 
-        {/* Menu Items */}
+        {/* 🍽️ Menu Items */}
         <div className="lg:px-3 sm:px-4 pb-24">
           <button
             onClick={() => setExpandedSection(!expandedSection)}
@@ -116,6 +156,7 @@ export default function CustomerDashboard() {
                 ({filteredItems.length})
               </span>
             </h2>
+
             {expandedSection ? (
               <ChevronUp className="w-5 h-5 text-muted-foreground" />
             ) : (
@@ -123,66 +164,67 @@ export default function CustomerDashboard() {
             )}
           </button>
 
-          <AnimatePresence>
-            {expandedSection && (
-              <motion.div
-                layout="position"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
-              >
-                {filteredItems.map((item) => (
-                  <MenuItemCard
-                    key={item.id}
-                    item={item}
-                    quantity={cart[item.id] || 0}
-                    onAdd={() => addToCart(item.id)}
-                    onRemove={() => removeFromCart(item.id)}
-                  />
-                ))}
-                {filteredItems.length === 0 && (
-                  <div className="text-center py-12 text-muted-foreground text-sm w-full">
-                    No items found
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Cart Footer */}
-        <AnimatePresence>
-          {totalCartItems > 0 && (
+          {/* <AnimatePresence> */}
+          {expandedSection && (
             <motion.div
-              initial={{ y: 80 }}
-              animate={{ y: 0 }}
-              exit={{ y: 80 }}
-              className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-lg px-4 z-40"
+              layout="position"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
             >
-              <div className="bg-[#e25f28] text-primary-foreground rounded-2xl px-5 py-3.5 flex items-center justify-between shadow-lg shadow-primary/25">
-                <div>
-                  <p className="text-xs font-medium opacity-80">
-                    {totalCartItems} item{totalCartItems > 1 ? "s" : ""}
-                  </p>
-                  <p className="text-lg font-bold">
-                    ₹ {totalCartPrice.toFixed(2)}
-                  </p>
+              {filteredItems.map((item) => (
+                <MenuItemCard
+                  key={item.id}
+                  item={item}
+                  quantity={cart[item.id] || 0}
+                  onAdd={() => addToCart(item.id)}
+                  onRemove={() => removeFromCart(item.id)}
+                />
+              ))}
+
+              {filteredItems.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground text-sm w-full">
+                  No items found
                 </div>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="font-semibold text-[#e25f28] bg-[#f1edea]"
-                >
-                  View Cart <ChevronRightCircleIcon/>
-                </Button>
-              </div>
+              )}
             </motion.div>
           )}
-        </AnimatePresence>
+          {/* </AnimatePresence> */}
+        </div>
 
-        {/* Bottom Nav */}
+        {/* 🛒 Cart Footer */}
+        {/* <AnimatePresence> */}
+        {totalCartItems > 0 && (
+          <motion.div
+            initial={{ y: 80 }}
+            animate={{ y: 0 }}
+            exit={{ y: 80 }}
+            className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-lg px-4 z-40"
+          >
+            <div className="bg-[#e25f28] text-primary-foreground rounded-2xl px-5 py-3.5 flex items-center justify-between shadow-lg shadow-primary/25">
+              <div>
+                <p className="text-xs font-medium opacity-80">
+                  {totalCartItems} item{totalCartItems > 1 ? "s" : ""}
+                </p>
+                <p className="text-lg font-bold">
+                  ₹ {totalCartPrice.toFixed(2)}
+                </p>
+              </div>
+
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => router.push("/customer/cart")}
+                className="font-semibold text-[#e25f28] bg-[#f1edea]"
+              >
+                View Cart <ChevronRightCircleIcon />
+              </Button>
+            </div>
+          </motion.div>
+        )}
+        {/* </AnimatePresence> */}
       </div>
     </>
   );

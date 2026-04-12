@@ -4,18 +4,15 @@ import VegBadge from "./VegBadge";
 import { Badge } from "./ui/badge";
 import { Minus, Plus, Star } from "lucide-react";
 import { Button } from "./ui/button";
+import React from "react";
 
-export default function MenuItemCard({
-  item,
-  quantity,
-  onAdd,
-  onRemove,
-}: {
+const MenuItemCard = ({ item, quantity, onAdd, onRemove }: {
   item: MenuItem;
   quantity: number;
   onAdd: () => void;
   onRemove: () => void;
-}) {
+}) =>
+ {
   return (
     <motion.div
       layout
@@ -104,3 +101,5 @@ export default function MenuItemCard({
     </motion.div>
   );
 }
+
+export default React.memo(MenuItemCard);
