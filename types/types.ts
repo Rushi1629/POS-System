@@ -7,6 +7,21 @@ export type CartState = {
 export type TableStatus = "available" | "occupied" | "reserved" | "cleaning";
 export type TableCategory = "family" | "pod" | "hall";
 
+export interface LoginFormData {
+  email: string;
+  password: string;
+  remember: boolean;
+}
+
+export interface DemoCredential {
+  role: string;
+  roleLabel: string;
+  email: string;
+  password: string;
+  accent: string;
+  dot: string;
+}
+
 export type Table = {
   id: string;
   number: number;

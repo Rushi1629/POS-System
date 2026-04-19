@@ -1,0 +1,15 @@
+1)  API Flow 
+
+    Form (email, password, remember)
+            ↓
+    onSubmit()
+            ↓
+    Pick required fields
+            ↓
+    loginMutation.mutate()
+            ↓
+    API (auth.service.ts)
+            ↓
+    fetcher()
+            ↓
+    Backend

@@ -81,6 +81,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  interpolate-size: allow-keywords;
 }
 
 .dark {
@@ -142,19 +143,19 @@
 }
 
 .border-veg {
-    border-color: #30a661;
+  border-color: #30a661;
 }
 
 .bg-veg {
-    background-color: #30a661;
+  background-color: #30a661;
 }
 
 .border-non-veg {
-    border-color: #dc2828;
+  border-color: #dc2828;
 }
 
 .bg-non-veg {
-    background-color: #dc2828;
+  background-color: #dc2828;
 }
 
 /* 🔥 Thin Orange Scrollbar */
