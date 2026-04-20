@@ -1,4 +1,4 @@
-const BASE_URL = "http://secretcafe-api-production.up.railway.app/api/v1";
+const BASE_URL = "https://secretcafe-api-production.up.railway.app/api/v1";
 
 export const fetcher = async (
   endpoint: string,

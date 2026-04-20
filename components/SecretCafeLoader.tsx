@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 interface SecretCafeLoaderProps {
@@ -14,7 +16,7 @@ export function SecretCafeLoader({
   useEffect(() => {
     const id = setInterval(() => {
       setDots((d) => (d.length >= 3 ? "" : d + "."));
-    }, 450);
+    }, 1000);
     return () => clearInterval(id);
   }, []);
 

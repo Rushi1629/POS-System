@@ -6,9 +6,8 @@ export const login = (data: { email: string; password: string }) =>
     body: JSON.stringify(data),
   });
 
-export const getMe = () => fetcher("/auth/me");
-
 export const logout = () =>
   fetcher("/auth/logout", {
     method: "POST",
   });
+ 

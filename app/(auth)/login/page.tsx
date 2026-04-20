@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { useLogin } from "@/api/hooks/useAuth";
 import SecretCafeLoader from "@/components/SecretCafeLoader";
 import { DemoCredential } from "@/types/types";
+import { useAppDispatch } from "@/store/hooks";
 
 const demoCredentials: DemoCredential[] = [
   {
@@ -42,13 +43,14 @@ const demoCredentials: DemoCredential[] = [
 ];
 
 export default function LoginForm() {
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
   // Login API mutation using custom hook
   const loginMutation = useLogin();
 
-  useEffect(() => {
+    useEffect(() => {
     if (loginMutation.isSuccess) {
       toast.success("Login successful 🎉");
       setTimeout(() => router.push("/customer"), 800);
@@ -75,7 +77,12 @@ export default function LoginForm() {
 
   return (
     <>
-      {isLoading && <SecretCafeLoader message="Authenticating..." submessage="Verifying credentials and preparing your dashboard..." />}
+      {isLoading && (
+        <SecretCafeLoader
+          message="Authenticating..."
+          submessage="Verifying credentials and preparing your dashboard..."
+        />
+      )}
 
       <div className="min-h-screen bg-[#0f0d0b] flex items-center justify-center relative overflow-hidden px-4 py-10">
         <Toaster position="top-right" richColors />
@@ -201,6 +208,7 @@ export default function LoginForm() {
               )}
 
               <form
+                autoComplete="off"
                 onSubmit={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -236,7 +244,7 @@ export default function LoginForm() {
                       <input
                         id="email"
                         type="email"
-                        autoComplete="email"
+                        autoComplete="new-email"
                         placeholder="you@cafepos.app"
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
@@ -281,7 +289,7 @@ export default function LoginForm() {
                         <input
                           id="password"
                           type={showPassword ? "text" : "password"}
-                          autoComplete="current-password"
+                          autoComplete="new-password"
                           placeholder="Enter your password"
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}

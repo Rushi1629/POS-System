@@ -5,6 +5,8 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import "../globals.css";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
+import SecretCafeLoader from "@/components/SecretCafeLoader";
 
 export default function DashboardLayout({
   children,
@@ -27,7 +29,15 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col min-w-0">
         <Header />
 
-        <main className="flex-1 p-4 overflow-y-auto pb-20 bg-[#f9f7f5]">{children}</main>
+          <main className="flex-1 p-6 lg:p-8 overflow-y-auto pb-20 bg-[#f9f7f5]">
+          <Suspense
+            fallback={
+              <SecretCafeLoader message="Loading dashboard..." />
+            }
+          >
+            {children}
+          </Suspense>
+        </main>
 
         {/* Mobile Bottom Navigation */}
         <div className="md:hidden">

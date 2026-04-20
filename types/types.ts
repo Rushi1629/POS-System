@@ -67,3 +67,25 @@ export const statusBg: Record<string, string> = {
   reserved: "bg-gradient-to-br from-[#3374db]/10 to-transparent",
   cleaning: "bg-gradient-to-br from-[#f59f0a]/10 to-transparent",
 };
+
+export type UserRole = "Admin" | "Manager" | "Staff";
+
+export interface User {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  phoneNumber: string;
+  role: UserRole;
+  password?: string;
+  createdAt: string;
+}
+
+export interface UserFormValues {
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+  role: UserRole;
+}
