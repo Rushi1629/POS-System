@@ -89,3 +89,24 @@ export interface UserFormValues {
   phoneNumber: string;
   role: UserRole;
 }
+
+export interface CreateUserPayload {
+  name: string;
+  username: string;
+  email: string;
+  password?: string;
+  phoneNumber: string;
+  roleId: number;
+}
+
+export const roleMap: Record<UserRole, number> = {
+  Admin: 1,
+  Manager: 2,
+  Staff: 3,
+};
+
+export const roleReverseMap: Record<number, UserRole> = {
+  1: "Admin",
+  2: "Manager",
+  3: "Staff",
+};

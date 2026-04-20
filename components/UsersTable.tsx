@@ -74,7 +74,7 @@ function initials(name: string) {
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, {
+  return new Date(iso).toLocaleDateString("en-GB", {
     month: "short",
     day: "numeric",
     year: "numeric",

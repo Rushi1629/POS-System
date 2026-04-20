@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
@@ -94,20 +94,25 @@ export function UserFormDialog({
   >({});
 
   useEffect(() => {
-    if (!open) return;
-    if (mode === "edit" && initialUser) {
-      setValues({
-        name: initialUser.name,
-        username: initialUser.username,
-        email: initialUser.email,
-        phoneNumber: initialUser.phoneNumber,
-        role: initialUser.role,
-        password: "",
-      });
+    if (open) {
+      if (mode === "edit" && initialUser) {
+        setValues({
+          name: initialUser.name,
+          username: initialUser.username,
+          email: initialUser.email,
+          phoneNumber: initialUser.phoneNumber,
+          role: initialUser.role,
+          password: "",
+        });
+      } else {
+        setValues(empty); // ✅ reset for create
+      }
+      setErrors({});
     } else {
+      // ✅ VERY IMPORTANT: reset when dialog closes
       setValues(empty);
+      setErrors({});
     }
-    setErrors({});
   }, [open, mode, initialUser]);
 
   const update = <K extends keyof UserFormValues>(
@@ -203,7 +208,7 @@ export function UserFormDialog({
             </span>
           </div>
         ) : (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} autoComplete="off">
             <div className="grid gap-4 px-6 py-5 sm:grid-cols-2">
               {fields.map((f) => (
                 <div
@@ -224,6 +229,13 @@ export function UserFormDialog({
                       placeholder={f.placeholder}
                       value={values[f.key]}
                       onChange={(e) => update(f.key, e.target.value)}
+                      autoComplete={
+                        f.key === "password"
+                          ? "new-password"
+                          : f.key === "email"
+                            ? "new-email"
+                            : "off"
+                      }
                       aria-invalid={!!errors[f.key]}
                       className="pl-9"
                     />
@@ -267,7 +279,7 @@ export function UserFormDialog({
               </div>
             </div>
 
-            <DialogFooter className="border-t bg-muted/30 px-6 py-4">
+            <DialogFooter className="border-t bg-muted/30 px-4 py-2">
               <Button
                 type="button"
                 variant="outline"
@@ -276,7 +288,11 @@ export function UserFormDialog({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading}>
+              <Button
+                type="submit"
+                className="bg-[#e25f28] hover:bg-[#e25f28]/90 px-4 py-2"
+                disabled={loading}
+              >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {mode === "create" ? "Create User" : "Save Changes"}
               </Button>

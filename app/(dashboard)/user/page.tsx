@@ -24,8 +24,9 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { UsersTable } from "@/components/UsersTable";
 import { UserFormDialog } from "@/components/userFormDialog";
-import type { User, UserFormValues } from "@/types/types";
+import { roleMap, roleReverseMap, type CreateUserPayload, type User, type UserFormValues } from "@/types/types";
 import { useRouter } from "next/navigation";
+import { createUser } from "@/api/services/user.service";
 
 // const router = useRouter();
 
@@ -38,7 +39,7 @@ const seedUsers: User[] = [
     username: "ada",
     email: "ada@secretcafe.io",
     phoneNumber: "+1 555 010 0001",
-    role: "Admin",
+    role: roleReverseMap[1],
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
   },
   {
@@ -47,7 +48,7 @@ const seedUsers: User[] = [
     username: "alan",
     email: "alan@secretcafe.io",
     phoneNumber: "+1 555 010 0002",
-    role: "Manager",
+    role: roleReverseMap[2],
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12).toISOString(),
   },
   {
@@ -56,7 +57,7 @@ const seedUsers: User[] = [
     username: "grace",
     email: "grace@secretcafe.io",
     phoneNumber: "+1 555 010 0003",
-    role: "Staff",
+    role: roleReverseMap[3],
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(),
   },
   {
@@ -65,7 +66,7 @@ const seedUsers: User[] = [
     username: "linus",
     email: "linus@secretcafe.io",
     phoneNumber: "+1 555 010 0004",
-    role: "Staff",
+    role: roleReverseMap[3],
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
   },
 ];
@@ -110,39 +111,24 @@ export default function UsersPage() {
   };
 
   const handleSubmit = async (values: UserFormValues) => {
-    setLoadingForm(true);
-    await delay(500);
-    if (formMode === "create") {
-      const newUser: User = {
-        id: crypto.randomUUID(),
+    try {
+
+      const payload = {
         name: values.name,
         username: values.username,
         email: values.email,
+        password: values.password,
         phoneNumber: values.phoneNumber,
-        role: values.role,
-        createdAt: new Date().toISOString(),
+        roleId: roleMap[values.role],
+        ...(values.password && { password: values.password }), // ✅ only if exists
       };
-      setUsers((prev) => [newUser, ...prev]);
+
+      await createUser(payload);
       toast.success("User created successfully");
-    } else if (editing) {
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === editing.id
-            ? {
-                ...u,
-                name: values.name,
-                username: values.username,
-                email: values.email,
-                phoneNumber: values.phoneNumber,
-                role: values.role,
-              }
-            : u,
-        ),
-      );
-      toast.success("User updated successfully");
+      setFormOpen(false);
+    } catch (err) {
+      toast.error("Failed to create user");
     }
-    setLoadingForm(false);
-    setFormOpen(false);
   };
 
   const confirmDelete = async () => {
@@ -188,7 +174,11 @@ export default function UsersPage() {
               Create, edit and manage cafe team members and their access.
             </p>
           </div>
-          <Button onClick={openCreate} size="lg" className="shadow-sm px-8 bg-[#e25f28] hover:bg-[#e25f28]/90 text-white">
+          <Button
+            onClick={openCreate}
+            size="lg"
+            className="shadow-sm px-8 bg-[#e25f28] hover:bg-[#e25f28]/90 text-white"
+          >
             <UserPlus className="h-4 w-4" />
             New User
           </Button>
