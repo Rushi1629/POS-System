@@ -1,14 +1,20 @@
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { login, logout } from "../services/auth.service";
+import { fetchUserProfile, login, logout } from "../services/auth.service";
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: login,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["me"] });
+    onSuccess: async () => {
+      // 🔥 REMOVE OLD CACHE COMPLETELY
+      queryClient.removeQueries({ queryKey: ["me"] });
+
+      // 🔥 FORCE FETCH NEW PROFILE
+      await queryClient.fetchQuery({
+        queryKey: ["me"], 
+        queryFn: fetchUserProfile,
+      });
     },
   });
 };
@@ -19,7 +25,17 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: logout,
     onSuccess: () => {
-      queryClient.clear(); // 🔥 clear all cache
+      queryClient.clear();
     },
+  });
+};
+
+export const useProfile = () => {
+  return useQuery({
+    queryKey: ["me"],
+    queryFn: fetchUserProfile,
+    refetchOnWindowFocus: false,
+    retry: false,
+    staleTime: 0, // 🔥 IMPORTANT (always fresh)
   });
 };

@@ -195,3 +195,13 @@ input:-internal-autofill-selected{
   background-color: #e25f28;
   border-radius: 10px;
 }
+
+/* Hide scrollbar but keep scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
+}

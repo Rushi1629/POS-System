@@ -1,29 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useProfile } from "@/api/hooks/useAuth";
+import SecretCafeLoader from "./SecretCafeLoader";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useAppDispatch } from "@/store/hooks";
-import { setUser, clearUser } from "@/store/user/authSlice";
-import SecretCafeLoader from "@/components/SecretCafeLoader";
+import { setUser, clearUser } from "@/store/auth/authSlice";
 
-export default function AuthInitializer() {
+type Props = {
+  children: React.ReactNode;
+};
+
+export default function AuthInitializer({ children }: Props) {
+  const { data: user, isLoading, isError } = useProfile();
+  const router = useRouter();
   const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(true);
+
+  const roleRoutes: Record<string, string> = {
+    admin: "/admin",
+    manager: "/manager",
+    cashier: "/pos",
+  };
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-
-    if (storedUser) {
-      dispatch(setUser(JSON.parse(storedUser)));
-    } else {
-      dispatch(clearUser());
+    if (user) {
+      dispatch(setUser(user));
+      const route = roleRoutes[user.role] || "/user";
+      console.log("REDIRECTING TO:", route);
+      router.replace(route);
     }
 
-    setLoading(false);
-  }, []);
+    if (isError) {
+      dispatch(clearUser());
+      router.replace("/login");
+    }
+  }, [user, isError, router, dispatch]);
 
-  if (loading) {
-    return <SecretCafeLoader message="Checking session..." />;
+  if (isLoading) {
+    return <SecretCafeLoader message="Starting app..." />;
   }
 
-  return null;
+  return <>{children}</>;
 }

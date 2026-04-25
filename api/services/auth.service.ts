@@ -10,4 +10,11 @@ export const logout = () =>
   fetcher("/auth/logout", {
     method: "POST",
   });
- 
+
+export const fetchUserProfile = async () => {
+  const res = await fetcher("/users/profile", {
+    method: "GET",
+  });
+
+  return res.data;
+};

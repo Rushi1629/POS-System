@@ -5,6 +5,7 @@ import QueryProvider from "@/components/QueryProvider";
 import "./globals.css";
 import Providers from "./providers";
 import SecretCafeLoader from "@/components/SecretCafeLoader";
+import AuthInitializer from "@/components/AuthInitializer";
 // import AuthInitializer from "@/components/AuthInitializer";
 
 export const viewport: Viewport = {
@@ -29,10 +30,11 @@ export default function RootLayout({
       <body>
         <Providers>
           <QueryProvider>
-            {/* <AuthInitializer /> */}
-            <Suspense fallback={<SecretCafeLoader message="Starting app..." />}>
-              {children}
-            </Suspense>
+            <AuthInitializer>
+              <Suspense fallback={<SecretCafeLoader message="Starting app..." />}>
+                {children}
+              </Suspense>
+            </AuthInitializer>
           </QueryProvider>
         </Providers>
       </body>

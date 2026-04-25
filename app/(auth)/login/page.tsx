@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Copy, CheckCheck, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
-import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useLogin } from "@/api/hooks/useAuth";
@@ -53,7 +52,7 @@ export default function LoginForm() {
     useEffect(() => {
     if (loginMutation.isSuccess) {
       toast.success("Login successful 🎉");
-      setTimeout(() => router.push("/customer"), 800);
+      setTimeout(() => router.push("/customer"), 800);    
     }
 
     if (loginMutation.isError) {

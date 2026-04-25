@@ -22,7 +22,19 @@ import {
 import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useLogout } from "@/api/hooks/useAuth";
-import { clearUser } from "@/store/user/authSlice";
+import { clearUser } from "@/store/auth/authSlice";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface NavItem {
   id: string;
@@ -111,11 +123,12 @@ export default function Sidebar() {
   const router = useRouter();
   const logoutMutation = useLogout();
   const user = useAppSelector((state) => state.auth.user);
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
-
+      queryClient.clear();
       dispatch(clearUser()); // clear redux
       router.replace("/login"); // redirect
     } catch (error) {
@@ -260,17 +273,42 @@ export default function Sidebar() {
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-stone-200 truncate">
-                  {user?.email || "Manager Account"}
+                  {user?.username || "Manager Account"}
                 </p>
                 <p className="text-xs text-stone-500 truncate">Admin</p>
               </div>
             )}
             {!collapsed && (
-              <button
-                className="text-stone-500 hover:text-red-400 transition-colors"
-              >
-                <LogOut size={14} onClick={handleLogout} />
-              </button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button className="text-stone-500 hover:text-red-400 transition-colors">
+                    <LogOut size={14} />
+                  </button>
+                </AlertDialogTrigger>
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+
+                    <AlertDialogDescription>
+                      Are you sure you want to logout from{" "}
+                      {user?.username || "your account"}?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                    <AlertDialogAction
+                      onClick={handleLogout}
+                      disabled={logoutMutation.isPending}
+                      className="bg-red-500 hover:bg-red-600"
+                    >
+                      {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
         </div>

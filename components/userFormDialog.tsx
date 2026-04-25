@@ -77,7 +77,7 @@ const empty: UserFormValues = {
   email: "",
   password: "",
   phoneNumber: "",
-  role: "Staff",
+  role: "",
 };
 
 export function UserFormDialog({
@@ -208,77 +208,84 @@ export function UserFormDialog({
             </span>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} autoComplete="off">
-            <div className="grid gap-4 px-6 py-5 sm:grid-cols-2">
-              {fields.map((f) => (
-                <div
-                  key={f.key}
-                  className={`space-y-1.5 ${f.full ? "sm:col-span-2" : ""}`}
-                >
+          <form
+            onSubmit={handleSubmit}
+            autoComplete="off"
+            className="flex flex-col h-full max-h-[90vh]"
+          >
+            <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar px-6 py-5">
+              <div className="grid gap-4 sm:grid-cols-2">
+                {fields.map((f) => (
+                  <div
+                    key={f.key}
+                    className={`space-y-1.5 ${f.full ? "sm:col-span-2" : ""}`}
+                  >
+                    <Label
+                      htmlFor={f.key}
+                      className="text-xs font-medium text-foreground"
+                    >
+                      {f.label}
+                    </Label>
+                    <div className="relative">
+                      <f.icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id={f.key}
+                        type={f.type ?? "text"}
+                        placeholder={f.placeholder}
+                        value={values[f.key]}
+                        onChange={(e) => update(f.key, e.target.value)}
+                        autoComplete={
+                          f.key === "password"
+                            ? "new-password"
+                            : f.key === "email"
+                              ? "new-email"
+                              : "off"
+                        }
+                        aria-invalid={!!errors[f.key]}
+                        className="pl-9"
+                      />
+                    </div>
+                    {errors[f.key] && (
+                      <p className="text-xs text-destructive">
+                        {errors[f.key]}
+                      </p>
+                    )}
+                  </div>
+                ))}
+
+                <div className="space-y-1.5 sm:col-span-2">
                   <Label
-                    htmlFor={f.key}
+                    htmlFor="role"
                     className="text-xs font-medium text-foreground"
                   >
-                    {f.label}
+                    Role
                   </Label>
-                  <div className="relative">
-                    <f.icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id={f.key}
-                      type={f.type ?? "text"}
-                      placeholder={f.placeholder}
-                      value={values[f.key]}
-                      onChange={(e) => update(f.key, e.target.value)}
-                      autoComplete={
-                        f.key === "password"
-                          ? "new-password"
-                          : f.key === "email"
-                            ? "new-email"
-                            : "off"
-                      }
-                      aria-invalid={!!errors[f.key]}
-                      className="pl-9"
-                    />
-                  </div>
-                  {errors[f.key] && (
-                    <p className="text-xs text-destructive">{errors[f.key]}</p>
+                  <Select
+                    value={values.role}
+                    onValueChange={(v) => update("role", v as UserRole)}
+                  >
+                    <SelectTrigger id="role" className="w-full">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+                        <SelectValue placeholder="Select Role" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Admin">Admin — full access</SelectItem>
+                      <SelectItem value="Manager">
+                        Manager — operations
+                      </SelectItem>
+                      <SelectItem value="Staff">
+                        Staff — limited access
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.role && (
+                    <p className="text-xs text-destructive">{errors.role}</p>
                   )}
                 </div>
-              ))}
-
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label
-                  htmlFor="role"
-                  className="text-xs font-medium text-foreground"
-                >
-                  Role
-                </Label>
-                <Select
-                  value={values.role}
-                  onValueChange={(v) => update("role", v as UserRole)}
-                >
-                  <SelectTrigger id="role" className="w-full">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-                      <SelectValue />
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Admin">Admin — full access</SelectItem>
-                    <SelectItem value="Manager">
-                      Manager — operations
-                    </SelectItem>
-                    <SelectItem value="Staff">
-                      Staff — limited access
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.role && (
-                  <p className="text-xs text-destructive">{errors.role}</p>
-                )}
               </div>
             </div>
-
             <DialogFooter className="border-t bg-muted/30 px-4 py-2">
               <Button
                 type="button"
