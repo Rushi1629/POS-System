@@ -16,16 +16,17 @@ export default function AuthInitializer({ children }: Props) {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const roleRoutes: Record<string, string> = {
-    admin: "/admin",
-    manager: "/manager",
-    cashier: "/pos",
-  };
+  // const roleRoutes: Record<string, string> = {
+  //   admin: "/admin",
+  //   manager: "/manager",
+  //   cashier: "/pos",
+  // };
 
   useEffect(() => {
     if (user) {
       dispatch(setUser(user));
-      const route = roleRoutes[user.role] || "/user";
+      // const route = roleRoutes[user.role] || "/user";
+      const route = "/user";
       console.log("REDIRECTING TO:", route);
       router.replace(route);
     }
