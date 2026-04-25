@@ -24,7 +24,13 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { UsersTable } from "@/components/UsersTable";
 import { UserFormDialog } from "@/components/userFormDialog";
-import { roleMap, roleReverseMap, type CreateUserPayload, type User, type UserFormValues } from "@/types/types";
+import {
+  roleMap,
+  roleReverseMap,
+  type CreateUserPayload,
+  type User,
+  type UserFormValues,
+} from "@/types/types";
 import { useRouter } from "next/navigation";
 import { createUser } from "@/api/services/user.service";
 
@@ -112,7 +118,6 @@ export default function UsersPage() {
 
   const handleSubmit = async (values: UserFormValues) => {
     try {
-
       const payload = {
         name: values.name,
         username: values.username,
@@ -120,7 +125,7 @@ export default function UsersPage() {
         password: values.password,
         phoneNumber: values.phoneNumber,
         roleId: roleMap[values.role],
-        ...(values.password && { password: values.password }), // ✅ only if exists
+        ...(values.password && { password: values.password }),
       };
 
       await createUser(payload);
