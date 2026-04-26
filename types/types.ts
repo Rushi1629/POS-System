@@ -1,4 +1,25 @@
 "use client";
+import {
+  Loader2,
+  User as UserIcon,
+  Mail,
+  Phone,
+  AtSign,
+  Lock,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  UtensilsCrossed,
+  Table2,
+  CreditCard,
+  Package,
+  BarChart3,
+  Users,
+  Clock,
+} from "lucide-react";
 
 export type CartState = {
   cart: Record<string, number>;
@@ -68,17 +89,74 @@ export const statusBg: Record<string, string> = {
   cleaning: "bg-gradient-to-br from-[#f59f0a]/10 to-transparent",
 };
 
-export type UserRole = "Admin" | "Manager" | "Staff";
+export type UserRole = "Super Admin" | "Admin" | "Chef" | "Waiter" | "Customer";
+
+export interface Role {
+  id: number;
+  name: UserRole;
+  description?: string | null;
+  isActive: boolean;
+}
+
+export interface userProps {
+  users: User[];
+  roles: Role[];
+  onEdit: (user: User) => void;
+  onDelete: (user: User) => void;
+  onCreate?: () => void;
+}
+
+export const roleStyles: Record<UserRole, string> = {
+  "Super Admin":
+    "bg-red-500/10 text-red-700 border border-red-500/30",
+
+  Admin:
+    "bg-blue-500/10 text-blue-700 border border-blue-500/30",
+
+  Chef:
+    "bg-orange-500/10 text-orange-700 border border-orange-500/30",
+
+  Waiter:
+    "bg-purple-500/10 text-purple-700 border border-purple-500/30",
+
+  Customer:
+    "bg-teal-500/10 text-teal-700 border border-teal-500/30",
+};
+
+export type UsersResponse = {
+  status: boolean;
+  message: string;
+  data: User[];
+};
 
 export interface User {
-  id: string;
+  id: number;
   name: string;
   username: string;
   email: string;
   phoneNumber: string;
-  role: UserRole;
-  password?: string;
   createdAt: string;
+  isActive: boolean;
+  role: UserRole;
+}
+
+export const empty: UserFormValues = {
+  name: "",
+  username: "",
+  email: "",
+  password: "",
+  phoneNumber: "",
+  role: "Waiter",
+};
+
+export interface AddUserProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  roles: Role[];
+  mode: "create" | "edit";
+  initialUser?: User | null;
+  loading?: boolean;
+  onSubmit: (values: UserFormValues) => Promise<void> | void;
 }
 
 export interface UserFormValues {
@@ -100,13 +178,143 @@ export interface CreateUserPayload {
 }
 
 export const roleMap: Record<UserRole, number> = {
-  Admin: 1,
-  Manager: 2,
-  Staff: 3,
+  "Super Admin": 1,
+  Admin: 2,
+  Chef: 3,
+  Waiter: 4,
+  Customer: 5,
 };
 
 export const roleReverseMap: Record<number, UserRole> = {
-  1: "Admin",
-  2: "Manager",
-  3: "Staff",
+  1: "Super Admin",
+  2: "Admin",
+  3: "Chef",
+  4: "Waiter",
+  5: "Customer",
 };
+
+export type FieldDef = {
+  key: keyof Omit<UserFormValues, "role">;
+  label: string;
+  type?: string;
+  placeholder: string;
+  icon: React.ComponentType<{ className?: string }>;
+  full?: boolean;
+};
+
+export const fields: FieldDef[] = [
+  {
+    key: "name",
+    label: "Full Name",
+    placeholder: "Jane Doe",
+    icon: UserIcon,
+    full: true,
+  },
+  {
+    key: "username",
+    label: "Username",
+    placeholder: "janedoe",
+    icon: AtSign,
+  },
+  {
+    key: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "jane@cafe.io",
+    icon: Mail,
+  },
+  {
+    key: "phoneNumber",
+    label: "Phone",
+    placeholder: "+1 555 123 4567",
+    icon: Phone,
+  },
+  {
+    key: "password",
+    label: "Password",
+    type: "password",
+    placeholder: "••••••••",
+    icon: Lock,
+  },
+];
+
+// Sidebar navigation items start here
+
+export interface NavItem {
+  id: string;
+  label: string;
+  icon: React.ElementType;
+  href: string;
+  badge?: number;
+  group: string;
+}
+
+export const navItems: NavItem[] = [
+  {
+    id: "nav-dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    href: "/dashboard",
+    group: "Operations",
+  },
+  {
+    id: "nav-orders",
+    label: "Order Management",
+    icon: ShoppingCart,
+    href: "/order-management",
+    badge: 4,
+    group: "Operations",
+  },
+  {
+    id: "nav-menu",
+    label: "Menu",
+    icon: UtensilsCrossed,
+    href: "/dashboard",
+    group: "Operations",
+  },
+  {
+    id: "nav-tables",
+    label: "Tables",
+    icon: Table2,
+    href: "/dashboard",
+    group: "Operations",
+  },
+  {
+    id: "nav-billing",
+    label: "Billing",
+    icon: CreditCard,
+    href: "/dashboard",
+    group: "Finance",
+  },
+  {
+    id: "nav-inventory",
+    label: "Inventory",
+    icon: Package,
+    badge: 3,
+    href: "/dashboard",
+    group: "Finance",
+  },
+  {
+    id: "nav-reports",
+    label: "Reports",
+    icon: BarChart3,
+    href: "/dashboard",
+    group: "Management",
+  },
+  {
+    id: "nav-staff",
+    label: "Staff & Shifts",
+    icon: Users,
+    href: "/dashboard",
+    group: "Management",
+  },
+  {
+    id: "nav-shifts",
+    label: "Shift Log",
+    icon: Clock,
+    href: "/dashboard",
+    group: "Management",
+  },
+];
+
+// Sidebar navigation items end here

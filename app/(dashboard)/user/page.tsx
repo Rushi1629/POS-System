@@ -27,62 +27,65 @@ import { UserFormDialog } from "@/components/userFormDialog";
 import {
   roleMap,
   roleReverseMap,
-  type CreateUserPayload,
   type User,
   type UserFormValues,
 } from "@/types/types";
-import { useRouter } from "next/navigation";
-import { createUser } from "@/api/services/user.service";
+import {
+  useCreateUser,
+  useDeleteUser,
+  useEditUser,
+  useFetchRoles,
+  useFetchUsers,
+} from "@/api/hooks/useUser";
+import ApiLoader from "@/components/ApiLoader";
 
-// const router = useRouter();
+import { isEqual } from "lodash-es";
 
-// router.push("/users");
-
-const seedUsers: User[] = [
-  {
-    id: "1",
-    name: "Ada Lovelace",
-    username: "ada",
-    email: "ada@secretcafe.io",
-    phoneNumber: "+1 555 010 0001",
-    role: roleReverseMap[1],
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
-  },
-  {
-    id: "2",
-    name: "Alan Turing",
-    username: "alan",
-    email: "alan@secretcafe.io",
-    phoneNumber: "+1 555 010 0002",
-    role: roleReverseMap[2],
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12).toISOString(),
-  },
-  {
-    id: "3",
-    name: "Grace Hopper",
-    username: "grace",
-    email: "grace@secretcafe.io",
-    phoneNumber: "+1 555 010 0003",
-    role: roleReverseMap[3],
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(),
-  },
-  {
-    id: "4",
-    name: "Linus Torvalds",
-    username: "linus",
-    email: "linus@secretcafe.io",
-    phoneNumber: "+1 555 010 0004",
-    role: roleReverseMap[3],
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-  },
-];
+// const seedUsers: User[] = [
+//   {
+//     id: "1",
+//     name: "Ada Lovelace",
+//     username: "ada",
+//     email: "ada@secretcafe.io",
+//     phoneNumber: "+1 555 010 0001",
+//     role: roleReverseMap[1],
+//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
+//   },
+//   {
+//     id: "2",
+//     name: "Alan Turing",
+//     username: "alan",
+//     email: "alan@secretcafe.io",
+//     phoneNumber: "+1 555 010 0002",
+//     role: roleReverseMap[2],
+//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12).toISOString(),
+//   },
+//   {
+//     id: "3",
+//     name: "Grace Hopper",
+//     username: "grace",
+//     email: "grace@secretcafe.io",
+//     phoneNumber: "+1 555 010 0003",
+//     role: roleReverseMap[3],
+//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(),
+//   },
+//   {
+//     id: "4",
+//     name: "Linus Torvalds",
+//     username: "linus",
+//     email: "linus@secretcafe.io",
+//     phoneNumber: "+1 555 010 0004",
+//     role: roleReverseMap[3],
+//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
+//   },
+// ];
 
 function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>(seedUsers);
+  // const [users, setUsers] = useState<User[]>(seedUsers);
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [editing, setEditing] = useState<User | null>(null);
@@ -90,14 +93,28 @@ export default function UsersPage() {
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const { mutateAsync: createUserMutation } = useCreateUser();
+
+  const { data: users = [], isLoading, error } = useFetchUsers();
+
+  const { data: roles = [] } = useFetchRoles();
+
+  const { mutate: deleteUser } = useDeleteUser();
+
+  const { mutateAsync: editUser } = useEditUser();
+
   const stats = useMemo(() => {
     const admins = users.filter((u) => u.role === "Admin").length;
+
     const recent = users.filter(
       (u) =>
         Date.now() - new Date(u.createdAt).getTime() < 1000 * 60 * 60 * 24 * 7,
     ).length;
+
     return { total: users.length, admins, recent };
   }, [users]);
+
+  // console.log(users, "users in page");
 
   const openCreate = () => {
     setFormMode("create");
@@ -116,20 +133,32 @@ export default function UsersPage() {
     setLoadingForm(false);
   };
 
-  const handleSubmit = async (values: UserFormValues) => {
+    if (isLoading) {
+      return <ApiLoader message="Loading users..." />;
+    }
+
+  const handleCreate = async (values: UserFormValues) => {
+    debugger;
     try {
+      const role = roles.find((r) => r.name === values.role);
+
+      if (!role) {
+        toast.error("Invalid role selected");
+        return;
+      }
       const payload = {
         name: values.name,
         username: values.username,
         email: values.email,
         password: values.password,
         phoneNumber: values.phoneNumber,
-        roleId: roleMap[values.role],
+        roleId: role.id,
         ...(values.password && { password: values.password }),
       };
 
-      await createUser(payload);
-      toast.success("User created successfully");
+      await createUserMutation(payload);
+
+      toast.success("User created successfully - welcome to the team! 🎉");
       setFormOpen(false);
     } catch (err) {
       toast.error("Failed to create user");
@@ -138,12 +167,70 @@ export default function UsersPage() {
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
+
     setDeleting(true);
-    await delay(400);
-    setUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id));
-    toast.success(`Deleted ${deleteTarget.name}`);
-    setDeleting(false);
-    setDeleteTarget(null);
+
+    try {
+      await deleteUser(deleteTarget.id);
+
+      toast.success("User deleted successfully - goodbye! 👋");
+      setDeleteTarget(null);
+    } catch (err) {
+      toast.error("Failed to delete user");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleEditSubmit = async (values: UserFormValues) => {
+    try {
+      if (!editing) return;
+
+      const role = roles.find((r) => r.name === values.role);
+
+      if (!role) {
+        toast.error("Invalid role selected");
+        return;
+      }
+
+      // 🔥 CHECK IF ANYTHING CHANGED
+      const isSame = isEqual(editing, {
+        ...values,
+        roleId: role.id,
+      });
+
+      if (isSame) {
+        toast.info("No changes detected - nothing to update 🤔");
+        setFormOpen(false);
+        return; // 🚫 STOP API CALL
+      }
+
+      const payload = {
+        name: values.name,
+        username: values.username,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        roleId: role.id,
+      };
+
+      await editUser({
+        id: editing.id,
+        data: payload,
+      });
+
+      toast.success("User updated successfully - welcome back! 🎉");
+      setFormOpen(false);
+    } catch (err) {
+      toast.error("Failed to update user");
+    }
+  };
+
+  const handleSubmit = async (values: UserFormValues) => {
+    if (formMode === "create") {
+      await handleCreate(values);
+    } else {
+      await handleEditSubmit(values);
+    }
   };
 
   const statCards = [
@@ -215,6 +302,7 @@ export default function UsersPage() {
           <CardContent className="p-0">
             <UsersTable
               users={users}
+              roles={roles}
               onEdit={openEdit}
               onDelete={(u) => setDeleteTarget(u)}
               onCreate={openCreate}
@@ -225,9 +313,10 @@ export default function UsersPage() {
 
       <UserFormDialog
         open={formOpen}
-        onOpenChange={(o) => {
+        onOpenChange={(o: any) => {
           if (!loadingForm) setFormOpen(o);
         }}
+        roles={roles}
         mode={formMode}
         initialUser={editing}
         loading={loadingForm}
@@ -254,10 +343,10 @@ export default function UsersPage() {
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
-                confirmDelete();
+                confirmDelete(); // 👈 HERE
               }}
               disabled={deleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-white hover:bg-destructive/90"
             >
               {deleting && <Loader2 className="h-4 w-4 animate-spin" />}
               Delete

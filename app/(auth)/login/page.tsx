@@ -84,7 +84,6 @@ export default function LoginForm() {
       )}
 
       <div className="min-h-screen bg-[#0f0d0b] flex items-center justify-center relative overflow-hidden px-4 py-10">
-        <Toaster position="top-right" richColors />
 
         {/* Animated background blobs */}
         <div className="absolute inset-0 pointer-events-none">

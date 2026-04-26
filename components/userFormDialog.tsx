@@ -20,14 +20,15 @@ import {
 } from "@/components/ui/select";
 import {
   Loader2,
-  User as UserIcon,
-  Mail,
-  Phone,
-  AtSign,
-  Lock,
   ShieldCheck,
 } from "lucide-react";
-import type { User, UserFormValues, UserRole } from "@/types/types";
+import {
+  AddUserProps,
+  UserFormValues,
+  UserRole,
+  empty,
+} from "@/types/types";
+import { getUserFields } from "@/types/user/config/userFields";
 
 const baseSchema = {
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -42,7 +43,7 @@ const baseSchema = {
     .string()
     .trim()
     .regex(/^\+?[0-9\s-]{7,20}$/, "Invalid phone number"),
-  role: z.enum(["Admin", "Manager", "Staff"]),
+  role: z.enum(["Super Admin", "Admin", "Chef", "Waiter", "Customer"])
 };
 
 const createSchema = z.object({
@@ -62,32 +63,15 @@ const editSchema = z.object({
     ),
 });
 
-interface Props {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  mode: "create" | "edit";
-  initialUser?: User | null;
-  loading?: boolean;
-  onSubmit: (values: UserFormValues) => Promise<void> | void;
-}
-
-const empty: UserFormValues = {
-  name: "",
-  username: "",
-  email: "",
-  password: "",
-  phoneNumber: "",
-  role: "",
-};
-
 export function UserFormDialog({
   open,
   onOpenChange,
   mode,
+  roles,
   initialUser,
   loading,
   onSubmit,
-}: Props) {
+}: AddUserProps) {
   const [values, setValues] = useState<UserFormValues>(empty);
   const [errors, setErrors] = useState<
     Partial<Record<keyof UserFormValues, string>>
@@ -141,51 +125,6 @@ export function UserFormDialog({
 
   const isLoadingFetch = mode === "edit" && loading && !initialUser;
 
-  type FieldDef = {
-    key: keyof Omit<UserFormValues, "role">;
-    label: string;
-    type?: string;
-    placeholder: string;
-    icon: React.ComponentType<{ className?: string }>;
-    full?: boolean;
-  };
-
-  const fields: FieldDef[] = [
-    {
-      key: "name",
-      label: "Full Name",
-      placeholder: "Jane Doe",
-      icon: UserIcon,
-      full: true,
-    },
-    {
-      key: "username",
-      label: "Username",
-      placeholder: "janedoe",
-      icon: AtSign,
-    },
-    {
-      key: "email",
-      label: "Email",
-      type: "email",
-      placeholder: "jane@cafe.io",
-      icon: Mail,
-    },
-    {
-      key: "phoneNumber",
-      label: "Phone",
-      placeholder: "+1 555 123 4567",
-      icon: Phone,
-    },
-    {
-      key: "password",
-      label: mode === "edit" ? "Password (leave blank to keep)" : "Password",
-      type: "password",
-      placeholder: "••••••••",
-      icon: Lock,
-    },
-  ];
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px] p-0 overflow-hidden">
@@ -215,7 +154,7 @@ export function UserFormDialog({
           >
             <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar px-6 py-5">
               <div className="grid gap-4 sm:grid-cols-2">
-                {fields.map((f) => (
+                {getUserFields(mode).map((f) => (
                   <div
                     key={f.key}
                     className={`space-y-1.5 ${f.full ? "sm:col-span-2" : ""}`}
@@ -261,6 +200,7 @@ export function UserFormDialog({
                     Role
                   </Label>
                   <Select
+                    disabled={mode === "edit"}
                     value={values.role}
                     onValueChange={(v) => update("role", v as UserRole)}
                   >
@@ -271,13 +211,12 @@ export function UserFormDialog({
                       </div>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Admin">Admin — full access</SelectItem>
-                      <SelectItem value="Manager">
-                        Manager — operations
-                      </SelectItem>
-                      <SelectItem value="Staff">
-                        Staff — limited access
-                      </SelectItem>
+                      <SelectItem value="all">All roles</SelectItem>
+                      {roles.map((role: any) => (
+                        <SelectItem key={role.id} value={role.name}>
+                          {role.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   {errors.role && (

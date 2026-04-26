@@ -46,24 +46,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { User, UserRole } from "@/types/types";
+import { roleStyles, userProps, type User, type UserRole } from "@/types/types";
 
-interface Props {
-  users: User[];
-  onEdit: (user: User) => void;
-  onDelete: (user: User) => void;
-  onCreate?: () => void;
-}
+function initials(name?: string) {
+  if (!name) return "NA"; // fallback
 
-const roleStyles: Record<UserRole, string> = {
-  Admin:
-    "bg-amber-500/10 text-amber-700 border-amber-500/20 dark:text-amber-400",
-  Manager: "bg-blue-500/10 text-blue-700 border-blue-500/20 dark:text-blue-400",
-  Staff:
-    "bg-emerald-500/10 text-emerald-700 border-emerald-500/20 dark:text-emerald-400",
-};
-
-function initials(name: string) {
   return name
     .split(" ")
     .map((p) => p[0])
@@ -81,7 +68,7 @@ function formatDate(iso: string) {
   });
 }
 
-export function UsersTable({ users, onEdit, onDelete }: Props) {
+export function UsersTable({ users, onEdit, onDelete, roles }: userProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [filter, setFilter] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
@@ -149,7 +136,7 @@ export function UsersTable({ users, onEdit, onDelete }: Props) {
         cell: ({ row }) => (
           <Badge
             variant="outline"
-            className={`font-medium ${roleStyles[row.original.role]}`}
+            className={`rounded-full ${roleStyles[row.original.role]}`}
           >
             {row.original.role}
           </Badge>
@@ -258,15 +245,21 @@ export function UsersTable({ users, onEdit, onDelete }: Props) {
             className="pl-9"
           />
         </div>
-        <Select value={roleFilter} onValueChange={setRoleFilter}>
+        <Select
+          value={roleFilter}
+          onValueChange={(value) => setRoleFilter(value)}
+        >
           <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Filter by role" />
           </SelectTrigger>
+
           <SelectContent>
-            <SelectItem className="focus:bg-[#fe9a00]-500\/10 focus:text-[#bb4d00]" value="all">All roles</SelectItem>
-            <SelectItem className="focus:bg-[#fe9a00]-500\/10 focus:text-[#bb4d00]" value="Admin">Admin</SelectItem>
-            <SelectItem className="focus:bg-[#fe9a00]-500\/10 focus:text-[#bb4d00]" value="Manager">Manager</SelectItem>
-            <SelectItem className="focus:bg-[#fe9a00]-500\/10 focus:text-[#bb4d00]" value="Staff">Staff</SelectItem>
+            <SelectItem value="all">All roles</SelectItem>
+            {roles.map((role) => (
+              <SelectItem key={role.id} value={role.name}>
+                {role.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

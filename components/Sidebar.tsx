@@ -4,15 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard,
-  ShoppingCart,
-  UtensilsCrossed,
-  Table2,
-  CreditCard,
-  Package,
-  BarChart3,
-  Users,
-  Clock,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -35,83 +26,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { useQueryClient } from "@tanstack/react-query";
-
-interface NavItem {
-  id: string;
-  label: string;
-  icon: React.ElementType;
-  href: string;
-  badge?: number;
-  group: string;
-}
-
-const navItems: NavItem[] = [
-  {
-    id: "nav-dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    href: "/dashboard",
-    group: "Operations",
-  },
-  {
-    id: "nav-orders",
-    label: "Order Management",
-    icon: ShoppingCart,
-    href: "/order-management",
-    badge: 4,
-    group: "Operations",
-  },
-  {
-    id: "nav-menu",
-    label: "Menu",
-    icon: UtensilsCrossed,
-    href: "/dashboard",
-    group: "Operations",
-  },
-  {
-    id: "nav-tables",
-    label: "Tables",
-    icon: Table2,
-    href: "/dashboard",
-    group: "Operations",
-  },
-  {
-    id: "nav-billing",
-    label: "Billing",
-    icon: CreditCard,
-    href: "/dashboard",
-    group: "Finance",
-  },
-  {
-    id: "nav-inventory",
-    label: "Inventory",
-    icon: Package,
-    badge: 3,
-    href: "/dashboard",
-    group: "Finance",
-  },
-  {
-    id: "nav-reports",
-    label: "Reports",
-    icon: BarChart3,
-    href: "/dashboard",
-    group: "Management",
-  },
-  {
-    id: "nav-staff",
-    label: "Staff & Shifts",
-    icon: Users,
-    href: "/dashboard",
-    group: "Management",
-  },
-  {
-    id: "nav-shifts",
-    label: "Shift Log",
-    icon: Clock,
-    href: "/dashboard",
-    group: "Management",
-  },
-];
+import { navItems } from "@/types/types";
 
 const groups = ["Operations", "Finance", "Management"];
 

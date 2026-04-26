@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAppDispatch } from "@/store/hooks";
 import { setUser, clearUser } from "@/store/auth/authSlice";
+import ApiLoader from "./ApiLoader";
 
 type Props = {
   children: React.ReactNode;
@@ -38,7 +39,7 @@ export default function AuthInitializer({ children }: Props) {
   }, [user, isError, router, dispatch]);
 
   if (isLoading) {
-    return <SecretCafeLoader message="Starting app..." />;
+    return <ApiLoader message="Loading users..." />;
   }
 
   return <>{children}</>;
