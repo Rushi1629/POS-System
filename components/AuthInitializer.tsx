@@ -2,7 +2,7 @@
 
 import { useProfile } from "@/api/hooks/useAuth";
 import SecretCafeLoader from "./SecretCafeLoader";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAppDispatch } from "@/store/hooks";
 import { setUser, clearUser } from "@/store/auth/authSlice";
@@ -16,21 +16,15 @@ export default function AuthInitializer({ children }: Props) {
   const { data: user, isLoading, isError } = useProfile();
   const router = useRouter();
   const dispatch = useAppDispatch();
-
-  // const roleRoutes: Record<string, string> = {
-  //   admin: "/admin",
-  //   manager: "/manager",
-  //   cashier: "/pos",
-  // };
+  const pathname = usePathname();
 
   useEffect(() => {
     if (user) {
       dispatch(setUser(user));
-      // console.log("User authenticated:", user);
-      // const route = roleRoutes[user.role] || "/user";
-      const route = "/user";
-      // console.log("REDIRECTING TO:", route);
-      router.replace(route);
+      
+      if (pathname === "/login") {
+        router.replace("/user");
+      }
     }
 
     if (isError) {

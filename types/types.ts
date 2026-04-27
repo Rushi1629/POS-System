@@ -1,14 +1,4 @@
 "use client";
-import {
-  Loader2,
-  User as UserIcon,
-  Mail,
-  Phone,
-  AtSign,
-  Lock,
-  ShieldCheck,
-  User2,
-} from "lucide-react";
 
 import {
   LayoutDashboard,
@@ -20,6 +10,12 @@ import {
   BarChart3,
   Users,
   Clock,
+  User as UserIcon,
+  Mail,
+  Phone,
+  AtSign,
+  Lock,
+  User2,
 } from "lucide-react";
 
 export type CartState = {
@@ -256,11 +252,10 @@ export const navItems: NavItem[] = [
     roles: ["Super Admin"],
   },
   {
-    id: "nav-orders",
-    label: "Order Management",
-    icon: ShoppingCart,
-    href: "/order-management",
-    badge: 4,
+    id: "nav-category",
+    label: "Category",
+    icon: Package,
+    href: "/category",
     group: "Operations",
     roles: ["Super Admin", "Admin"],
   },
