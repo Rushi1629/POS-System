@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { useLogout } from "@/api/hooks/useAuth";
+import { useLogout, useProfile } from "@/api/hooks/useAuth";
 import { clearUser } from "@/store/auth/authSlice";
 import {
   AlertDialog,
@@ -37,8 +37,9 @@ export default function Sidebar() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const logoutMutation = useLogout();
-  const user = useAppSelector((state) => state.auth.user);
+  // const user = useAppSelector((state) => state.auth.user);
   const queryClient = useQueryClient();
+  const { data: user, isLoading, isError } = useProfile();
 
   const handleLogout = async () => {
     try {
@@ -49,6 +50,30 @@ export default function Sidebar() {
     } catch (error) {
       console.error("Logout failed");
     }
+  };
+
+  // console.log("Current user in sidebar:", user);
+
+  const ROLE_PRIORITY: Record<string, number> = {
+    superadmin: 5,
+    admin: 4,
+    chef: 3,
+    waiter: 2,
+    customer: 1,
+  };
+
+  const normalizeRole = (role?: unknown) => {
+    if (typeof role !== "string") return undefined;
+    return role.toLowerCase().replace(/\s+/g, "");
+  };
+
+  const role = normalizeRole(user?.role?.name);
+  console.log("Normalized user role:", role);
+
+  const hasAccess = (allowedRoles: string[]) => {
+    if (!role) return false;
+
+    return allowedRoles.map((r) => normalizeRole(r)).includes(role);
   };
 
   return (
@@ -95,7 +120,10 @@ export default function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 px-2 py-3 overflow-y-auto custom-scrollbar">
           {groups.map((group) => {
-            const items = navItems.filter((n) => n.group === group);
+            // const items = navItems.filter((n) => n.group === group);
+            const items = navItems.filter(
+              (n) => n.group === group && hasAccess(n.roles),
+            );
             return (
               <div key={`group-${group}`} className="mb-4">
                 {!collapsed && (

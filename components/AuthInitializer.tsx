@@ -26,9 +26,10 @@ export default function AuthInitializer({ children }: Props) {
   useEffect(() => {
     if (user) {
       dispatch(setUser(user));
+      // console.log("User authenticated:", user);
       // const route = roleRoutes[user.role] || "/user";
       const route = "/user";
-      console.log("REDIRECTING TO:", route);
+      // console.log("REDIRECTING TO:", route);
       router.replace(route);
     }
 

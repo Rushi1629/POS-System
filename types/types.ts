@@ -7,6 +7,7 @@ import {
   AtSign,
   Lock,
   ShieldCheck,
+  User2,
 } from "lucide-react";
 
 import {
@@ -107,20 +108,15 @@ export interface userProps {
 }
 
 export const roleStyles: Record<UserRole, string> = {
-  "Super Admin":
-    "bg-red-500/10 text-red-700 border border-red-500/30",
+  "Super Admin": "bg-red-500/10 text-red-700 border border-red-500/30",
 
-  Admin:
-    "bg-blue-500/10 text-blue-700 border border-blue-500/30",
+  Admin: "bg-blue-500/10 text-blue-700 border border-blue-500/30",
 
-  Chef:
-    "bg-orange-500/10 text-orange-700 border border-orange-500/30",
+  Chef: "bg-orange-500/10 text-orange-700 border border-orange-500/30",
 
-  Waiter:
-    "bg-purple-500/10 text-purple-700 border border-purple-500/30",
+  Waiter: "bg-purple-500/10 text-purple-700 border border-purple-500/30",
 
-  Customer:
-    "bg-teal-500/10 text-teal-700 border border-teal-500/30",
+  Customer: "bg-teal-500/10 text-teal-700 border border-teal-500/30",
 };
 
 export type UsersResponse = {
@@ -247,6 +243,7 @@ export interface NavItem {
   href: string;
   badge?: number;
   group: string;
+  roles: UserRole[];
 }
 
 export const navItems: NavItem[] = [
@@ -256,6 +253,7 @@ export const navItems: NavItem[] = [
     icon: LayoutDashboard,
     href: "/dashboard",
     group: "Operations",
+    roles: ["Super Admin"],
   },
   {
     id: "nav-orders",
@@ -264,49 +262,64 @@ export const navItems: NavItem[] = [
     href: "/order-management",
     badge: 4,
     group: "Operations",
+    roles: ["Super Admin", "Admin"],
   },
   {
     id: "nav-menu",
     label: "Menu",
     icon: UtensilsCrossed,
-    href: "/dashboard",
+    href: "/menu",
     group: "Operations",
+    roles: ["Super Admin"],
+  },
+  {
+    id: "customer-menu",
+    label: "Customer",
+    icon: User2,
+    href: "/customer",
+    group: "Operations",
+    roles: ["Super Admin"],
   },
   {
     id: "nav-tables",
     label: "Tables",
     icon: Table2,
-    href: "/dashboard",
+    href: "/tables",
     group: "Operations",
+    roles: ["Super Admin"],
   },
   {
     id: "nav-billing",
     label: "Billing",
     icon: CreditCard,
-    href: "/dashboard",
+    href: "/billing",
     group: "Finance",
+    roles: ["Super Admin"],
   },
   {
     id: "nav-inventory",
     label: "Inventory",
     icon: Package,
     badge: 3,
-    href: "/dashboard",
+    href: "/inventory",
     group: "Finance",
+    roles: ["Super Admin"],
   },
   {
     id: "nav-reports",
     label: "Reports",
     icon: BarChart3,
-    href: "/dashboard",
+    href: "/reports",
     group: "Management",
+    roles: ["Super Admin"],
   },
   {
     id: "nav-staff",
-    label: "Staff & Shifts",
+    label: "User Management",
     icon: Users,
-    href: "/dashboard",
+    href: "/user",
     group: "Management",
+    roles: ["Super Admin"],
   },
   {
     id: "nav-shifts",
@@ -314,6 +327,7 @@ export const navItems: NavItem[] = [
     icon: Clock,
     href: "/dashboard",
     group: "Management",
+    roles: ["Super Admin"],
   },
 ];
 
