@@ -230,6 +230,39 @@ export const fields: FieldDef[] = [
   },
 ];
 
+export type Category = {
+  id: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+  imageUrl?: string;
+  createdAt: number;
+};
+
+export type CategoryDialogProps = {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  initial: Category | null;
+  onSave: (data: FormData) => Promise<void>; // ✅ better
+  loading?: boolean; // ✅ ADD THIS
+};
+
+export interface CreateCategoryPayload{
+  name: string;
+  description: string;
+  isActive: boolean;
+  imageUrl?: string;
+}
+
+export interface FetchCategoriesResponse {
+  id: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+  imageUrl?: string;
+  createdAt: number;
+}
+
 // Sidebar navigation items start here
 
 export interface NavItem {

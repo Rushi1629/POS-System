@@ -269,7 +269,7 @@ export default function UsersPage() {
           <Button
             onClick={openCreate}
             size="lg"
-            className="shadow-sm px-8 bg-[#e25f28] hover:bg-[#e25f28]/90 text-white"
+            className="shadow-sm px-8 bg-[#f77f00] hover:bg-[#f77f00]/90 text-white"
           >
             <UserPlus className="h-4 w-4" />
             New User

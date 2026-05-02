@@ -4,11 +4,12 @@ export const fetcher = async (
   endpoint: string,
   options: RequestInit = {}
 ) => {
+  const isFormData = options.body instanceof FormData;
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     credentials: "include", // ✅ cookie auth
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...options.headers,
     },
   });

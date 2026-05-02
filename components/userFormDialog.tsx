@@ -127,7 +127,7 @@ export function UserFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[560px] p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[560px] p-0 overflow-hidden max-h-[85vh] flex flex-col">
         <DialogHeader className="border-b bg-muted/30 px-6 py-5">
           <DialogTitle className="text-lg">
             {mode === "create" ? "Create New User" : "Edit User"}
@@ -150,7 +150,7 @@ export function UserFormDialog({
           <form
             onSubmit={handleSubmit}
             autoComplete="off"
-            className="flex flex-col h-full max-h-[90vh]"
+            className="flex flex-col flex-1 min-h-0"
           >
             <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar px-6 py-5">
               <div className="grid gap-4 sm:grid-cols-2">

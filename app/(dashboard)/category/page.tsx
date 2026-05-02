@@ -1,17 +1,26 @@
 "use client";
-
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Plus,
-  Users as UsersIcon,
-  Loader2,
-  UserPlus,
-  ShieldCheck,
-  UserCheck,
-  Package,
+  Pencil,
+  Trash2,
+  Search,
+  ImagePlus,
+  LayoutGrid,
+  List as ListIcon,
+  CheckCircle2,
+  XCircle,
+  Tags,
+  MoreHorizontal,
+  ChevronsRight,
+  ChevronRight,
+  ChevronLeft,
+  ChevronsLeft,
 } from "lucide-react";
-import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,295 +31,529 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Card, CardContent } from "@/components/ui/card";
-import { UsersTable } from "@/components/UsersTable";
-import { UserFormDialog } from "@/components/userFormDialog";
 import {
-  roleMap,
-  roleReverseMap,
-  type User,
-  type UserFormValues,
-} from "@/types/types";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
-  useCreateUser,
-  useDeleteUser,
-  useEditUser,
-  useFetchRoles,
-  useFetchUsers,
-} from "@/api/hooks/useUser";
-import ApiLoader from "@/components/ApiLoader";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import { Category } from "@/types/types";
+import StatusPill from "@/components/StatusPill";
+import CategoryDialog from "@/components/categoryDialog";
+import StatCard from "@/components/StatCard";
+import CategoryCard from "@/components/CategoryCard";
+import Thumb from "@/components/Thumb";
+import {
+  useCreateCategory,
+  useDeleteCategory,
+  useEditCategory,
+  useFetchCategories,
+} from "@/api/hooks/useCategory";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  PaginationState,
+  useReactTable,
+} from "@tanstack/react-table";
 
-import { isEqual } from "lodash-es";
+function CategoriesPage() {
+  const [search, setSearch] = useState("");
+  const [view, setView] = useState<"grid" | "table">("table");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "active" | "inactive"
+  >("all");
 
-function delay(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
-}
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<Category | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5,
+  });
 
-export default function categoryPage() {
-  const [formOpen, setFormOpen] = useState(false);
-  const [formMode, setFormMode] = useState<"create" | "edit">("create");
-  const [editing, setEditing] = useState<User | null>(null);
-  const [loadingForm, setLoadingForm] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const { data: categories = [], isLoading, error } = useFetchCategories();
 
-  const { mutateAsync: createUserMutation } = useCreateUser();
+  console.log(categories);
 
-  const { data: users = [], isLoading, error } = useFetchUsers();
+  useEffect(() => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0,
+    }));
+  }, [search, statusFilter]);
 
-  const { data: roles = [] } = useFetchRoles();
+  // const { mutateAsync: createCategory } = useCreateCategory();
+  const { mutateAsync: createCategory, isPending: isCreating } =
+    useCreateCategory();
 
-  const { mutate: deleteUser } = useDeleteUser();
+  // const { mutateAsync: updateCategory } = useEditCategory();
+  const { mutateAsync: updateCategory, isPending: isUpdating } =
+    useEditCategory();
 
-  const { mutateAsync: editUser } = useEditUser();
+  // const { mutateAsync: deleteCategory } = useDeleteCategory();
+  const { mutateAsync: deleteCategory, isPending: isDeleting } =
+    useDeleteCategory();
 
-  const stats = useMemo(() => {
-    const admins = users.filter((u) => u.role === "Admin").length;
+  const openEdit = useCallback((cat: Category) => {
+    setEditing(cat);
+    setDialogOpen(true);
+  }, []);
 
-    const recent = users.filter(
-      (u) =>
-        Date.now() - new Date(u.createdAt).getTime() < 1000 * 60 * 60 * 24 * 7,
-    ).length;
+  const filtered = useMemo(() => {
+    return categories
+      .filter((c) =>
+        statusFilter === "all"
+          ? true
+          : statusFilter === "active"
+            ? c.isActive
+            : !c.isActive,
+      )
+      .filter(
+        (c) =>
+          c.name?.toLowerCase().includes(search.toLowerCase()) ||
+          c.description?.toLowerCase().includes(search.toLowerCase()),
+      )
+      .sort((a, b) => b.createdAt - a.createdAt);
+  }, [categories, search, statusFilter]);
 
-    return { total: users.length, admins, recent };
-  }, [users]);
+  const stats = useMemo(
+    () => ({
+      total: categories.length,
+      active: categories.filter((c) => c.isActive).length,
+      inactive: categories.filter((c) => !c.isActive).length,
+    }),
+    [categories],
+  );
 
-  // console.log(users, "users in page");
+  const columns = useMemo<ColumnDef<Category>[]>(
+    () => [
+      {
+        id: "image",
+        header: "Image",
+        cell: ({ row }) => (
+          <Thumb src={row.original.imageUrl} name={row.original.name} />
+        ),
+      },
+      {
+        accessorKey: "name",
+        header: "Category",
+        cell: ({ row }) => (
+          <span className="font-semibold text-foreground">
+            {row.original.name}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "description",
+        header: "Description",
+        cell: ({ row }) => (
+          <span className="block max-w-md truncate text-sm text-muted-foreground">
+            {row.original.description || "—"}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "isActive",
+        header: "Status",
+        cell: ({ row }) => <StatusPill active={row.original.isActive} />,
+      },
+      {
+        id: "actions",
+        header: () => <div className="text-right">Actions</div>,
+        cell: ({ row }) => (
+          <div className="flex justify-end gap-1">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => openEdit(row.original)}
+              aria-label="Edit"
+              className="h-9 w-9"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => setDeleteTarget(row.original)}
+              aria-label="Delete"
+              className="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-label="More"
+              className="h-9 w-9"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    [openEdit, setDeleteTarget],
+  );
 
-  const openCreate = () => {
-    setFormMode("create");
+  const table = useReactTable({
+    data: filtered,
+    columns,
+    state: { pagination },
+    onPaginationChange: setPagination,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    autoResetPageIndex: true,
+  });
+
+  const pageCount = table.getPageCount();
+  const pageIndex = table.getState().pagination.pageIndex;
+  const pageSize = table.getState().pagination.pageSize;
+  const startIndex = pageIndex * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, filtered.length);
+
+  function openCreate() {
     setEditing(null);
-    setFormOpen(true);
-  };
-
-  const openEdit = async (user: User) => {
-    setFormMode("edit");
-    setEditing(null);
-    setFormOpen(true);
-    setLoadingForm(true);
-    await delay(400);
-    const fresh = users.find((u) => u.id === user.id) ?? user;
-    setEditing(fresh);
-    setLoadingForm(false);
-  };
-
-  if (isLoading) {
-    return <ApiLoader message="Loading users..." />;
+    setDialogOpen(true);
   }
 
-  const handleCreate = async (values: UserFormValues) => {
-    debugger;
+  async function handleSave(data: FormData) {
     try {
-      const role = roles.find((r) => r.name === values.role);
-
-      if (!role) {
-        toast.error("Invalid role selected");
-        return;
+      if (editing) {
+        await updateCategory({
+          id: editing.id,
+          data,
+        });
+        toast.success("Category updated");
+      } else {
+        await createCategory(data);
+        toast.success("Category created");
       }
-      const payload = {
-        name: values.name,
-        username: values.username,
-        email: values.email,
-        password: values.password,
-        phoneNumber: values.phoneNumber,
-        roleId: role.id,
-        ...(values.password && { password: values.password }),
-      };
 
-      await createUserMutation(payload);
-
-      toast.success("User created successfully - welcome to the team! 🎉");
-      setFormOpen(false);
+      setDialogOpen(false);
+      setEditing(null);
     } catch (err) {
-      toast.error("Failed to create user");
+      toast.error("Something went wrong");
     }
-  };
+  }
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
 
-    setDeleting(true);
-
     try {
-      await deleteUser(deleteTarget.id);
+      await deleteCategory(deleteTarget.id);
 
-      toast.success("User deleted successfully - goodbye! 👋");
+      toast.success("Category deleted successfully 👋");
       setDeleteTarget(null);
     } catch (err) {
-      toast.error("Failed to delete user");
-    } finally {
-      setDeleting(false);
+      toast.error("Failed to delete category");
     }
   };
-
-  const handleEditSubmit = async (values: UserFormValues) => {
-    try {
-      if (!editing) return;
-
-      const role = roles.find((r) => r.name === values.role);
-
-      if (!role) {
-        toast.error("Invalid role selected");
-        return;
-      }
-
-      // 🔥 CHECK IF ANYTHING CHANGED
-      const isSame = isEqual(editing, {
-        ...values,
-        roleId: role.id,
-      });
-
-      if (isSame) {
-        toast.info("No changes detected - nothing to update 🤔");
-        setFormOpen(false);
-        return; // 🚫 STOP API CALL
-      }
-
-      const payload = {
-        name: values.name,
-        username: values.username,
-        email: values.email,
-        phoneNumber: values.phoneNumber,
-        roleId: role.id,
-      };
-
-      await editUser({
-        id: editing.id,
-        data: payload,
-      });
-
-      toast.success("User updated successfully - welcome back! 🎉");
-      setFormOpen(false);
-    } catch (err) {
-      toast.error("Failed to update user");
-    }
-  };
-
-  const handleSubmit = async (values: UserFormValues) => {
-    if (formMode === "create") {
-      await handleCreate(values);
-    } else {
-      await handleEditSubmit(values);
-    }
-  };
-
-  const statCards = [
-    {
-      label: "Total Categories",
-      value: stats.total,
-      icon: Package,
-      tint: "bg-[#cd4805]/10 text-[#cd4805]",
-    },
-    {
-      label: "Active Categories",
-      value: stats.active,
-      icon: ShieldCheck,
-      tint: "bg-emerald-500/10 text-emerald-600",
-    },
-    {
-      label: "New Categories",
-      value: stats.recent,
-      icon: UserCheck,
-      tint: "bg-blue-500/10 text-blue-600",
-    },
-  ];
 
   return (
-    <div>
-      <div className="mx-auto max-w-7xl space-y-6">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              Category Management
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Create, edit and manage cafe categories and their properties.
-            </p>
-          </div>
-          <Button
-            onClick={openCreate}
-            size="lg"
-            className="shadow-sm px-8 bg-[#e25f28] hover:bg-[#e25f28]/90 text-white"
-          >
-            <Package className="h-4 w-4" />
-            New Category
-          </Button>
-        </header>
-
-        <div className="grid gap-4 sm:grid-cols-3">
-          {statCards.map((s) => (
-            <Card key={s.label} className="border-border/60 shadow-sm">
-              <CardContent className="flex items-center justify-between p-5">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    {s.label}
-                  </p>
-                  <p className="mt-1 text-3xl font-semibold tracking-tight text-foreground">
-                    {s.value}
-                  </p>
-                </div>
-                <div
-                  className={`flex h-11 w-11 items-center justify-center rounded-xl ${s.tint}`}
-                >
-                  <s.icon className="h-5 w-5" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+    <div className="">
+      {/* Title row */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            Category Management
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Create, edit and organize your cafe menu categories.
+          </p>
         </div>
-
-        <Card className="border-border/60 shadow-sm p-0">
-          <CardContent className="p-0">
-            <UsersTable
-              users={users}
-              roles={roles}
-              onEdit={openEdit}
-              onDelete={(u) => setDeleteTarget(u)}
-              onCreate={openCreate}
-            />
-          </CardContent>
-        </Card>
+        <Button
+          size="lg"
+          onClick={openCreate}
+          className="gap-2 px-8 rounded-md bg-[#f77f00] hover:bg-[#f77f00]/90 text-white"
+        >
+          <Plus className="h-4 w-4" />
+          New Category
+        </Button>
       </div>
 
-      <UserFormDialog
-        open={formOpen}
-        onOpenChange={(o: any) => {
-          if (!loadingForm) setFormOpen(o);
-        }}
-        roles={roles}
-        mode={formMode}
-        initialUser={editing}
-        loading={loadingForm}
-        onSubmit={handleSubmit}
-      />
+      {/* Stats */}
+      <div className="mt-7 grid grid-cols-1 gap-5 md:grid-cols-3">
+        <StatCard
+          label="TOTAL CATEGORIES"
+          value={stats.total}
+          icon={<Tags className="h-5 w-5" />}
+          tint="primary"
+        />
+        <StatCard
+          label="ACTIVE"
+          value={stats.active}
+          icon={<CheckCircle2 className="h-5 w-5" />}
+          tint="emerald"
+        />
+        <StatCard
+          label="INACTIVE"
+          value={stats.inactive}
+          icon={<XCircle className="h-5 w-5" />}
+          tint="muted"
+        />
+      </div>
 
+      {/* Toolbar card */}
+      <Card className="mt-7 border-border/70 shadow-sm">
+        <CardContent className="flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between">
+          <div className="relative w-full md:max-w-md">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search by name or description..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-11 rounded-full border-border bg-[#fcf5f6] pl-10"
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <Select
+              value={statusFilter}
+              onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}
+            >
+              <SelectTrigger className="h-11 w-[160px] rounded-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All status</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center rounded-full border p-1 bg-white">
+              <Button
+                size="sm"
+                onClick={() => setView("table")}
+                className={`h-8 rounded-full px-3 transition-colors
+                  ${
+                    view === "table"
+                      ? "bg-[#f77f00] text-white hover:bg-[color-mix(in_oklab,#f77f00_90%,transparent)]"
+                      : "bg-transparent text-black hover:bg-[#f8e5cb]"
+                  }
+                `}
+              >
+                <ListIcon className="h-4 w-4" />
+              </Button>
+
+              <Button
+                size="sm"
+                onClick={() => setView("grid")}
+                className={`h-8 rounded-full px-3 transition-colors
+                  ${
+                    view === "grid"
+                      ? "bg-[#f77f00] text-white hover:bg-[color-mix(in_oklab,#f77f00_90%,transparent)]"
+                      : "bg-transparent text-black hover:bg-[#f8e5cb]"
+                  }
+                `}
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Content */}
+      {filtered.length === 0 ? (
+        <Card className="mt-6 border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <ImagePlus className="h-6 w-6" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold">No categories found</h3>
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+              Try adjusting your search, or create your first category.
+            </p>
+            <Button onClick={openCreate} className="mt-5 gap-2 bg-[#f77f00] hover:bg-[#f77f00]/90 text-white px-6 py-2 rounded-md">
+              <Plus className="h-4 w-4" /> New Category
+            </Button>
+          </CardContent>
+        </Card>
+      ) : view === "grid" ? (
+        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filtered.map((c) => (
+            <CategoryCard
+              key={c.id}
+              category={c}
+              onEdit={() => openEdit(c)}
+              onDelete={() => setDeleteTarget(c)}
+            />
+          ))}
+        </div>
+      ) : (
+        <Card className="mt-6 overflow-hidden border-border/70 shadow-sm">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((hg) => (
+                <TableRow key={hg.id} className="bg-muted/40 hover:bg-muted/40">
+                  {hg.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      className="py-4 text-xs uppercase tracking-wider text-muted-foreground"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} className="hover:bg-muted/30">
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="py-4">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          <div className="flex flex-col items-center justify-between gap-3 border-t bg-muted/20 px-4 py-3 text-sm text-muted-foreground sm:flex-row">
+            <div className="flex items-center gap-3">
+              <span>
+                Showing{" "}
+                <strong className="text-foreground">
+                  {filtered.length === 0 ? 0 : startIndex + 1}
+                </strong>
+                –
+                <strong className="text-foreground">
+                  {Math.min(startIndex + pageSize, filtered.length)}
+                </strong>{" "}
+                of{" "}
+                <strong className="text-foreground">{filtered.length}</strong>
+              </span>
+              <Select
+                value={String(pageSize)}
+                onValueChange={(v) =>
+                  setPagination((prev) => ({
+                    ...prev,
+                    pageSize: Number(v),
+                  }))
+                }
+              >
+                <SelectTrigger className="h-8 w-[110px] rounded-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[5, 10, 20, 50].map((n) => (
+                    <SelectItem key={n} value={String(n)}>
+                      {n} / page
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span className="text-xs">
+                Page{" "}
+                <strong className="text-foreground">{pageIndex + 1}</strong> of{" "}
+                <strong className="text-foreground">
+                  {Math.max(1, pageCount)}
+                </strong>
+              </span>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-full"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
+                  aria-label="First page"
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-full"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                  aria-label="Previous page"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-full"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                  aria-label="Next page"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-full"
+                  onClick={() => table.setPageIndex(pageCount - 1)}
+                  disabled={!table.getCanNextPage()}
+                  aria-label="Last page"
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+      <CategoryDialog
+        open={dialogOpen}
+        onOpenChange={(o) => {
+          setDialogOpen(o);
+          if (!o) setEditing(null);
+        }}
+        initial={editing}
+        onSave={handleSave}
+        loading={isCreating || isUpdating}
+      />
       <AlertDialog
         open={!!deleteTarget}
-        onOpenChange={(o) => !o && !deleting && setDeleteTarget(null)}
+        onOpenChange={(o) => !o && setDeleteTarget(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete user?</AlertDialogTitle>
+            <AlertDialogTitle>Delete this category?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete{" "}
-              <span className="font-medium text-foreground">
-                {deleteTarget?.name}
-              </span>
-              . This action cannot be undone.
+              This action can't be undone. The category will be permanently
+              removed from your menu.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault();
-                confirmDelete(); // 👈 HERE
-              }}
-              disabled={deleting}
-              className="bg-destructive text-white hover:bg-destructive/90"
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting && <Loader2 className="h-4 w-4 animate-spin" />}
-              Delete
+              {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -318,3 +561,5 @@ export default function categoryPage() {
     </div>
   );
 }
+
+export default CategoriesPage;
