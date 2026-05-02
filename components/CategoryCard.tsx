@@ -17,9 +17,9 @@ function CategoryCard({
   return (
     <Card className="group overflow-hidden border-border/70 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg">
       <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-primary/10 to-accent">
-        {category.image ? (
+        {category.imageUrl ? (
           <img
-            src={category.image}
+            src={category.imageUrl}
             alt={category.name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
