@@ -18,7 +18,6 @@ import {
   Type,
   X,
 } from "lucide-react";
-import { Input } from "./ui/input";
 import {
   Select,
   SelectContent,
@@ -31,6 +30,7 @@ import { Switch } from "./ui/switch";
 import { Button } from "./ui/button";
 import { MenuFormData, MenuItem, MenuType, SubFormRow } from "@/types/types";
 import { menuSchema } from "@/Schema/menuScheme";
+import { Input } from "@/components/input";
 
 function MenuDialog({
   open,
