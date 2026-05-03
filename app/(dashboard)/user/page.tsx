@@ -40,49 +40,7 @@ import {
 import ApiLoader from "@/components/ApiLoader";
 
 import { isEqual } from "lodash-es";
-
-// const seedUsers: User[] = [
-//   {
-//     id: "1",
-//     name: "Ada Lovelace",
-//     username: "ada",
-//     email: "ada@secretcafe.io",
-//     phoneNumber: "+1 555 010 0001",
-//     role: roleReverseMap[1],
-//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
-//   },
-//   {
-//     id: "2",
-//     name: "Alan Turing",
-//     username: "alan",
-//     email: "alan@secretcafe.io",
-//     phoneNumber: "+1 555 010 0002",
-//     role: roleReverseMap[2],
-//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12).toISOString(),
-//   },
-//   {
-//     id: "3",
-//     name: "Grace Hopper",
-//     username: "grace",
-//     email: "grace@secretcafe.io",
-//     phoneNumber: "+1 555 010 0003",
-//     role: roleReverseMap[3],
-//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(),
-//   },
-//   {
-//     id: "4",
-//     name: "Linus Torvalds",
-//     username: "linus",
-//     email: "linus@secretcafe.io",
-//     phoneNumber: "+1 555 010 0004",
-//     role: roleReverseMap[3],
-//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-//   },
-// ];
-
-function delay(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
-}
+import { delay } from "@/utils/utils";
 
 export default function UsersPage() {
   // const [users, setUsers] = useState<User[]>(seedUsers);

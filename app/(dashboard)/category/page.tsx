@@ -69,6 +69,7 @@ import {
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
+import { isEqual } from "lodash-es";
 
 function CategoriesPage() {
   const [search, setSearch] = useState("");
@@ -96,15 +97,12 @@ function CategoriesPage() {
     }));
   }, [search, statusFilter]);
 
-  // const { mutateAsync: createCategory } = useCreateCategory();
   const { mutateAsync: createCategory, isPending: isCreating } =
     useCreateCategory();
 
-  // const { mutateAsync: updateCategory } = useEditCategory();
   const { mutateAsync: updateCategory, isPending: isUpdating } =
     useEditCategory();
 
-  // const { mutateAsync: deleteCategory } = useDeleteCategory();
   const { mutateAsync: deleteCategory, isPending: isDeleting } =
     useDeleteCategory();
 
@@ -146,6 +144,11 @@ function CategoriesPage() {
         header: "Image",
         cell: ({ row }) => (
           <Thumb src={row.original.imageUrl} name={row.original.name} />
+          // <img
+          //   src={row.original.imageUrl || "/placeholder.png"}
+          //   alt={row.original.name}
+          //   className="h-11 w-11 rounded-lg object-cover ring-1 ring-border"
+          // />
         ),
       },
       {
@@ -235,6 +238,21 @@ function CategoriesPage() {
   async function handleSave(data: FormData) {
     try {
       if (editing) {
+        const isSame = isEqual(
+          {
+            name: editing.name,
+            description: editing.description,
+            isActive: editing.isActive,
+          },
+          data,
+        );
+
+        if (isSame) {
+          toast.info("No changes detected - nothing to update 🤔");
+          setDialogOpen(false);
+          return;
+        }
+
         await updateCategory({
           id: editing.id,
           data,
@@ -380,7 +398,10 @@ function CategoriesPage() {
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
               Try adjusting your search, or create your first category.
             </p>
-            <Button onClick={openCreate} className="mt-5 gap-2 bg-[#f77f00] hover:bg-[#f77f00]/90 text-white px-6 py-2 rounded-md">
+            <Button
+              onClick={openCreate}
+              className="mt-5 gap-2 bg-[#f77f00] hover:bg-[#f77f00]/90 text-white px-6 py-2 rounded-md"
+            >
               <Plus className="h-4 w-4" /> New Category
             </Button>
           </CardContent>

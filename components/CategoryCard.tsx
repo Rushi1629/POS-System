@@ -16,7 +16,7 @@ function CategoryCard({
 }) {
   return (
     <Card className="group overflow-hidden border-border/70 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg">
-      <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-primary/10 to-accent">
+      <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-[#f77f00]/10 to-accent">
         {category.imageUrl ? (
           <img
             src={category.imageUrl}
@@ -25,7 +25,7 @@ function CategoryCard({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <span className="text-5xl font-bold text-primary/40">
+            <span className="text-5xl font-bold text-[#f77f00]/40">
               {category.name.charAt(0).toUpperCase()}
             </span>
           </div>

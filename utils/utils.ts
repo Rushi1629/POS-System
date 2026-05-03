@@ -27,5 +27,9 @@ function getPageNumbers(current: number, total: number): Array<number | "ellipsi
   return pages;
 }
 
+function delay(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
 
-export { formatDuration, getPageNumbers };
+
+export { formatDuration, getPageNumbers, delay };

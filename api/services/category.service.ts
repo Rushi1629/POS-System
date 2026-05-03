@@ -17,14 +17,18 @@ export const fetchAllCategories = async (): Promise<
   const res = await fetcher("/category");
 
   return res.data.map((u: any) => ({
-    ...u,
-    imageUrl: u.image,
+    id: String(u.id),
+    name: u.name,
+    description: u.description,
+    isActive: u.isActive,
+    imageUrl: u.imageUrl || "", // ✅ FIX
+    createdAt: new Date(u.createdAt).getTime(), // ✅ FIX (important)
   }));
 };
 
 export const editCategoryById = async (
   id: string,
-  data: FormData
+  data: FormData,
 ): Promise<Category> => {
   const res = await fetcher(`/category/${id}`, {
     method: "PATCH",
