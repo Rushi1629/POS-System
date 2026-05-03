@@ -1,5 +1,7 @@
 "use client";
 
+import { menuSchema } from "@/Schema/menuScheme";
+import { z } from "zod";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -274,6 +276,38 @@ export interface NavItem {
   group: string;
   roles: UserRole[];
 }
+
+export type SubFormRow = {
+  name: string;
+  price: string;
+  available: boolean;
+  description: string;
+};
+
+export type MenuType = "Veg" | "NonVeg";
+
+export type MenuFormData = z.infer<typeof menuSchema>;
+
+export type SubMenuItem = {
+  id: number;
+  name: string;
+  price: number;
+  available: boolean;
+  description: string;
+  imageUrl?: string | null;
+};
+
+export type MenuItem = {
+  id: number;
+  name: string;
+  price: number;
+  menuType: MenuType;
+  description: string;
+  available: boolean;
+  imageUrl?: string | null;
+  category: { id: number; name: string };
+  subMenuItems: SubMenuItem[];
+};
 
 export const navItems: NavItem[] = [
   {

@@ -6,7 +6,7 @@ export interface MenuItem {
   category: string;
   isVeg: boolean;
   isBestseller?: boolean;
-  image?: string;
+  imageUrl?: string;
 }
 
 export interface Category {
