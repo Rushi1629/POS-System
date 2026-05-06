@@ -20,10 +20,6 @@ import {
   User2,
 } from "lucide-react";
 
-export type CartState = {
-  cart: Record<string, number>;
-};
-
 export type TableStatus = "available" | "occupied" | "reserved" | "cleaning";
 export type TableCategory = "family" | "pod" | "hall";
 

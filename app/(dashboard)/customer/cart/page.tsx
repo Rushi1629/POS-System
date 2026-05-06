@@ -8,54 +8,35 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { addItemAction, removeItemAction } from "@/store/cart/cartSlice";
 
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 const CartView = () => {
   const dispatch = useDispatch();
 
-  const cart = useSelector((state: RootState) => state.cart.cart);
+  const cart = useSelector((state: RootState) => state.cart?.items ?? {});
 
-  const addItem = useCallback(
-    (id: string) => {
-      dispatch(addItemAction(id));
-    },
-    [dispatch],
-  );
+  // const addItem = (id: string) => dispatch(addItemAction(id));
+  // const removeItem = (id: string) => dispatch(removeItemAction(id));
 
-  const removeItem = useCallback(
-    (id: string) => {
-      dispatch(removeItemAction(id));
-    },
-    [dispatch],
-  );
-
-  // ✅ Create fast lookup map (VERY IMPORTANT)
-  const menuMap = useMemo(() => {
-    return Object.fromEntries(menuItems.map((i) => [i.id, i]));
-  }, []);
+  // const handleIncrement = (id: string) => dispatch(addItemAction(id));
+  // const handleDecrement = (id: string) => dispatch(removeItemAction(id));
 
   // ✅ Convert cart → UI items (optimized)
   const items = useMemo(() => {
-    return Object.entries(cart).map(([id, qty]) => {
-      const item = menuMap[id];
-
-      return {
-        ...item,
-        quantity: qty,
-      };
-    });
-  }, [cart, menuMap]);
+    return Object.values(cart);
+  }, [cart]);
 
   // ✅ Derived values (memoized)
-  const subtotal = useMemo(
-    () => items.reduce((s, i) => s + i.price * i.quantity, 0),
-    [items],
-  );
-
-  const totalQty = useMemo(
-    () => items.reduce((s, i) => s + i.quantity, 0),
-    [items],
-  );
+  const { subtotal, totalQty } = useMemo(() => {
+    return items.reduce(
+      (acc, item) => {
+        acc.subtotal += item.price * item.quantity;
+        acc.totalQty += item.quantity;
+        return acc;
+      },
+      { subtotal: 0, totalQty: 0 },
+    );
+  }, [items]);
 
   return (
     <div className="flex flex-col xl:flex-row gap-8">
@@ -65,9 +46,9 @@ const CartView = () => {
           <CartItemCard
             key={item.id}
             item={item}
-            onIncrement={() => addItem(item.id)}
-            onDecrement={() => removeItem(item.id)}
-            onRemove={() => removeItem(item.id)}
+            onIncrement={() => dispatch(addItemAction(item))}
+            onDecrement={() => dispatch(removeItemAction(item.id))}
+            onRemove={() => dispatch(removeItemAction(item.id))}
           />
         ))}
 

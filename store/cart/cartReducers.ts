@@ -1,18 +1,36 @@
-import { CartState } from "@/types/types";
-import { PayloadAction } from "@reduxjs/toolkit";
+import { clearCartDB, saveCartToDB } from "@/lib/db";
+import { CartItem, CartState } from "@/types/cart-types";
+import { current, PayloadAction } from "@reduxjs/toolkit";
 
-export const addItem = (state: CartState, action: PayloadAction<string>) => {
-  const id = action.payload;
-  state.cart[id] = (state.cart[id] || 0) + 1;
+export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
+  const item = action.payload;
+
+  if (state.items[item.id]) {
+    state.items[item.id].quantity += 1;
+  } else {
+    state.items[item.id] = { ...item, quantity: 1 };
+  }
 };
 
 export const removeItem = (state: CartState, action: PayloadAction<string>) => {
   const id = action.payload;
 
-  if (state.cart[id] > 1) state.cart[id]--;
-  else delete state.cart[id];
+  if (!state.items[id]) return;
+
+  if (state.items[id].quantity > 1) {
+    state.items[id].quantity -= 1;
+  } else {
+    delete state.items[id];
+  }
 };
 
 export const clearCart = (state: CartState) => {
-  state.cart = {};
+  state.items = {};
+};
+
+export const setCart = (
+  state: CartState,
+  action: PayloadAction<Record<string, CartItem>>,
+) => {
+  state.items = action.payload;
 };

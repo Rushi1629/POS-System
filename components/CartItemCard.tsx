@@ -3,16 +3,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import React from "react";
-
-export interface CartItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  quantity: number;
-  isVeg: boolean;
-  isBest?: boolean;
-}
+import { CartItem } from "@/types/cart-types";
 
 interface CartItemCardProps {
   item: CartItem;
@@ -21,7 +12,12 @@ interface CartItemCardProps {
   onRemove: () => void;
 }
 
-const CartItemCard = ({ item, onIncrement, onDecrement, onRemove }: CartItemCardProps) => {
+const CartItemCard = ({
+  item,
+  onIncrement,
+  onDecrement,
+  onRemove,
+}: CartItemCardProps) => {
   const total = item.price * item.quantity;
 
   return (
@@ -29,8 +25,12 @@ const CartItemCard = ({ item, onIncrement, onDecrement, onRemove }: CartItemCard
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className={`inline-block h-4 w-4 rounded-sm border-2 ${item.isVeg ? 'border-[#30a661]' : 'border-[#dc2828]'}`}>
-              <span className={`block h-2 w-2 rounded-full m-[2px] ${item.isVeg ? 'bg-[#30a661]' : 'bg-[#dc2828]'}`} />
+            <span
+              className={`inline-block h-4 w-4 rounded-sm border-2 ${item.isVeg ? "border-[#30a661]" : "border-[#dc2828]"}`}
+            >
+              <span
+                className={`block h-2 w-2 rounded-full m-[2px] ${item.isVeg ? "bg-[#30a661]" : "bg-[#dc2828]"}`}
+              />
             </span>
             {item.isBest && (
               <Badge className="bg-[#f36f16] text-primary-foreground text-[10px] px-2 py-0 font-semibold tracking-wide">
@@ -38,14 +38,20 @@ const CartItemCard = ({ item, onIncrement, onDecrement, onRemove }: CartItemCard
               </Badge>
             )}
           </div>
-          <h3 className="font-semibold text-base text-foreground leading-tight">{item.name}</h3>
-          <p className="text-sm text-muted-foreground mt-0.5">{item.description}</p>
+          <h3 className="font-semibold text-base text-foreground leading-tight">
+            {item.name}
+          </h3>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {item.description}
+          </p>
         </div>
 
         <div className="text-right shrink-0">
           <p className="text-lg font-bold text-foreground">₹{total}</p>
           {item.quantity > 1 && (
-            <p className="text-xs text-muted-foreground">₹{item.price} × {item.quantity}</p>
+            <p className="text-xs text-muted-foreground">
+              ₹{item.price} × {item.quantity}
+            </p>
           )}
         </div>
       </div>
@@ -68,7 +74,9 @@ const CartItemCard = ({ item, onIncrement, onDecrement, onRemove }: CartItemCard
           >
             <Minus className="h-3.5 w-3.5" />
           </Button>
-          <span className="w-8 text-center text-sm font-semibold text-foreground">{item.quantity}</span>
+          <span className="w-8 text-center text-sm font-semibold text-foreground">
+            {item.quantity}
+          </span>
           <Button
             size="icon"
             className="h-8 w-8 rounded-md bg-[#e66b19] text-primary-foreground hover:bg-primary/90"

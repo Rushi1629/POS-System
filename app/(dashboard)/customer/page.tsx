@@ -41,13 +41,27 @@ export default function CustomerDashboard() {
   // ✅ redux state
   const dispatch = useDispatch();
 
-  const cart = useSelector((state: RootState) => state.cart.cart);
+  const cart = useSelector((state: RootState) => state.cart.items);
+
+  const menuMap = useMemo(() => {
+    return Object.fromEntries(menuItems.map((i) => [i.id, i]));
+  }, []);
 
   const addToCart = useCallback(
-    (id: string) => {
-      dispatch(addItemAction(id));
+    (itemId: string) => {
+      const item = menuMap[itemId];
+      if (!item) return;
+
+      dispatch(
+        addItemAction({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: 1, // reducer will override if needed
+        }),
+      );
     },
-    [dispatch],
+    [dispatch, menuMap],
   );
 
   const removeFromCart = useCallback(
@@ -58,19 +72,15 @@ export default function CustomerDashboard() {
   );
 
   const totalCartItems = useMemo(() => {
-    return Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+    return Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
   }, [cart]);
 
-  const menuMap = useMemo(() => {
-    return Object.fromEntries(menuItems.map((i) => [i.id, i]));
-  }, []);
-
   const totalCartPrice = useMemo(() => {
-    return Object.entries(cart).reduce((sum, [id, qty]) => {
-      const item = menuMap[id];
-      return sum + (item ? item.price * qty : 0);
-    }, 0);
-  }, [cart, menuMap]);
+    return Object.values(cart).reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
+  }, [cart]);
 
   // ✅ Filter logic
   const filteredItems = useMemo(() => {
@@ -178,7 +188,7 @@ export default function CustomerDashboard() {
                 <MenuItemCard
                   key={item.id}
                   item={item}
-                  quantity={cart[item.id] || 0}
+                  quantity={cart[item.id]?.quantity || 0}
                   onAdd={() => addToCart(item.id)}
                   onRemove={() => removeFromCart(item.id)}
                 />

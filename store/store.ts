@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import cartReducer from "./cart/cartSlice";
 import tableReducer from "./table/tableSlice";
 import authReducer from "./auth/authSlice";
+import { cartSyncMiddleware } from "@/middleware/cartSyncMiddleware";
 
 export const store = configureStore({
   reducer: {
@@ -9,6 +10,8 @@ export const store = configureStore({
     tables: tableReducer,
     auth: authReducer,
   },
+   middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(cartSyncMiddleware),
 });
 
 // types (very important for TS)

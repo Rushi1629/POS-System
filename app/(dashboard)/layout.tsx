@@ -4,9 +4,12 @@ import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import "../globals.css";
-import { usePathname } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import SecretCafeLoader from "@/components/SecretCafeLoader";
+import { useAppDispatch } from "@/store/hooks";
+import { loadCartFromDB } from "@/lib/db";
+import { setCartAction } from "../../store/cart/cartSlice";
+import { store } from "../../store/store";
 
 export default function DashboardLayout({
   children,
@@ -17,6 +20,17 @@ export default function DashboardLayout({
 
   // // ✅ Show sidebar only for /admin routes
   // const showSidebar = pathname.startsWith("/admin");
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const load = async () => {
+      const items = await loadCartFromDB();
+      dispatch(setCartAction(items));
+    };
+
+    load();
+  }, []);
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar - Desktop only */}
@@ -29,11 +43,9 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col min-w-0">
         <Header />
 
-          <main className="flex-1 p-6 lg:p-8 overflow-y-auto pb-20 bg-[#f9f7f5]">
+        <main className="flex-1 p-6 lg:p-8 overflow-y-auto pb-20 bg-[#f9f7f5]">
           <Suspense
-            fallback={
-              <SecretCafeLoader message="Loading dashboard..." />
-            }
+            fallback={<SecretCafeLoader message="Loading dashboard..." />}
           >
             {children}
           </Suspense>
