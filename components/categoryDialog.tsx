@@ -14,9 +14,11 @@ import { Label } from "./ui/label";
 import { AlignLeft, ImagePlus, Loader2, Type } from "lucide-react";
 import { Switch } from "./ui/switch";
 import { Button } from "./ui/button";
-import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./input";
 import { Textarea } from "./ui/textarea";
+import z from "zod";
 
 function CategoryDialog({
   open,
@@ -25,25 +27,43 @@ function CategoryDialog({
   onSave,
   loading, // ✅ include it
 }: CategoryDialogProps) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [isActive, setIsActive] = useState(true);
+  type FormData = z.infer<typeof categorySchema>;
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      isActive: true,
+      imageFile: undefined,
+    },
+  });
+  const isActive = watch("isActive");
   // const [image, setImage] = useState<string | undefined>(undefined);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const fileRef = useRef<HTMLInputElement>(null);
 
 useEffect(() => {
   if (open) {
-    setName(initial?.name ?? "");
-    setDescription(initial?.description ?? "");
-    setIsActive(initial?.isActive ?? true);
+    reset({
+      name: initial?.name ?? "",
+      description: initial?.description ?? "",
+      isActive: initial?.isActive ?? true,
+      imageFile: undefined,
+    });
+
     setImageFile(null);
     setPreview(initial?.imageUrl ?? "");
-    setErrors({});
   }
-}, [open, initial]);
+}, [open, initial, reset]); // ✅ ADD reset
 
   function handleFile(file: File | null) {
     if (!file) return;
@@ -58,6 +78,8 @@ useEffect(() => {
       return;
     }
 
+    setValue("imageFile", file); // ✅ VERY IMPORTANT
+
     // ✅ store actual file
     setImageFile(file);
 
@@ -66,47 +88,28 @@ useEffect(() => {
     setPreview(imageUrl);
 
     // optional: clear error
-    setErrors((prev) => ({ ...prev, image: "" }));
   }
 
-  async function submit() {
+  const onSubmit = async (data: FormData) => {
     if (loading) return;
-    const result = categorySchema.safeParse({
-      name,
-      description,
-      isActive,
-      imageFile,
-    });
 
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        fieldErrors[String(issue.path[0])] = issue.message;
-      }
-      setErrors(fieldErrors);
-      return;
-    }
-
-    // ✅ CREATE FORM DATA
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("isActive", String(isActive));
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("isActive", String(data.isActive));
 
-    if (imageFile) {
-      formData.append("imageFile", imageFile); // 🔥 REQUIRED KEY
+    if (data.imageFile) {
+      formData.append("imageFile", data.imageFile);
     }
 
-    await onSave(formData); // ✅ send FormData
+    await onSave(formData);
 
     if (!initial) {
-      setName("");
-      setDescription("");
-      setIsActive(true);
-      setImageFile(null);
+      reset();
       setPreview("");
+      setImageFile(null);
     }
-  }
+  };
 
   return (
     <Dialog
@@ -162,8 +165,10 @@ useEffect(() => {
                 onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
               />
             </div>
-            {errors.image && (
-              <p className="text-xs text-destructive">{errors.image}</p>
+            {errors.imageFile?.message && (
+              <p className="text-xs text-destructive">
+                {String(errors.imageFile.message)}
+              </p>
             )}
           </div>
 
@@ -173,8 +178,7 @@ useEffect(() => {
               <Type className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                {...register("name")}
                 placeholder="e.g. Hot Beverages"
                 maxLength={60}
                 className="pl-9"
@@ -182,7 +186,7 @@ useEffect(() => {
               />
             </div>
             {errors.name && (
-              <p className="text-xs text-destructive">{errors.name}</p>
+              <p className="text-xs text-destructive">{errors.name.message}</p>
             )}
           </div>
 
@@ -192,16 +196,17 @@ useEffect(() => {
               <AlignLeft className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Textarea
                 id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Short summary of what's in this category..."
+                {...register("description")}
+                placeholder="Short summary..."
                 rows={3}
                 maxLength={400}
                 className="pl-9"
               />
             </div>
             {errors.description && (
-              <p className="text-xs text-destructive">{errors.description}</p>
+              <p className="text-xs text-destructive">
+                {errors.description.message}
+              </p>
             )}
           </div>
 
@@ -217,8 +222,8 @@ useEffect(() => {
             <Switch
               id="active"
               checked={isActive}
+              onCheckedChange={(val) => setValue("isActive", val)}
               className="data-[state=checked]:bg-[#f77f00] data-[state=unchecked]:bg-gray-300"
-              onCheckedChange={setIsActive}
             />
           </div>
         </div>
@@ -228,7 +233,7 @@ useEffect(() => {
             Cancel
           </Button>
           <Button
-            onClick={submit}
+            onClick={handleSubmit(onSubmit)}
             disabled={loading}
             className="bg-[#f77f00] hover:bg-[#f77f00]/90"
           >

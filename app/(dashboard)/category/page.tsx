@@ -95,7 +95,7 @@ function CategoriesPage() {
       ...prev,
       pageIndex: 0,
     }));
-  }, [search, statusFilter]);
+  }, [search, statusFilter, view]);
 
   const { mutateAsync: createCategory, isPending: isCreating } =
     useCreateCategory();
@@ -122,10 +122,13 @@ function CategoriesPage() {
       )
       .filter(
         (c) =>
-          c.name?.toLowerCase().includes(search.toLowerCase()) ||
-          c.description?.toLowerCase().includes(search.toLowerCase()),
+          (c.name ?? "").toLowerCase().includes(search.toLowerCase()) ||
+          (c.description ?? "").toLowerCase().includes(search.toLowerCase()),
       )
-      .sort((a, b) => b.createdAt - a.createdAt);
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
   }, [categories, search, statusFilter]);
 
   const stats = useMemo(
@@ -235,38 +238,47 @@ function CategoriesPage() {
     setDialogOpen(true);
   }
 
-  async function handleSave(data: FormData) {
+  async function handleSave(formData: FormData) {
     try {
       if (editing) {
+        const payload = {
+          name: String(formData.get("name") ?? ""),
+          description: String(formData.get("description") ?? ""),
+          isActive: formData.get("isActive") === "true",
+        };
+
         const isSame = isEqual(
           {
             name: editing.name,
             description: editing.description,
             isActive: editing.isActive,
           },
-          data,
+          payload,
         );
 
-        if (isSame) {
-          toast.info("No changes detected - nothing to update 🤔");
+        const hasImageChanged = formData.get("imageFile") instanceof File;
+
+        if (isSame && !hasImageChanged) {
+          toast.info("No changes detected 🤔");
           setDialogOpen(false);
           return;
         }
 
         await updateCategory({
           id: editing.id,
-          data,
+          data: formData,
         });
-        toast.success("Category updated");
+
+        toast.success("Category updated ✅");
       } else {
-        await createCategory(data);
-        toast.success("Category created");
+        await createCategory(formData);
+        toast.success("Category created ✅");
       }
 
       setDialogOpen(false);
       setEditing(null);
     } catch (err) {
-      toast.error("Something went wrong");
+      toast.error("Something went wrong ❌");
     }
   }
 
@@ -278,6 +290,10 @@ function CategoriesPage() {
 
       toast.success("Category deleted successfully 👋");
       setDeleteTarget(null);
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: 0,
+      }));
     } catch (err) {
       toast.error("Failed to delete category");
     }
