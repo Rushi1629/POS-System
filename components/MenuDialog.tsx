@@ -140,7 +140,7 @@ function MenuDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-5 py-2 overflow-y-auto pr-2 no-scrollbar">
+        <div className="grid gap-5 py-2 overflow-y-auto px-2 no-scrollbar">
           <div className="grid gap-2">
             <Label htmlFor="m-name">Name</Label>
             <div className="relative">
