@@ -4,8 +4,7 @@ export const categorySchema = z.object({
   name: z
     .string()
     .trim()
-    .min(5, { message: "Name must be at least 5 characters" }) // ✅ use object
-
+    .min(5, { message: "Name must be at least 5 characters" })
     .max(60, { message: "Name must be under 60 characters" }),
 
   description: z
@@ -16,7 +15,11 @@ export const categorySchema = z.object({
 
   isActive: z.boolean(),
 
-  imageFile: z.any().refine((file) => file instanceof File, {
-    message: "Image is required",
-  }),
+  imageFile: z
+    .any()
+    .optional()
+    .refine(
+      (file) => !file || file instanceof File, // ✅ allow undefined OR File
+      { message: "Invalid file" }
+    ),
 });

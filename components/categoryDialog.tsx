@@ -51,19 +51,19 @@ function CategoryDialog({
   const [preview, setPreview] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
 
-useEffect(() => {
-  if (open) {
-    reset({
-      name: initial?.name ?? "",
-      description: initial?.description ?? "",
-      isActive: initial?.isActive ?? true,
-      imageFile: undefined,
-    });
+  useEffect(() => {
+    if (open) {
+      reset({
+        name: initial?.name ?? "",
+        description: initial?.description ?? "",
+        isActive: initial?.isActive ?? true,
+        imageFile: undefined,
+      });
 
-    setImageFile(null);
-    setPreview(initial?.imageUrl ?? "");
-  }
-}, [open, initial, reset]); // ✅ ADD reset
+      setImageFile(null);
+      setPreview(initial?.imageUrl ?? "");
+    }
+  }, [open, initial, reset]); // ✅ ADD reset
 
   function handleFile(file: File | null) {
     if (!file) return;
@@ -93,16 +93,23 @@ useEffect(() => {
   const onSubmit = async (data: FormData) => {
     if (loading) return;
 
+    // ✅ enforce required only on CREATE
+    if (!initial && !data.imageFile) {
+      toast.error("Image is required");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("description", data.description);
     formData.append("isActive", String(data.isActive));
 
+    // ✅ ONLY append if exists
     if (data.imageFile) {
       formData.append("imageFile", data.imageFile);
     }
 
-    await onSave(formData);
+    await onSave(formData, imageFile);
 
     if (!initial) {
       reset();

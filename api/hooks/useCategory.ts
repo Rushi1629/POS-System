@@ -22,18 +22,7 @@ export const useCreateCategory = () => {
 export const useFetchCategories = () => {
   return useQuery<Category[]>({
     queryKey: ["categories"],
-    queryFn: async () => {
-      const res: FetchCategoriesResponse[] = await fetchAllCategories();
-
-      return res.map((item) => ({
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        isActive: item.isActive,
-        imageUrl: item.imageUrl || "",  // 🔥 mapping fix
-        createdAt: item.createdAt,
-      }));
-    },
+    queryFn: fetchAllCategories,
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

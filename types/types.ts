@@ -241,7 +241,7 @@ export type CategoryDialogProps = {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   initial: Category | null;
-  onSave: (data: FormData) => Promise<void>; // ✅ better
+  onSave: (formData: FormData, imageFile: File | null) => Promise<void>;
   loading?: boolean; // ✅ ADD THIS
 };
 

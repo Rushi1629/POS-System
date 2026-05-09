@@ -238,7 +238,7 @@ function CategoriesPage() {
     setDialogOpen(true);
   }
 
-  async function handleSave(formData: FormData) {
+  async function handleSave(formData: FormData, imageFile: File | null) {
     try {
       if (editing) {
         const payload = {
