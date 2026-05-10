@@ -91,11 +91,15 @@ import {
 } from "@/api/hooks/useMenu";
 import { useFetchCategories } from "@/api/hooks/useCategory";
 import { isEqual } from "lodash-es";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 function MenuPage() {
   const { data: items = [], isLoading } = useFetchMenus();
-  const { mutateAsync: createMenu , isPending: isCreating } = useCreateMenu();
+  const { mutateAsync: createMenu, isPending: isCreating } = useCreateMenu();
   const { mutateAsync: updateMenu, isPending: isUpdating } = useUpdateMenu();
   const { mutateAsync: deleteMenu } = useDeleteMenu();
 
@@ -236,7 +240,10 @@ function MenuPage() {
                 </div>
                 <ul className="max-h-64 divide-y overflow-auto">
                   {subs.map((s) => (
-                    <li key={s.id} className="flex items-start justify-between gap-3 px-3 py-2">
+                    <li
+                      key={s.id}
+                      className="flex items-start justify-between gap-3 px-3 py-2"
+                    >
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="truncate text-sm font-medium text-foreground">
@@ -244,9 +251,13 @@ function MenuPage() {
                           </span>
                           <span
                             className={`inline-block h-1.5 w-1.5 rounded-full ${
-                              s.available ? "bg-emerald-500" : "bg-muted-foreground/40"
+                              s.available
+                                ? "bg-emerald-500"
+                                : "bg-muted-foreground/40"
                             }`}
-                            aria-label={s.available ? "Available" : "Unavailable"}
+                            aria-label={
+                              s.available ? "Available" : "Unavailable"
+                            }
                           />
                         </div>
                         {s.description ? (
@@ -380,7 +391,7 @@ function MenuPage() {
       setEditing(null);
     } catch (err) {
       console.error("handleSave error:", err);
-      toast.error("Something went wrong ❌");
+      toast.error("Something went wrong while saving ❌");
     }
   }
 
@@ -390,7 +401,7 @@ function MenuPage() {
     try {
       await deleteMenu(String(deleteId));
 
-      toast.success("Menu deleted ✅");
+      toast.success("Menu Deleted Sucessfully 🗑  ️");
       setDeleteId(null);
     } catch {
       toast.error("Delete failed ❌");
