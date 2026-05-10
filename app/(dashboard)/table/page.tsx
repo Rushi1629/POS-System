@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   type ColumnDef,
   type PaginationState,
@@ -19,36 +19,20 @@ import {
   Pencil,
   Trash2,
   Search,
-  ImagePlus,
-  LayoutGrid,
-  List as ListIcon,
   CheckCircle2,
-  XCircle,
-  LayoutDashboard,
-  Tags,
-  UtensilsCrossed,
   Users,
   Table2,
-  Receipt,
-  Package,
-  BarChart3,
-  Bell,
-  Settings,
-  Clock,
-  LogOut,
-  Coffee,
   MoreHorizontal,
-  Type,
-  AlignLeft,
-  IndianRupee,
-  Leaf,
-  Drumstick,
+  Timer,
+  Power,
   X,
+  Rotate3D,
+  RotateCcw,
+  RotateCw,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   AlertDialog,
@@ -76,53 +60,78 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import MenuDialog from "@/components/MenuDialog";
-import StatusPill from "@/components/StatusPill";
-import VegBadge from "@/components/VegBadge";
-import Thumb from "@/components/Thumb";
-import { MenuItem } from "@/types/types";
+import {
+  FetchTableResponse,
+  TABLE_STATUS,
+  TABLE_TYPES,
+  TableFormValues,
+  TableStatus,
+  TableType,
+} from "@/types/table-types";
+import TableThumb from "@/components/TableThumb";
+import TypeBadge from "@/components/TypeBadge";
 import StatCard from "@/components/StatCard";
-import MenuCard from "@/components/MenuCard";
+import TableDialog from "@/components/TableDialog";
 import {
-  useCreateMenu,
-  useDeleteMenu,
-  useFetchMenus,
-  useUpdateMenu,
-} from "@/api/hooks/useMenu";
-import { useFetchCategories } from "@/api/hooks/useCategory";
+  useCreateTable,
+  useDeleteTable,
+  useEditTable,
+  useFetchTables,
+} from "@/api/hooks/useTable";
 import { isEqual } from "lodash-es";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+import TableStatusCustom from "@/components/TableStatus";
 
-function MenuPage() {
-  const { data: items = [], isLoading } = useFetchMenus();
-  const { mutateAsync: createMenu, isPending: isCreating } = useCreateMenu();
-  const { mutateAsync: updateMenu, isPending: isUpdating } = useUpdateMenu();
-  const { mutateAsync: deleteMenu } = useDeleteMenu();
+const seed: FetchTableResponse[] = [
+  {
+    id: 2000001,
+    name: "H-1",
+    type: "HALL",
+    status: "AVAILABLE",
+    capacity: 4,
+    enableTimeRate: true,
+    ratePerMinute: 1.25,
+    qrCode: null,
+    isActive: true,
+  },
+  {
+    id: 1,
+    name: "P-1",
+    type: "POD",
+    status: "OCCUPIED",
+    capacity: 4,
+    enableTimeRate: true,
+    ratePerMinute: 1.25,
+    qrCode: null,
+    isActive: true,
+  },
+  {
+    id: 2,
+    name: "F-1",
+    type: "FAMILY",
+    status: "RESERVED",
+    capacity: 6,
+    enableTimeRate: false,
+    ratePerMinute: 0,
+    qrCode: null,
+    isActive: true,
+  },
+];
 
-  const {
-    data: allCategory = [],
-    isPending: isFetchingCategories,
-    isFetching,
-    isError,
-  } = useFetchCategories();
+function TablesPage() {
+  const { data: tables = [] } = useFetchTables();
+  const { mutateAsync: createTable, isPending: isCreating } = useCreateTable();
 
-  useEffect(() => {
-    console.log("✅ categories updated:", allCategory);
-  }, [allCategory]);
+  const { mutateAsync: updateTable, isPending: isEditing } = useEditTable();
+  const { mutateAsync: deleteTable, isPending: isDeleting } = useDeleteTable();
 
+  // const [items, setItems] = useState<FetchTableResponse[]>(seed);
+  const items = tables;
   const [search, setSearch] = useState("");
-  const [view, setView] = useState<"grid" | "table">("table");
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "available" | "unavailable"
-  >("all");
-  const [categoryFilter, setCategoryFilter] = useState<"all" | string>("all");
+  const [typeFilter, setTypeFilter] = useState<"all" | TableType>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | TableStatus>("all");
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<MenuItem | null>(null);
+  const [editing, setEditing] = useState<FetchTableResponse | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -132,152 +141,82 @@ function MenuPage() {
 
   const filtered = useMemo(() => {
     return items
-      .filter((m) =>
-        statusFilter === "all"
-          ? true
-          : statusFilter === "available"
-            ? m.available
-            : !m.available,
+      .filter((t) => (typeFilter === "all" ? true : t.type === typeFilter))
+      .filter((t) =>
+        statusFilter === "all" ? true : t.status === statusFilter,
       )
-      .filter((m) =>
-        categoryFilter === "all"
-          ? true
-          : String(m.category?.id) === categoryFilter,
-      )
-      .filter(
-        (m) =>
-          m.name.toLowerCase().includes(search.toLowerCase()) ||
-          (m.description || "").toLowerCase().includes(search.toLowerCase()),
-      );
-  }, [items, search, statusFilter, categoryFilter]);
-
-  useEffect(() => {
-    setPagination((p) => ({ ...p, pageIndex: 0 }));
-  }, [search, categoryFilter, statusFilter]);
+      .filter((t) => t.name.toLowerCase().includes(search.toLowerCase()));
+  }, [items, search, typeFilter, statusFilter]);
 
   const stats = useMemo(
     () => ({
       total: items.length,
-      available: items.filter((m) => m.available).length,
-      veg: items.filter((m) => m.menuType === "Veg").length,
-      nonVeg: items.filter((m) => m.menuType === "NonVeg").length,
+      available: items.filter((t) => t.status === "AVAILABLE").length,
+      active: items.filter((t) => t.isActive).length,
     }),
     [items],
   );
 
-  const columns = useMemo<ColumnDef<MenuItem>[]>(
+  const columns = useMemo<ColumnDef<FetchTableResponse>[]>(
     () => [
       {
-        id: "image",
-        header: "Item",
+        id: "name",
+        header: "Table",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
-            <Thumb
-              src={row.original.imageUrl ?? undefined}
-              name={row.original.name}
-            />
+            <TableThumb name={row.original.name} type={row.original.type} />
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-foreground">
                   {row.original.name}
                 </span>
-                {/* <VegBadge type={row.original.menuType} /> */}
-                <VegBadge isVeg={row.original.menuType === "Veg"} />
+                <TypeBadge type={row.original.type} />
               </div>
-              <p className="max-w-xs truncate text-xs text-muted-foreground">
-                {row.original.description || "—"}
-              </p>
             </div>
           </div>
         ),
       },
       {
-        accessorKey: "category",
-        header: "Category",
+        accessorKey: "capacity",
+        header: "Capacity",
         cell: ({ row }) => (
-          <Badge variant="secondary" className="rounded-full font-medium">
-            {row.original.category.name}
-          </Badge>
-        ),
-      },
-      {
-        accessorKey: "price",
-        header: "Price",
-        cell: ({ row }) => (
-          <span className="font-semibold tabular-nums text-foreground">
-            ₹{Number(row.original.price).toFixed(2)}
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground">
+            <Users className="h-4 w-4 text-muted-foreground" />
+            {row.original.capacity}
           </span>
         ),
       },
       {
-        id: "submenu",
-        header: "Add-ons",
-        cell: ({ row }) => {
-          const subs = row.original.subMenuItems;
-          const count = subs.length;
-          if (count === 0) {
-            return <span className="text-sm text-muted-foreground">—</span>;
-          }
-          return (
-            <HoverCard openDelay={120} closeDelay={80}>
-              <HoverCardTrigger asChild>
-                <button
-                  type="button"
-                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-dashed border-border bg-muted/40 px-2.5 py-1 text-xs font-medium text-foreground/80 transition-colors hover:border-primary/60 hover:bg-primary/5 hover:text-foreground"
-                >
-                  <Plus className="h-3 w-3" />
-                  {count} add-on{count === 1 ? "" : "s"}
-                </button>
-              </HoverCardTrigger>
-              <HoverCardContent side="top" align="start" className="w-72 p-0">
-                <div className="border-b px-3 py-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Add-ons for {row.original.name}
-                  </p>
-                </div>
-                <ul className="max-h-64 divide-y overflow-auto">
-                  {subs.map((s) => (
-                    <li
-                      key={s.id}
-                      className="flex items-start justify-between gap-3 px-3 py-2"
-                    >
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="truncate text-sm font-medium text-foreground">
-                            {s.name}
-                          </span>
-                          <span
-                            className={`inline-block h-1.5 w-1.5 rounded-full ${
-                              s.available
-                                ? "bg-emerald-500"
-                                : "bg-muted-foreground/40"
-                            }`}
-                            aria-label={
-                              s.available ? "Available" : "Unavailable"
-                            }
-                          />
-                        </div>
-                        {s.description ? (
-                          <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
-                            {s.description}
-                          </p>
-                        ) : null}
-                      </div>
-                      <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
-                        ₹{Number(s.price).toFixed(2)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </HoverCardContent>
-            </HoverCard>
-          );
-        },
+        id: "rate",
+        header: "Rate / min",
+        cell: ({ row }) =>
+          row.original.enableTimeRate ? (
+            <span className="inline-flex items-center gap-1.5 font-semibold tabular-nums text-foreground">
+              <Timer className="h-4 w-4 text-primary" />₹
+              {Number(row.original.ratePerMinute).toFixed(2)}
+            </span>
+          ) : (
+            <span className="text-sm text-muted-foreground">—</span>
+          ),
       },
       {
-        accessorKey: "available",
+        accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => <StatusPill active={row.original.available} />,
+        cell: ({ row }) => <TableStatusCustom status={row.original.status} />,
+      },
+      {
+        accessorKey: "isActive",
+        header: "Active",
+        cell: ({ row }) => (
+          <span
+            className={`inline-flex items-center gap-1.5 text-xs font-medium ${
+              row.original.isActive ? "text-chart-2" : "text-muted-foreground"
+            }`}
+          >
+            <Power className="h-3.5 w-3.5" />
+            {row.original.isActive ? "Enabled" : "Disabled"}
+          </span>
+        ),
       },
       {
         id: "actions",
@@ -332,56 +271,61 @@ function MenuPage() {
     setDialogOpen(true);
   }
 
-  function openEdit(m: MenuItem) {
-    setEditing(m);
+  function openEdit(t: FetchTableResponse) {
+    setEditing(t);
     setDialogOpen(true);
   }
 
-  async function handleSave(formData: FormData) {
-    try {
-      // console.log("handleSave called", { isEditing: !!editing });
-      if (editing) {
-        const data = JSON.parse(String(formData.get("data") || "{}"));
+  function resetFilters() {
+    setSearch("");
+    setTypeFilter("all");
+    setStatusFilter("all");
+  }
 
+  async function handleSave(data: TableFormValues) {
+    try {
+      if (editing) {
         const payload = {
           name: data.name,
-          description: data.description,
-          price: data.price,
-          available: data.available,
-          categoryId: data.categoryId,
+          type: data.type,
+          status: data.status,
+          capacity: data.capacity,
+          enableTimeRate: data.enableTimeRate,
+          ratePerMinute: data.ratePerMinute,
+          isActive: data.isActive,
         };
 
         const isSame = isEqual(
           {
             name: editing.name,
-            description: editing.description,
-            price: Number(editing.price),
-            available: editing.available,
-            categoryId: editing.category?.id,
+            type: editing.type,
+            status: editing.status,
+            capacity: editing.capacity,
+            enableTimeRate: editing.enableTimeRate,
+            ratePerMinute: editing.ratePerMinute,
+            isActive: editing.isActive,
           },
           payload,
         );
 
-        const hasImageChanged = formData.get("imageFile") instanceof File;
-
-        if (isSame && !hasImageChanged) {
+        if (isSame) {
           toast.info("No changes detected 🤔");
           setDialogOpen(false);
           return;
         }
 
         console.log("Updating menu...");
-        await updateMenu({
-          id: String(editing.id),
-          formData: formData,
+        await updateTable({
+          id: Number(editing.id),
+          data: data,
         });
 
-        toast.success("Menu updated 👍");
+        toast.success("Table updated 👍");
       } else {
-        console.log("Creating new menu...");
-        await createMenu(formData);
-        console.log("Menu created successfully");
-        toast.success("Menu created 🥳");
+        console.log("Creating new table...");
+        await createTable(data);
+        console.log("Table created successfully");
+        toast.success("Table created 🥳");
       }
 
       setDialogOpen(false);
@@ -396,9 +340,9 @@ function MenuPage() {
     if (!deleteId) return;
 
     try {
-      await deleteMenu(String(deleteId));
+      await deleteTable(Number(deleteId));
 
-      toast.success("Menu Deleted Sucessfully 🗑  ️");
+      toast.success("Table Deleted Sucessfully 🗑  ️");
       setDeleteId(null);
     } catch {
       toast.error("Delete failed ❌");
@@ -410,10 +354,11 @@ function MenuPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Menu Management
+            Table Management
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            Create, edit and manage menu items, pricing and add-ons.
+            Configure dining tables, capacity, status and time-based billing
+            rates.
           </p>
         </div>
         <Button
@@ -422,15 +367,15 @@ function MenuPage() {
           className="gap-2 bg-primary text-primary-foreground shadow-[var(--shadow-elegant)] hover:bg-primary/90"
         >
           <Plus className="h-4 w-4" />
-          New Menu Item
+          New Table
         </Button>
       </div>
 
-      <div className="mt-7 grid grid-cols-1 gap-5 md:grid-cols-4">
+      <div className="mt-7 grid grid-cols-1 gap-5 md:grid-cols-3">
         <StatCard
-          label="TOTAL ITEMS"
+          label="TOTAL TABLES"
           value={stats.total}
-          icon={<UtensilsCrossed className="h-5 w-5" />}
+          icon={<Table2 className="h-5 w-5" />}
           tint="primary"
         />
         <StatCard
@@ -440,16 +385,10 @@ function MenuPage() {
           tint="emerald"
         />
         <StatCard
-          label="VEGETARIAN"
-          value={stats.veg}
-          icon={<Leaf className="h-5 w-5" />}
+          label="ACTIVE"
+          value={stats.active}
+          icon={<Power className="h-5 w-5" />}
           tint="muted"
-        />
-        <StatCard
-          label="NON-VEGETARIAN"
-          value={stats.nonVeg}
-          icon={<Drumstick className="h-5 w-5" />}
-          tint="default"
         />
       </div>
 
@@ -458,7 +397,7 @@ function MenuPage() {
           <div className="relative w-full md:max-w-md">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search by name or description..."
+              placeholder="Search by table name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="h-11 rounded-full border-border bg-background pl-10"
@@ -466,30 +405,19 @@ function MenuPage() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Select
-              value={categoryFilter}
-              onValueChange={(v) => setCategoryFilter(v)}
+              value={typeFilter}
+              onValueChange={(v) => setTypeFilter(v as typeof typeFilter)}
             >
               <SelectTrigger className="h-11 w-[170px] rounded-full">
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All categories</SelectItem>
-
-                {isFetchingCategories ? (
-                  <SelectItem value="loading" disabled>
-                    Loading...
+                <SelectItem value="all">All types</SelectItem>
+                {TABLE_TYPES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
                   </SelectItem>
-                ) : allCategory.length > 0 ? (
-                  allCategory.map((c) => (
-                    <SelectItem key={c.id} value={String(c.id)}>
-                      {c.name}
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="empty" disabled>
-                    No categories
-                  </SelectItem>
-                )}
+                ))}
               </SelectContent>
             </Select>
 
@@ -502,29 +430,22 @@ function MenuPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All status</SelectItem>
-                <SelectItem value="available">Available</SelectItem>
-                <SelectItem value="unavailable">Unavailable</SelectItem>
+                {TABLE_STATUS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
-            <div className="flex items-center rounded-full border bg-background p-1">
-              <Button
-                size="sm"
-                variant={view === "table" ? "default" : "ghost"}
-                onClick={() => setView("table")}
-                className="h-8 rounded-full px-3"
-              >
-                <ListIcon className="h-4 w-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant={view === "grid" ? "default" : "ghost"}
-                onClick={() => setView("grid")}
-                className="h-8 rounded-full px-3"
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              className="h-11 rounded-full px-6 py-3 bg-transparent hover:bg-muted/10 text-zinc-800 text-muted-foreground font-semibold"
+              onClick={resetFilters}
+            >
+              <RotateCw className="mr-2 h-4 w-4" />
+              Reset
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -533,28 +454,17 @@ function MenuPage() {
         <Card className="mt-6 border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <UtensilsCrossed className="h-6 w-6" />
+              <Table2 className="h-6 w-6" />
             </div>
-            <h3 className="mt-4 text-lg font-semibold">No menu items found</h3>
+            <h3 className="mt-4 text-lg font-semibold">No tables found</h3>
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Try adjusting your filters, or create your first menu item.
+              Try adjusting your filters, or create your first table.
             </p>
             <Button onClick={openCreate} className="mt-5 gap-2">
-              <Plus className="h-4 w-4" /> New Menu Item
+              <Plus className="h-4 w-4" /> New Table
             </Button>
           </CardContent>
         </Card>
-      ) : view === "grid" ? (
-        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((m) => (
-            <MenuCard
-              key={m.id}
-              item={m}
-              onEdit={() => openEdit(m)}
-              onDelete={() => setDeleteId(m.id)}
-            />
-          ))}
-        </div>
       ) : (
         <Card className="mt-6 overflow-hidden border-border/70 shadow-sm">
           <Table>
@@ -675,16 +585,15 @@ function MenuPage() {
         </Card>
       )}
 
-      <MenuDialog
+      <TableDialog
         open={dialogOpen}
         onOpenChange={(o) => {
           setDialogOpen(o);
           if (!o) setEditing(null);
         }}
-        allCategory={allCategory}
         initial={editing}
         onSave={handleSave}
-        loading={isCreating || isUpdating}
+        loading={isCreating || isEditing}
       />
 
       <AlertDialog
@@ -693,10 +602,10 @@ function MenuPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this menu item?</AlertDialogTitle>
+            <AlertDialogTitle>Delete this table?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action can't be undone. The menu item and its add-ons will be
-              permanently removed.
+              This action can't be undone. The table will be permanently
+              removed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -714,4 +623,4 @@ function MenuPage() {
   );
 }
 
-export default MenuPage;
+export default TablesPage;

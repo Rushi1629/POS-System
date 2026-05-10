@@ -21,9 +21,9 @@ export default function AuthInitializer({ children }: Props) {
   useEffect(() => {
     if (user) {
       dispatch(setUser(user));
-      
+
       if (pathname === "/login") {
-        router.replace("/user");
+        router.replace("/user-management");
       }
     }
 
@@ -34,7 +34,7 @@ export default function AuthInitializer({ children }: Props) {
   }, [user, isError, router, dispatch]);
 
   if (isLoading) {
-    return <ApiLoader message="Loading users..." />;
+    return <ApiLoader message="Loading your profile..." />;
   }
 
   return <>{children}</>;

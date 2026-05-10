@@ -10,7 +10,7 @@ export const store = configureStore({
     tables: tableReducer,
     auth: authReducer,
   },
-   middleware: (getDefaultMiddleware) =>
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(cartSyncMiddleware),
 });
 
