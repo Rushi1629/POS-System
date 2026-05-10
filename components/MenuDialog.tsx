@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,8 +11,10 @@ import { Label } from "./ui/label";
 import {
   AlignLeft,
   Drumstick,
+  ImagePlus,
   IndianRupee,
   Leaf,
+  Loader2,
   Pencil,
   Plus,
   Type,
@@ -28,55 +30,120 @@ import {
 import { Textarea } from "./ui/textarea";
 import { Switch } from "./ui/switch";
 import { Button } from "./ui/button";
-import { MenuFormData, MenuItem, MenuType, SubFormRow } from "@/types/types";
+import { SubFormRow, SubMenuItem } from "@/types/types";
 import { menuSchema } from "@/Schema/menuScheme";
 import { Input } from "@/components/input";
+import { FormValues, menuDialogProps, MenuPayload } from "@/types/menu-types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 function MenuDialog({
   open,
   onOpenChange,
   initial,
   onSave,
-}: {
-  open: boolean;
-  onOpenChange: (o: boolean) => void;
-  initial: MenuItem | null;
-  onSave: (data: MenuFormData) => void;
-}) {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [menuType, setMenuType] = useState<MenuType>("Veg");
-  const [description, setDescription] = useState("");
-  const [available, setAvailable] = useState(true);
-  const [categoryId, setCategoryId] = useState<string>("");
-  const [submenu, setSubmenu] = useState<SubFormRow[]>([]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  allCategory,
+  loading,
+}: menuDialogProps) {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: zodResolver(menuSchema) as any,
+    defaultValues: {
+      name: "",
+      description: "",
+      price: 0,
+      categoryId: 0,
+      available: true,
+      menuType: "Veg",
+      submenu: [],
+      imageFile: undefined,
+    },
+  });
 
-  const lastInitialId = useRef<string | null>(null);
-  const key = open ? String(initial?.id ?? "new") : null;
-  if (open && lastInitialId.current !== key) {
-    lastInitialId.current = key;
-    setName(initial?.name ?? "");
-    setPrice(initial ? String(initial.price) : "");
-    setMenuType(initial?.menuType ?? "Veg");
-    setDescription(initial?.description ?? "");
-    setAvailable(initial?.available ?? true);
-    setCategoryId(initial ? String(initial.category.id) : "");
-    setSubmenu(
-      initial
-        ? initial.subMenuItems.map((s) => ({
-            name: s.name,
-            price: String(s.price),
-            available: s.available,
-            description: s.description,
-          }))
-        : [],
-    );
-    setErrors({});
+  const [submenu, setSubmenu] = useState<SubFormRow[]>([]);
+
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>("");
+
+  function handleFile(file: File | null) {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image must be under 2MB");
+      return;
+    }
+
+    // ✅ set in RHF
+    setValue("imageFile", file);
+
+    // ✅ store file
+    setImageFile(file);
+
+    // ✅ preview
+    const url = URL.createObjectURL(file);
+    setPreview(url);
   }
-  if (!open && lastInitialId.current !== null) {
-    lastInitialId.current = null;
-  }
+
+  const menuType = watch("menuType");
+
+  useEffect(() => {
+    if (!open) return; // ✅ only run when dialog opens
+
+    if (initial) {
+      // 👉 EDIT MODE
+      const mappedSubmenu =
+        initial.subMenuItems?.map((s: SubMenuItem) => ({
+          name: s.name,
+          price: Number(s.price),
+          available: s.available,
+          description: s.description,
+        })) || [];
+
+      reset({
+        name: initial.name,
+        description: initial.description,
+        price: initial.price,
+        categoryId: Number(initial.category?.id),
+        available: initial.available,
+        menuType: initial.menuType,
+        submenu: mappedSubmenu,
+        imageFile: undefined,
+      });
+
+      setSubmenu(mappedSubmenu);
+      setPreview(initial.imageUrl ?? "");
+      setImageFile(null);
+    } else {
+      // 👉 CREATE MODE (IMPORTANT 🔥)
+      reset({
+        name: "",
+        description: "",
+        price: 0,
+        categoryId: undefined, // ✅ important
+        available: true,
+        menuType: "Veg",
+        submenu: [],
+        imageFile: undefined,
+      });
+
+      setSubmenu([]);
+      setPreview("");
+      setImageFile(null);
+    }
+  }, [open, initial, reset]);
 
   function addSub() {
     setSubmenu((prev) => [
@@ -88,46 +155,78 @@ function MenuDialog({
     setSubmenu((prev) => prev.filter((_, idx) => idx !== i));
   }
   function updateSub(i: number, patch: Partial<SubFormRow>) {
-    setSubmenu((prev) =>
-      prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)),
-    );
+    setSubmenu((prev) => {
+      const updated = prev.map((s, idx) =>
+        idx === i ? { ...s, ...patch } : s,
+      );
+
+      // ✅ sync with RHF
+      setValue(
+        "submenu",
+        updated.map((s) => ({
+          ...s,
+          price: Number(s.price),
+        })),
+      );
+
+      return updated;
+    });
   }
 
-  function submit() {
-    const parsed = menuSchema.safeParse({
-      name,
-      price: Number(price),
-      menuType,
-      description,
-      available,
-      categoryId: categoryId ? Number(categoryId) : undefined,
-      submenu: submenu.map((s) => ({
+  // ✅ Submit handler → convert to FormData
+  const onSubmit = async (values: FormValues) => {
+    debugger;
+    console.log("🔥 SUBMIT CALLED");
+    try {
+      // ✅ FIX HERE
+      const formattedSubmenu = values.submenu || [];
+
+      const payload: MenuPayload = {
+        name: values.name,
+        description: values.description || "",
+        price: values.price,
+        categoryId: values.categoryId,
+        available: values.available,
+        menuType: values.menuType,
+        // subMenu: formattedSubmenu, // ⚠️ match backend key (NOT subMenuItems)
+      };
+
+      const cleanSubmenu = (values.submenu || []).map((s) => ({
         name: s.name,
         price: Number(s.price),
         available: s.available,
-        description: s.description,
-      })),
-    });
-    if (!parsed.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of parsed.error.issues) {
-        fieldErrors[issue.path.join(".")] = issue.message;
-      }
-      setErrors(fieldErrors);
-      return;
-    }
-    onSave(parsed.data);
-  }
+        description: s.description || "",
+      }));
 
-  const categoryList: Array<{ id: number; name: string }> = [
-    { id: 1, name: "Pizza" },
-    { id: 3, name: "Burger" },
-    { id: 4, name: "Small Burger" },
-    { id: 5, name: "Beverages" },
-  ];
+      if (!initial && cleanSubmenu.length > 0) {
+        payload.subMenu = cleanSubmenu;
+      }
+
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(payload));
+
+      if (values.imageFile) {
+        formData.append("imageFile", values.imageFile); // ✅ FIX
+      }
+
+      for (let pair of formData.entries()) {
+        console.log("FORMDATA:", pair[0], pair[1]);
+      }
+      await onSave(formData);
+      console.log("Form saved successfully");
+    } catch (error) {
+      console.error("Form submission error:", error);
+      toast.error("Failed to save menu item");
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        if (!loading) onOpenChange(o); // ✅ block close while saving
+      }}
+    >
       <DialogContent className="sm:max-w-[640px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-xl">
@@ -142,20 +241,60 @@ function MenuDialog({
 
         <div className="grid gap-5 py-2 overflow-y-auto px-2 no-scrollbar">
           <div className="grid gap-2">
+            <Label>Image</Label>
+            <div
+              className="group relative flex h-40 cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted/40 transition-colors hover:border-[#f77f00]/60 hover:bg-muted"
+              onClick={() => fileRef.current?.click()}
+            >
+              {preview ? (
+                <>
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/40 group-hover:opacity-100">
+                    <span className="rounded-md bg-background/90 px-3 py-1.5 text-sm font-medium">
+                      Replace image
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                  <ImagePlus className="h-8 w-8" />
+                  <p className="text-sm">Click to upload image</p>
+                  <p className="text-xs">PNG, JPG up to 2MB</p>
+                </div>
+              )}
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+              />
+            </div>
+            {errors.imageFile?.message && (
+              <p className="text-xs text-destructive">
+                {String(errors.imageFile.message)}
+              </p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
             <Label htmlFor="m-name">Name</Label>
             <div className="relative">
               <Type className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id="m-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Veg Cheese Burger"
+                {...register("name")}
+                placeholder="Menu name"
                 className="pl-9"
-                maxLength={80}
               />
             </div>
+
             {errors.name && (
-              <p className="text-xs text-destructive">{errors.name}</p>
+              <p className="text-xs text-destructive">{errors.name.message}</p>
             )}
           </div>
 
@@ -169,25 +308,29 @@ function MenuDialog({
                   type="number"
                   step="0.01"
                   min="0"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  {...register("price")}
                   placeholder="129.25"
                   className="pl-9"
                 />
               </div>
               {errors.price && (
-                <p className="text-xs text-destructive">{errors.price}</p>
+                <p className="text-xs text-destructive">
+                  {errors.price.message}
+                </p>
               )}
             </div>
 
             <div className="grid gap-2">
               <Label>Category</Label>
-              <Select value={categoryId} onValueChange={setCategoryId}>
+              <Select
+                value={watch("categoryId") ? String(watch("categoryId")) : ""}
+                onValueChange={(v) => setValue("categoryId", Number(v))} // ✅ convert here
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categoryList.map((c) => (
+                  {allCategory.map((c) => (
                     <SelectItem key={c.id} value={String(c.id)}>
                       {c.name}
                     </SelectItem>
@@ -195,7 +338,9 @@ function MenuDialog({
                 </SelectContent>
               </Select>
               {errors.categoryId && (
-                <p className="text-xs text-destructive">{errors.categoryId}</p>
+                <p className="text-xs text-destructive">
+                  {errors.categoryId.message}
+                </p>
               )}
             </div>
           </div>
@@ -205,7 +350,7 @@ function MenuDialog({
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => setMenuType("Veg")}
+                onClick={() => setValue("menuType", "Veg")}
                 className={`flex items-center justify-center gap-2 rounded-md border px-3 py-2.5 text-sm font-medium transition-colors ${
                   menuType === "Veg"
                     ? "border-chart-2 bg-chart-2/10 text-chart-2"
@@ -216,7 +361,7 @@ function MenuDialog({
               </button>
               <button
                 type="button"
-                onClick={() => setMenuType("NonVeg")}
+                onClick={() => setValue("menuType", "NonVeg")}
                 className={`flex items-center justify-center gap-2 rounded-md border px-3 py-2.5 text-sm font-medium transition-colors ${
                   menuType === "NonVeg"
                     ? "border-destructive bg-destructive/10 text-destructive"
@@ -234,8 +379,7 @@ function MenuDialog({
               <AlignLeft className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Textarea
                 id="m-desc"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                {...register("description")}
                 placeholder="Short description of the item..."
                 rows={3}
                 className="pl-9"
@@ -243,14 +387,22 @@ function MenuDialog({
             </div>
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border p-3">
+          <div
+            className="flex items-center justify-between rounded-lg border p-3 cursor-pointer"
+            onClick={() => setValue("available", !watch("available"))}
+          >
             <div>
               <Label className="text-sm">Available</Label>
               <p className="text-xs text-muted-foreground">
                 Customers can order this item when on.
               </p>
             </div>
-            <Switch checked={available} onCheckedChange={setAvailable} />
+
+            <Switch
+              checked={watch("available")}
+              onCheckedChange={(v) => setValue("available", v)}
+              onClick={(e) => e.stopPropagation()} // ✅ IMPORTANT
+            />
           </div>
 
           {/* Submenu / add-ons */}
@@ -332,9 +484,9 @@ function MenuDialog({
                         onCheckedChange={(v) => updateSub(i, { available: v })}
                       />
                     </div>
-                    {errors[`submenu.${i}.name`] && (
+                    {errors.submenu?.[i]?.name && (
                       <p className="mt-1 text-xs text-destructive">
-                        {errors[`submenu.${i}.name`]}
+                        {errors.submenu[i]?.name?.message}
                       </p>
                     )}
                   </div>
@@ -348,14 +500,24 @@ function MenuDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={submit} className="gap-2">
-            {initial ? (
+          <Button
+            onClick={handleSubmit(onSubmit, (errors) => {
+              console.log("❌ VALIDATION ERRORS:", errors);
+            })}
+            disabled={loading}
+            className="gap-2"
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : initial ? (
               <>
-                <Pencil className="h-4 w-4" /> Save changes
+                <Pencil className="h-4 w-4" />
+                Save changes
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4" /> Create item
+                <Plus className="h-4 w-4" />
+                Create item
               </>
             )}
           </Button>

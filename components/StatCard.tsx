@@ -10,7 +10,7 @@ function StatCard({
   label: string;
   value: number;
   icon: React.ReactNode;
-  tint: "primary" | "emerald" | "muted";
+  tint: "primary" | "emerald" | "muted" | "default";
 }) {
   const tintCls =
     tint === "primary"

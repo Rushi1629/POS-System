@@ -287,7 +287,7 @@ export type MenuFormData = z.infer<typeof menuSchema>;
 export type SubMenuItem = {
   id: number;
   name: string;
-  price: number;
+  price: string | number;
   available: boolean;
   description: string;
   imageUrl?: string | null;
@@ -301,7 +301,7 @@ export type MenuItem = {
   description: string;
   available: boolean;
   imageUrl?: string | null;
-  category: { id: number; name: string };
+  category: { id: string; name: string };
   subMenuItems: SubMenuItem[];
 };
 

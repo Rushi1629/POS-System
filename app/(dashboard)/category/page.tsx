@@ -269,10 +269,10 @@ function CategoriesPage() {
           data: formData,
         });
 
-        toast.success("Category updated ✅");
+        toast.success("Category updated 👍");
       } else {
         await createCategory(formData);
-        toast.success("Category created ✅");
+        toast.success("Category created 🥳");
       }
 
       setDialogOpen(false);

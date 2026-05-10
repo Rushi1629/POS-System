@@ -1,6 +1,5 @@
 "use client";
-import { useMemo, useRef, useState } from "react";
-import { z } from "zod";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   type ColumnDef,
   type PaginationState,
@@ -77,56 +76,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import Link from "next/link";
 import MenuDialog from "@/components/MenuDialog";
 import StatusPill from "@/components/StatusPill";
 import VegBadge from "@/components/VegBadge";
 import Thumb from "@/components/Thumb";
-import { menuSchema } from "@/Schema/menuScheme";
-import { MenuFormData, MenuItem } from "@/types/types";
+import { MenuItem } from "@/types/types";
 import StatCard from "@/components/StatCard";
 import MenuCard from "@/components/MenuCard";
-
-const categoryList: Array<{ id: number; name: string }> = [
-  { id: 1, name: "Pizza" },
-  { id: 3, name: "Burger" },
-  { id: 4, name: "Small Burger" },
-  { id: 5, name: "Beverages" },
-];
-
-const seed: MenuItem[] = [
-  {
-    id: 8,
-    name: "Veg Cheese Burger",
-    price: 129.25,
-    menuType: "Veg",
-    description: "Veg cheese Burger with some sauces and toppings.",
-    available: true,
-    imageUrl: null,
-    category: { id: 3, name: "Burger" },
-    subMenuItems: [
-      { id: 11, name: "Extra cheese.", price: 4.5, available: true, description: "Extra cheese." },
-      { id: 12, name: "Extra sauce.", price: 2.5, available: true, description: "Extra sauce." },
-    ],
-  },
-  {
-    id: 9,
-    name: "Veg Cheese Burger",
-    price: 129.25,
-    menuType: "Veg",
-    description: "Veg cheese Burger with some sauces and toppings.",
-    available: true,
-    imageUrl: null,
-    category: { id: 4, name: "Small Burger" },
-    subMenuItems: [
-      { id: 13, name: "Extra cheese.", price: 4.5, available: true, description: "Extra cheese." },
-      { id: 14, name: "Extra sauce.", price: 2.5, available: true, description: "Extra sauce." },
-    ],
-  },
-];
+import {
+  useCreateMenu,
+  useDeleteMenu,
+  useFetchMenus,
+  useUpdateMenu,
+} from "@/api/hooks/useMenu";
+import { useFetchCategories } from "@/api/hooks/useCategory";
+import { isEqual } from "lodash-es";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 function MenuPage() {
-  const [items, setItems] = useState<MenuItem[]>(seed);
+  const { data: items = [], isLoading } = useFetchMenus();
+  const { mutateAsync: createMenu , isPending: isCreating } = useCreateMenu();
+  const { mutateAsync: updateMenu, isPending: isUpdating } = useUpdateMenu();
+  const { mutateAsync: deleteMenu } = useDeleteMenu();
+
+  const { data: allCategory = [] } = useFetchCategories();
+
+  console.log(allCategory, "categories");
+
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"grid" | "table">("table");
   const [statusFilter, setStatusFilter] = useState<
@@ -155,20 +131,25 @@ function MenuPage() {
       .filter((m) =>
         categoryFilter === "all"
           ? true
-          : String(m.category.id) === categoryFilter,
+          : String(m.category?.id) === categoryFilter,
       )
       .filter(
         (m) =>
           m.name.toLowerCase().includes(search.toLowerCase()) ||
-          m.description.toLowerCase().includes(search.toLowerCase()),
+          (m.description || "").toLowerCase().includes(search.toLowerCase()),
       );
   }, [items, search, statusFilter, categoryFilter]);
+
+  useEffect(() => {
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
+  }, [search, categoryFilter, statusFilter]);
 
   const stats = useMemo(
     () => ({
       total: items.length,
       available: items.filter((m) => m.available).length,
       veg: items.filter((m) => m.menuType === "Veg").length,
+      nonVeg: items.filter((m) => m.menuType === "NonVeg").length,
     }),
     [items],
   );
@@ -213,19 +194,77 @@ function MenuPage() {
         header: "Price",
         cell: ({ row }) => (
           <span className="font-semibold tabular-nums text-foreground">
-            ₹{row.original.price.toFixed(2)}
+            ₹{Number(row.original.price).toFixed(2)}
           </span>
         ),
       },
+      // {
+      //   id: "submenu",
+      //   header: "Add-ons",
+      //   cell: ({ row }) => (
+      //     <span className="text-sm text-muted-foreground">
+      //       {row.original.subMenuItems?.length || 0} item
+      //       {row.original.subMenuItems.length === 1 ? "" : "s"}
+      //     </span>
+      //   ),
+      // },
       {
         id: "submenu",
         header: "Add-ons",
-        cell: ({ row }) => (
-          <span className="text-sm text-muted-foreground">
-            {row.original.subMenuItems.length} item
-            {row.original.subMenuItems.length === 1 ? "" : "s"}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const subs = row.original.subMenuItems;
+          const count = subs.length;
+          if (count === 0) {
+            return <span className="text-sm text-muted-foreground">—</span>;
+          }
+          return (
+            <HoverCard openDelay={120} closeDelay={80}>
+              <HoverCardTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-dashed border-border bg-muted/40 px-2.5 py-1 text-xs font-medium text-foreground/80 transition-colors hover:border-primary/60 hover:bg-primary/5 hover:text-foreground"
+                >
+                  <Plus className="h-3 w-3" />
+                  {count} add-on{count === 1 ? "" : "s"}
+                </button>
+              </HoverCardTrigger>
+              <HoverCardContent side="top" align="start" className="w-72 p-0">
+                <div className="border-b px-3 py-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Add-ons for {row.original.name}
+                  </p>
+                </div>
+                <ul className="max-h-64 divide-y overflow-auto">
+                  {subs.map((s) => (
+                    <li key={s.id} className="flex items-start justify-between gap-3 px-3 py-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="truncate text-sm font-medium text-foreground">
+                            {s.name}
+                          </span>
+                          <span
+                            className={`inline-block h-1.5 w-1.5 rounded-full ${
+                              s.available ? "bg-emerald-500" : "bg-muted-foreground/40"
+                            }`}
+                            aria-label={s.available ? "Available" : "Unavailable"}
+                          />
+                        </div>
+                        {s.description ? (
+                          <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                            {s.description}
+                          </p>
+                        ) : null}
+                      </div>
+                      <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
+                        ₹{Number(s.price).toFixed(2)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </HoverCardContent>
+            </HoverCard>
+          );
+        },
       },
       {
         accessorKey: "available",
@@ -254,14 +293,6 @@ function MenuPage() {
               className="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive"
             >
               <Trash2 className="h-4 w-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label="More"
-              className="h-9 w-9"
-            >
-              <MoreHorizontal className="h-4 w-4" />
             </Button>
           </div>
         ),
@@ -298,68 +329,72 @@ function MenuPage() {
     setDialogOpen(true);
   }
 
-  function handleSave(data: MenuFormData) {
-    const cat = categoryList.find((c) => c.id === data.categoryId);
-    if (!cat) {
-      toast.error("Invalid category");
-      return;
-    }
-    if (editing) {
-      setItems((prev) =>
-        prev.map((m) =>
-          m.id === editing.id
-            ? {
-                ...m,
-                name: data.name,
-                price: data.price,
-                menuType: data.menuType,
-                description: data.description ?? "",
-                available: data.available,
-                category: cat,
-                subMenuItems: data.submenu.map((s, i) => ({
-                  id: m.subMenuItems[i]?.id ?? Date.now() + i,
-                  name: s.name,
-                  price: s.price,
-                  available: s.available,
-                  description: s.description ?? "",
-                })),
-              }
-            : m,
-        ),
-      );
-      toast.success("Menu item updated");
-    } else {
-      setItems((prev) => [
-        {
-          id: Date.now(),
+  async function handleSave(formData: FormData) {
+    try {
+      // console.log("handleSave called", { isEditing: !!editing });
+      if (editing) {
+        const data = JSON.parse(String(formData.get("data") || "{}"));
+
+        const payload = {
           name: data.name,
+          description: data.description,
           price: data.price,
-          menuType: data.menuType,
-          description: data.description ?? "",
           available: data.available,
-          imageUrl: null,
-          category: cat,
-          subMenuItems: data.submenu.map((s, i) => ({
-            id: Date.now() + i + 1,
-            name: s.name,
-            price: s.price,
-            available: s.available,
-            description: s.description ?? "",
-          })),
-        },
-        ...prev,
-      ]);
-      toast.success("Menu item created");
+          categoryId: data.categoryId,
+        };
+
+        const isSame = isEqual(
+          {
+            name: editing.name,
+            description: editing.description,
+            price: Number(editing.price),
+            available: editing.available,
+            categoryId: editing.category?.id,
+          },
+          payload,
+        );
+
+        const hasImageChanged = formData.get("imageFile") instanceof File;
+
+        if (isSame && !hasImageChanged) {
+          toast.info("No changes detected 🤔");
+          setDialogOpen(false);
+          return;
+        }
+
+        console.log("Updating menu...");
+        await updateMenu({
+          id: String(editing.id),
+          formData: formData,
+        });
+
+        toast.success("Menu updated 👍");
+      } else {
+        console.log("Creating new menu...");
+        await createMenu(formData);
+        console.log("Menu created successfully");
+        toast.success("Menu created 🥳");
+      }
+
+      setDialogOpen(false);
+      setEditing(null);
+    } catch (err) {
+      console.error("handleSave error:", err);
+      toast.error("Something went wrong ❌");
     }
-    setDialogOpen(false);
-    setEditing(null);
   }
 
-  function confirmDelete() {
-    if (deleteId == null) return;
-    setItems((prev) => prev.filter((m) => m.id !== deleteId));
-    toast.success("Menu item deleted");
-    setDeleteId(null);
+  async function confirmDelete() {
+    if (!deleteId) return;
+
+    try {
+      await deleteMenu(String(deleteId));
+
+      toast.success("Menu deleted ✅");
+      setDeleteId(null);
+    } catch {
+      toast.error("Delete failed ❌");
+    }
   }
 
   return (
@@ -383,7 +418,7 @@ function MenuPage() {
         </Button>
       </div>
 
-      <div className="mt-7 grid grid-cols-1 gap-5 md:grid-cols-3">
+      <div className="mt-7 grid grid-cols-1 gap-5 md:grid-cols-4">
         <StatCard
           label="TOTAL ITEMS"
           value={stats.total}
@@ -401,6 +436,12 @@ function MenuPage() {
           value={stats.veg}
           icon={<Leaf className="h-5 w-5" />}
           tint="muted"
+        />
+        <StatCard
+          label="NON-VEGETARIAN"
+          value={stats.nonVeg}
+          icon={<Drumstick className="h-5 w-5" />}
+          tint="default"
         />
       </div>
 
@@ -425,7 +466,7 @@ function MenuPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All categories</SelectItem>
-                {categoryList.map((c) => (
+                {allCategory.map((c) => (
                   <SelectItem key={c.id} value={String(c.id)}>
                     {c.name}
                   </SelectItem>
@@ -621,8 +662,10 @@ function MenuPage() {
           setDialogOpen(o);
           if (!o) setEditing(null);
         }}
+        allCategory={allCategory}
         initial={editing}
         onSave={handleSave}
+        loading={isCreating || isUpdating}
       />
 
       <AlertDialog
