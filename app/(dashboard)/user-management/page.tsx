@@ -91,9 +91,9 @@ export default function UsersPage() {
     setLoadingForm(false);
   };
 
-    if (isLoading) {
-      return <ApiLoader message="Loading users..." />;
-    }
+  if (isLoading) {
+    return <ApiLoader message="Loading users..." />;
+  }
 
   const handleCreate = async (values: UserFormValues) => {
     debugger;
@@ -111,6 +111,7 @@ export default function UsersPage() {
         password: values.password,
         phoneNumber: values.phoneNumber,
         roleId: role.id,
+        isActive: true,
         ...(values.password && { password: values.password }),
       };
 
@@ -152,10 +153,12 @@ export default function UsersPage() {
       }
 
       // 🔥 CHECK IF ANYTHING CHANGED
-      const isSame = isEqual(editing, {
-        ...values,
-        roleId: role.id,
-      });
+      const isSame =
+        editing.name === values.name &&
+        editing.username === values.username &&
+        editing.email === values.email &&
+        editing.phoneNumber === values.phoneNumber &&
+        editing.role === values.role;
 
       if (isSame) {
         toast.info("No changes detected - nothing to update 🤔");
@@ -169,6 +172,7 @@ export default function UsersPage() {
         email: values.email,
         phoneNumber: values.phoneNumber,
         roleId: role.id,
+        isActive: editing.isActive
       };
 
       await editUser({

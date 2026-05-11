@@ -3,47 +3,86 @@
 import { TableCard } from "@/components/TableCard";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { categories, categoryLabels, TableCategory } from "@/types/types";
-import { useAppSelector } from "@/store/hooks";
+// import { categoryLabels } from "@/types/types";
+import { useFetchTables } from "@/api/hooks/useTable";
+import { TABLE_TYPE_LABELS, TABLE_TYPES, TableType } from "@/types/table-types";
 
-export default function Tables() {
-  const [filter, setFilter] = useState<TableCategory | "all">("all");
+export default function TablesManagement() {
+  const [filter, setFilter] = useState<TableType | "ALL">("ALL");
 
-  // ✅ Get tables from Redux store
-  const tables = useAppSelector((state) => state.tables.tables);
+  const { data: tables = [], isLoading } = useFetchTables();
 
-  // ✅ Apply filter
+  const mappedTables = tables.map((t) => ({
+    id: t.id,
+    name: t.name,
+    type: t.type,
+    status: t.status,
+    capacity: t.capacity,
+    enableTimeRate: t.enableTimeRate,
+    ratePerMinute: t.ratePerMinute,
+    qrCode: t.qrCode,
+    isActive: t.isActive,
+  }));
+
+  // id: number;
+  // name: string;
+  // type: TableType; // ✅ fixed
+  // status: TableStatus; // ✅ fixed
+  // capacity: number;
+  // enableTimeRate: boolean;
+  // ratePerMinute: number;
+  // qrCode: string | null;
+  // isActive: boolean;
+
   const filtered =
-    filter === "all" ? tables : tables.filter((t) => t.category === filter);
+    filter === "ALL"
+      ? mappedTables
+      : mappedTables.filter((t) => t.type === filter);
 
-  const groupedTables = tables.reduce(
+  // const isEmpty = filtered.length === 0;
+
+  const groupedTables = mappedTables.reduce(
     (acc, table) => {
-      if (!acc[table.category]) {
-        acc[table.category] = [];
+      if (!acc[table.type]) {
+        acc[table.type] = [];
       }
-      acc[table.category].push(table);
+      acc[table.type].push(table);
       return acc;
     },
-    {} as Record<string, typeof tables>,
+    {} as Record<TableType, typeof mappedTables>,
   );
-
   return (
     <div className="space-y-6">
       {/* 🔘 Category Filters */}
       <div className="flex items-center gap-2 flex-wrap">
-        {categories.map((cat) => (
+        {/* ✅ ALL BUTTON */}
+        <Button
+          variant={filter === "ALL" ? "default" : "outline"}
+          size="sm"
+          className={`text-[14px] transition-all ${
+            filter === "ALL"
+              ? "bg-[#e25f28] text-white hover:bg-[#e25f28]"
+              : "bg-transparent border border-gray-300 hover:bg-gray-100"
+          }`}
+          onClick={() => setFilter("ALL")}
+        >
+          All
+        </Button>
+
+        {/* ✅ TABLE TYPE BUTTONS */}
+        {TABLE_TYPES.map((type) => (
           <Button
-            key={cat.value}
-            variant={filter === cat.value ? "default" : "outline"}
+            key={type}
+            variant={filter === type ? "default" : "outline"}
             size="sm"
             className={`text-[14px] transition-all ${
-              filter === cat.value
+              filter === type
                 ? "bg-[#e25f28] text-white hover:bg-[#e25f28]"
                 : "bg-transparent border border-gray-300 hover:bg-gray-100"
             }`}
-            onClick={() => setFilter(cat.value)}
+            onClick={() => setFilter(type)}
           >
-            {cat.label}
+            {TABLE_TYPE_LABELS[type]}
           </Button>
         ))}
       </div>
@@ -69,27 +108,36 @@ export default function Tables() {
       </div>
 
       {/* 🪑 TABLE VIEW */}
-      {filter === "all" ? (
+      {filter === "ALL" ? (
         // ✅ GROUPED VIEW (ONLY ALL)
         <div className="space-y-8">
-          {Object.entries(groupedTables).map(([category, tables]) => (
-            <div key={category} className="space-y-3">
-              {/* Category Title */}
-              <h2 className="text-sm font-semibold text-muted-foreground capitalize">
-                {categoryLabels[category]}
-              </h2>
+          {TABLE_TYPES.map((type) => {
+            const tables = groupedTables[type];
 
-              {/* Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {tables.map((table) => (
-                  <TableCard key={table.id} table={table} />
-                ))}
+            if (!tables || tables.length === 0) return null;
+
+            return (
+              <div key={type} className="space-y-3">
+                {/* Category Title */}
+                <h2 className="text-sm font-semibold text-muted-foreground capitalize">
+                  {TABLE_TYPE_LABELS[type]} ({tables.length})
+                </h2>
+
+                {/* Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {tables.map((table) => (
+                    <TableCard key={table.id} table={table} />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-10 text-sm text-muted-foreground">
+          No tables found
         </div>
       ) : (
-        // ❗ EXISTING VIEW (UNCHANGED)
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filtered.map((table) => (
             <TableCard key={table.id} table={table} />

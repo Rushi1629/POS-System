@@ -24,10 +24,10 @@ export interface FetchTableResponse {
 }
 
 export const TABLE_TYPES = ["FAMILY", "POD", "HALL"] as const;
-export type TableType = (typeof TABLE_TYPES)[number];
+export const TABLE_STATUS = ["AVAILABLE", "OCCUPIED", "RESERVED", "CLEANING"] as const;
 
-export const TABLE_STATUS = ["AVAILABLE", "OCCUPIED", "RESERVED" , "CLEANING"] as const;
-export type TableStatus = (typeof TABLE_STATUS)[number];
+export type TableType = typeof TABLE_TYPES[number];
+export type TableStatus = typeof TABLE_STATUS[number];
 
 export type TableFormValues = z.infer<typeof tableSchema>;
 
@@ -51,4 +51,10 @@ export const statusMap: Record<
     label: "Cleaning",
     className: "bg-blue-500/15 text-blue-600",
   },
+};
+
+export const TABLE_TYPE_LABELS: Record<TableType, string> = {
+  FAMILY: "Family Table",
+  POD: "Private Pod",
+  HALL: "Hall Seating",
 };

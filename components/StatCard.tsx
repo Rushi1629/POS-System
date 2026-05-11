@@ -10,14 +10,16 @@ function StatCard({
   label: string;
   value: number;
   icon: React.ReactNode;
-  tint: "primary" | "emerald" | "muted" | "default";
+  tint: "primary" | "emerald" | "muted" | "nonveg";
 }) {
   const tintCls =
     tint === "primary"
       ? "bg-[#cd4805]/10 text-[#cd4805]"
       : tint === "emerald"
         ? "bg-chart-2/15 text-chart-2"
-        : "bg-muted text-muted-foreground";
+        : tint === "nonveg"
+          ? "bg-red-500/15 text-red-600"
+          : "bg-muted text-muted-foreground";
   return (
     <Card className="border-border/70 shadow-sm transition-shadow hover:shadow-md">
       <CardContent className="flex items-center justify-between p-6">

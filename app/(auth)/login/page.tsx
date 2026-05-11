@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Copy, CheckCheck, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -12,6 +11,7 @@ import { useLogin } from "@/api/hooks/useAuth";
 import SecretCafeLoader from "@/components/SecretCafeLoader";
 import { DemoCredential } from "@/types/types";
 import { useAppDispatch } from "@/store/hooks";
+import { useForm } from "react-hook-form";
 
 const demoCredentials: DemoCredential[] = [
   {
@@ -49,10 +49,10 @@ export default function LoginForm() {
   // Login API mutation using custom hook
   const loginMutation = useLogin();
 
-    useEffect(() => {
+  useEffect(() => {
     if (loginMutation.isSuccess) {
       toast.success("Login successful 🎉");
-      setTimeout(() => router.push("/customer"), 800);    
+      setTimeout(() => router.push("/customer"), 800);
     }
 
     if (loginMutation.isError) {
@@ -60,14 +60,15 @@ export default function LoginForm() {
     }
   }, [loginMutation.isSuccess, loginMutation.isError]);
 
-  const form = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       email: "",
       password: "",
       remember: false,
-    },
-    onSubmit: async ({ value }) => {
-      loginMutation.mutate(value);
     },
   });
 
@@ -84,7 +85,6 @@ export default function LoginForm() {
       )}
 
       <div className="min-h-screen bg-[#0f0d0b] flex items-center justify-center relative overflow-hidden px-4 py-10">
-
         {/* Animated background blobs */}
         <div className="absolute inset-0 pointer-events-none">
           <motion.div
@@ -207,142 +207,88 @@ export default function LoginForm() {
 
               <form
                 autoComplete="off"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  void form.handleSubmit();
-                }}
+                onSubmit={handleSubmit((data) => {
+                  loginMutation.mutate(data);
+                })}
                 className="space-y-4"
               >
                 {/* Email */}
-                <form.Field
-                  name="email"
-                  validators={{
-                    onChange: ({ value }) => {
-                      if (!value) return "Email is required";
-                      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                        return "Enter a valid email address";
-                      return undefined;
-                    },
-                  }}
-                >
-                  {(field) => (
-                    <motion.div
-                      variants={{
-                        hidden: { opacity: 0, y: 20 },
-                        visible: { opacity: 1, y: 0 },
-                      }}
-                    >
-                      <label
-                        htmlFor="email"
-                        className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider"
-                      >
-                        Email
-                      </label>
-                      <input
-                        id="email"
-                        type="email"
-                        autoComplete="new-email"
-                        placeholder="you@cafepos.app"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        onBlur={field.handleBlur}
-                        className={`w-full px-4 py-3 text-sm text-white placeholder-white/20 rounded-xl outline-none transition-all duration-200
-                        border bg-white/4
-                        focus:bg-white/[0.07] focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10
-                        ${field.state.meta.errors.length > 0 && field.state.meta.isTouched ? "border-red-500/40 bg-red-500/5" : "border-white/8 hover:border-white/[0.14]"}`}
-                      />
-                      {field.state.meta.isTouched &&
-                        field.state.meta.errors.length > 0 && (
-                          <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
-                            <AlertCircle size={11} />
-                            {field.state.meta.errors[0]}
-                          </p>
-                        )}
-                    </motion.div>
+                <div>
+                  <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">
+                    Email
+                  </label>
+
+                  <input
+                    type="email"
+                    placeholder="you@cafepos.app"
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: "Enter a valid email address",
+                      },
+                    })}
+                    className={`w-full px-4 py-3 text-sm text-white rounded-xl border
+    ${errors.email ? "border-red-500/40 bg-red-500/5" : "border-white/8"}`}
+                  />
+
+                  {errors.email && (
+                    <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
+                      <AlertCircle size={11} />
+                      {errors.email.message}
+                    </p>
                   )}
-                </form.Field>
+                </div>
 
                 {/* Password */}
-                <form.Field
-                  name="password"
-                  validators={{
-                    onChange: ({ value }) => {
-                      if (!value) return "Password is required";
-                      if (value.length < 6)
-                        return "Password must be at least 6 characters";
-                      return undefined;
-                    },
-                  }}
-                >
-                  {(field) => (
-                    <div>
-                      <label
-                        htmlFor="password"
-                        className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider"
-                      >
-                        Password
-                      </label>
-                      <div className="relative">
-                        <input
-                          id="password"
-                          type={showPassword ? "text" : "password"}
-                          autoComplete="new-password"
-                          placeholder="Enter your password"
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          onBlur={field.handleBlur}
-                          className={`w-full px-4 py-3 pr-11 text-sm text-white placeholder-white/20 rounded-xl outline-none transition-all duration-200
-                          border bg-white/4
-                          focus:bg-white/[0.07] focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10
-                          ${field.state.meta.errors.length > 0 && field.state.meta.isTouched ? "border-red-500/40 bg-red-500/5" : "border-white/8 hover:border-white/[0.14]"}`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
-                          aria-label={
-                            showPassword ? "Hide password" : "Show password"
-                          }
-                        >
-                          {showPassword ? (
-                            <EyeOff size={16} />
-                          ) : (
-                            <Eye size={16} />
-                          )}
-                        </button>
-                      </div>
-                      {field.state.meta.isTouched &&
-                        field.state.meta.errors.length > 0 && (
-                          <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
-                            <AlertCircle size={11} />
-                            {field.state.meta.errors[0]}
-                          </p>
-                        )}
-                    </div>
+                <div>
+                  <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">
+                    Password
+                  </label>
+
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      {...register("password", {
+                        required: "Password is required",
+                        minLength: {
+                          value: 6,
+                          message: "Password must be at least 6 characters",
+                        },
+                      })}
+                      className={`w-full px-4 py-3 pr-11 text-sm text-white rounded-xl border
+      ${errors.password ? "border-red-500/40 bg-red-500/5" : "border-white/8"}`}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2"
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+
+                  {errors.password && (
+                    <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
+                      <AlertCircle size={11} />
+                      {errors.password.message}
+                    </p>
                   )}
-                </form.Field>
+                </div>
 
                 {/* Remember */}
-                <form.Field name="remember">
-                  {(field) => (
-                    <div className="flex items-center gap-2.5 pt-1">
-                      <input
-                        id="remember"
-                        type="checkbox"
-                        checked={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.checked)}
-                        className="w-4 h-4 rounded border-white/20 bg-white/5 text-amber-500 focus:ring-amber-500/30 cursor-pointer"
-                      />
-                      <label
-                        htmlFor="remember"
-                        className="text-sm text-white/40 cursor-pointer select-none"
-                      >
-                        Keep me signed in
-                      </label>
-                    </div>
-                  )}
-                </form.Field>
+                <div className="flex items-center gap-2.5 pt-1">
+                  <input
+                    type="checkbox"
+                    {...register("remember")}
+                    className="w-4 h-4"
+                  />
+                  <label className="text-sm text-white/40">
+                    Keep me signed in
+                  </label>
+                </div>
 
                 {/* Submit */}
                 <motion.button

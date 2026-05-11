@@ -56,10 +56,10 @@ export const categoryLabels: Record<string, string> = {
 };
 
 export const statusLabels: Record<string, string> = {
-  available: "Available",
-  occupied: "Occupied",
-  reserved: "Reserved",
-  cleaning: "Cleaning",
+  AVAILABLE: "Available",
+  OCCUPIED: "Occupied",
+  RESERVED: "Reserved",
+  CLEANING: "Cleaning",
 };
 
 // 🎯 Categories
@@ -71,17 +71,17 @@ export const categories: { label: string; value: TableCategory | "all" }[] = [
 ];
 
 export const statusStyles: Record<string, string> = {
-  available: "bg-[#2eb8601a] text-[#2eb860] border-[#2eb86033]",
-  occupied: "bg-[#dc28281a] text-[#dc2828] border-[#dc282833]",
-  reserved: "bg-[#3374db1a] text-[#3374db] border-[#3374db33]",
-  cleaning: "bg-[#f59f0a1a] text-[#f59f0a] border-[#f59f0a33]",
+  AVAILABLE: "bg-[#2eb8601a] text-[#2eb860] border-[#2eb86033]",
+  OCCUPIED: "bg-[#dc28281a] text-[#dc2828] border-[#dc282833]",
+  RESERVED: "bg-[#3374db1a] text-[#3374db] border-[#3374db33]",
+  CLEANING: "bg-[#f59f0a1a] text-[#f59f0a] border-[#f59f0a33]",
 };
 
 export const statusBg: Record<string, string> = {
-  available: "bg-gradient-to-br from-[#2eb860]/10 to-transparent",
-  occupied: "bg-gradient-to-br from-[#dc2828]/10 to-transparent",
-  reserved: "bg-gradient-to-br from-[#3374db]/10 to-transparent",
-  cleaning: "bg-gradient-to-br from-[#f59f0a]/10 to-transparent",
+  AVAILABLE: "bg-gradient-to-br from-[#2eb860]/10 to-transparent",
+  OCCUPIED: "bg-gradient-to-br from-[#dc2828]/10 to-transparent",
+  RESERVED: "bg-gradient-to-br from-[#3374db]/10 to-transparent",
+  CLEANING: "bg-gradient-to-br from-[#f59f0a]/10 to-transparent",
 };
 
 export type UserRole = "Super Admin" | "Admin" | "Chef" | "Waiter" | "Customer";
@@ -137,6 +137,7 @@ export const empty: UserFormValues = {
   password: "",
   phoneNumber: "",
   role: "Waiter",
+   isActive: true,
 };
 
 export interface AddUserProps {
@@ -153,9 +154,10 @@ export interface UserFormValues {
   name: string;
   username: string;
   email: string;
-  password: string;
+  password?: string;
   phoneNumber: string;
   role: UserRole;
+  isActive: boolean;
 }
 
 export interface CreateUserPayload {
@@ -165,6 +167,7 @@ export interface CreateUserPayload {
   password?: string;
   phoneNumber: string;
   roleId: number;
+  isActive: boolean;
 }
 
 export const roleMap: Record<UserRole, number> = {

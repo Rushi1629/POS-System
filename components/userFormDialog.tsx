@@ -18,17 +18,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Loader2,
-  ShieldCheck,
-} from "lucide-react";
-import {
-  AddUserProps,
-  UserFormValues,
-  UserRole,
-  empty,
-} from "@/types/types";
+import { Loader2, ShieldCheck } from "lucide-react";
+import { AddUserProps, UserFormValues, UserRole, empty } from "@/types/types";
 import { getUserFields } from "@/types/user/config/userFields";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const baseSchema = {
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -43,7 +38,8 @@ const baseSchema = {
     .string()
     .trim()
     .regex(/^\+?[0-9\s-]{7,20}$/, "Invalid phone number"),
-  role: z.enum(["Super Admin", "Admin", "Chef", "Waiter", "Customer"])
+  role: z.enum(["Super Admin", "Admin", "Chef", "Waiter", "Customer"]),
+  isActive: z.boolean(),
 };
 
 const createSchema = z.object({
@@ -72,15 +68,29 @@ export function UserFormDialog({
   loading,
   onSubmit,
 }: AddUserProps) {
-  const [values, setValues] = useState<UserFormValues>(empty);
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof UserFormValues, string>>
-  >({});
+  // const [values, setValues] = useState<UserFormValues>(empty);
+  // const [errors, setErrors] = useState<
+  //   Partial<Record<keyof UserFormValues, string>>
+  // >({});
+
+  const schema = mode === "create" ? createSchema : editSchema;
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<UserFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: empty,
+  });
 
   useEffect(() => {
     if (open) {
       if (mode === "edit" && initialUser) {
-        setValues({
+        reset({
           name: initialUser.name,
           username: initialUser.username,
           email: initialUser.email,
@@ -89,38 +99,16 @@ export function UserFormDialog({
           password: "",
         });
       } else {
-        setValues(empty); // ✅ reset for create
+        reset(empty);
       }
-      setErrors({});
-    } else {
-      // ✅ VERY IMPORTANT: reset when dialog closes
-      setValues(empty);
-      setErrors({});
     }
-  }, [open, mode, initialUser]);
+  }, [open, mode, initialUser, reset]);
 
-  const update = <K extends keyof UserFormValues>(
-    key: K,
-    val: UserFormValues[K],
-  ) => {
-    setValues((v) => ({ ...v, [key]: val }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const schema = mode === "create" ? createSchema : editSchema;
-    const result = schema.safeParse(values);
-    if (!result.success) {
-      const fieldErrors: Partial<Record<keyof UserFormValues, string>> = {};
-      for (const issue of result.error.issues) {
-        const k = issue.path[0] as keyof UserFormValues;
-        if (!fieldErrors[k]) fieldErrors[k] = issue.message;
-      }
-      setErrors(fieldErrors);
-      return;
-    }
-    setErrors({});
-    await onSubmit(values);
+  const onSubmitForm = async (data: UserFormValues) => {
+    await onSubmit({
+      ...data,
+      isActive: true, // ✅ force value
+    });
   };
 
   const isLoadingFetch = mode === "edit" && loading && !initialUser;
@@ -148,7 +136,7 @@ export function UserFormDialog({
           </div>
         ) : (
           <form
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmitForm)}
             autoComplete="off"
             className="flex flex-col flex-1 min-h-0"
           >
@@ -171,8 +159,7 @@ export function UserFormDialog({
                         id={f.key}
                         type={f.type ?? "text"}
                         placeholder={f.placeholder}
-                        value={values[f.key]}
-                        onChange={(e) => update(f.key, e.target.value)}
+                        {...register(f.key)}
                         autoComplete={
                           f.key === "password"
                             ? "new-password"
@@ -186,7 +173,7 @@ export function UserFormDialog({
                     </div>
                     {errors[f.key] && (
                       <p className="text-xs text-destructive">
-                        {errors[f.key]}
+                        {errors[f.key]?.message}
                       </p>
                     )}
                   </div>
@@ -200,9 +187,10 @@ export function UserFormDialog({
                     Role
                   </Label>
                   <Select
-                    disabled={mode === "edit"}
-                    value={values.role}
-                    onValueChange={(v) => update("role", v as UserRole)}
+                    value={watch("role")}
+                    onValueChange={(v) => {
+                      setValue("role", v as UserRole, { shouldValidate: true });
+                    }}
                   >
                     <SelectTrigger id="role" className="w-full">
                       <div className="flex items-center gap-2">
@@ -211,7 +199,6 @@ export function UserFormDialog({
                       </div>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All roles</SelectItem>
                       {roles.map((role: any) => (
                         <SelectItem key={role.id} value={role.name}>
                           {role.name}
@@ -220,7 +207,9 @@ export function UserFormDialog({
                     </SelectContent>
                   </Select>
                   {errors.role && (
-                    <p className="text-xs text-destructive">{errors.role}</p>
+                    <p className="text-xs text-destructive">
+                      {errors.role?.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -234,12 +223,10 @@ export function UserFormDialog({
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                className="bg-[#e25f28] hover:bg-[#e25f28]/90 px-4 py-2"
-                disabled={loading}
-              >
-                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              <Button type="submit" disabled={isSubmitting || loading}>
+                {(isSubmitting || loading) && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
                 {mode === "create" ? "Create User" : "Save Changes"}
               </Button>
             </DialogFooter>

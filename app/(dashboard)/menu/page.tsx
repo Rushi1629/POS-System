@@ -449,7 +449,7 @@ function MenuPage() {
           label="NON-VEGETARIAN"
           value={stats.nonVeg}
           icon={<Drumstick className="h-5 w-5" />}
-          tint="default"
+          tint="nonveg"
         />
       </div>
 
@@ -475,7 +475,7 @@ function MenuPage() {
               <SelectContent>
                 <SelectItem value="all">All categories</SelectItem>
 
-                {isFetchingCategories ? (
+                {(isFetchingCategories || isFetching) ? (
                   <SelectItem value="loading" disabled>
                     Loading...
                   </SelectItem>

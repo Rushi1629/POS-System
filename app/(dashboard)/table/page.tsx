@@ -117,7 +117,7 @@ const seed: FetchTableResponse[] = [
   },
 ];
 
-function TablesPage() {
+function Tables() {
   const { data: tables = [] } = useFetchTables();
   const { mutateAsync: createTable, isPending: isCreating } = useCreateTable();
 
@@ -623,4 +623,4 @@ function TablesPage() {
   );
 }
 
-export default TablesPage;
+export default Tables;
