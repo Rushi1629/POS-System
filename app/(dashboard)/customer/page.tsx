@@ -1,12 +1,6 @@
 "use client";
 
 import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import { Field, FieldGroup } from "@/components/ui/field";
-import {
   Select,
   SelectContent,
   SelectGroup,
@@ -19,17 +13,20 @@ import {
   ChevronRightCircleIcon,
   ChevronUp,
   Search,
+  SearchIcon,
 } from "lucide-react";
-import { categories, menuItems } from "@/lib/data";
+import { menuItems } from "@/lib/data";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CategoryPill from "@/components/CategoryPill";
 import MenuItemCard from "@/components/MenuItemCard";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { addItemAction, removeItemAction } from "@/store/cart/cartSlice";
 import { useRouter } from "next/navigation";
+import { useFetchCategories } from "@/api/hooks/useCategory";
+import { Input } from "@/components/input";
 
 export default function CustomerDashboard() {
   const [activeCategory, setActiveCategory] = useState("chef-special");
@@ -37,6 +34,21 @@ export default function CustomerDashboard() {
   const [expandedSection, setExpandedSection] = useState(true);
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  const {
+    data: allCategory = [],
+    isPending: isFetchingCategories,
+    isFetching,
+    isError,
+  } = useFetchCategories();
+
+  const categories = useMemo(() => {
+    return allCategory.filter((c) => c.isActive === true);
+  }, [allCategory]);
+
+  useEffect(() => {
+    console.log("✅ categories updated:", allCategory);
+  }, [allCategory]);
 
   // ✅ redux state
   const dispatch = useDispatch();
@@ -101,37 +113,32 @@ export default function CustomerDashboard() {
   return (
     <>
       {/* 🔍 Search + Filter */}
-      <div className="flex gap-5 flex-wrap">
-        <InputGroup className="max-w-xl sm:w-full">
-          <InputGroupInput
-            className="bg-white"
-            placeholder="Search..."
+      <div className="w-full bg-transparent flex flex-col md:flex-row gap-4 md:items-center md:justify-between mb-3">
+        <div className="relative">
+          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
+          <Input
+            type="text"
+            placeholder="Search food..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
           />
-          <InputGroupAddon className="bg-white">
-            <Search />
-          </InputGroupAddon>
-        </InputGroup>
+        </div>
+        <div className="w-full md:w-56">
+          <Select>
+            <SelectTrigger className="h-10 rounded-xl border border-border bg-background">
+              <SelectValue placeholder="Sort / Filter" />
+            </SelectTrigger>
 
-        <FieldGroup className="w-full max-w-xl bg-white md:max-w-xl sm:w-full">
-          <Field>
-            <Select defaultValue="banana">
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent position="popper">
-                <SelectGroup>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </Field>
-        </FieldGroup>
+            <SelectContent>
+              <SelectItem value="popular">Popular</SelectItem>
+              <SelectItem value="price_low">Price: Low to High</SelectItem>
+              <SelectItem value="price_high">Price: High to Low</SelectItem>
+              <SelectItem value="rating">Top Rated</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="bg-[#f9f7f5] flex flex-col w-full relative">

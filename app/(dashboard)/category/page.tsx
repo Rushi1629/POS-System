@@ -88,7 +88,9 @@ function CategoriesPage() {
 
   const { data: categories = [], isLoading, error } = useFetchCategories();
 
-  console.log(categories);
+  useEffect(() => {
+    console.log("✅ categories updated:", categories);
+  }, [categories]);
 
   useEffect(() => {
     setPagination((prev) => ({

@@ -19,7 +19,13 @@ function CategoryPill({
           : "bg-card hover:bg-secondary"
       }`}
     >
-      <span className="text-2xl">{category.icon}</span>
+      {/* ✅ FIX HERE */}
+      <img
+        src={category.imageUrl}
+        alt={category.name}
+        className="w-10 h-10 object-cover rounded-full"
+      />
+
       <span
         className={`text-xs font-medium text-center leading-tight ${
           isActive ? "text-primary" : "text-muted-foreground"
