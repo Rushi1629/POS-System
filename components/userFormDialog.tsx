@@ -35,10 +35,10 @@ const baseSchema = {
     .max(30)
     .regex(/^[a-zA-Z0-9_]+$/, "Letters, numbers, underscores only"),
   email: z.string().trim().email("Invalid email").max(255),
-  phoneNumber: z
-    .string()
-    .trim()
-    .regex(/^\+?[0-9\s-]{7,20}$/, "Invalid phone number"),
+ phoneNumber: z
+  .string()
+  .trim()
+  .regex(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"),
   role: z.enum(["Super Admin", "Admin", "Chef", "Waiter", "Customer"]),
   isActive: z.boolean(),
 };
