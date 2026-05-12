@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -97,6 +98,7 @@ export function UserFormDialog({
           phoneNumber: initialUser.phoneNumber,
           role: initialUser.role,
           password: "",
+          isActive: initialUser.isActive,
         });
       } else {
         reset(empty);
@@ -104,10 +106,11 @@ export function UserFormDialog({
     }
   }, [open, mode, initialUser, reset]);
 
+  console.log(initialUser, "INITIAL USER");
+
   const onSubmitForm = async (data: UserFormValues) => {
     await onSubmit({
       ...data,
-      isActive: true, // ✅ force value
     });
   };
 
@@ -211,6 +214,26 @@ export function UserFormDialog({
                       {errors.role?.message}
                     </p>
                   )}
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-3 sm:col-span-2">
+                  <div>
+                    <Label htmlFor="isActive" className="text-sm font-medium">
+                      Active
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Enable this user account.
+                    </p>
+                  </div>
+                  <Switch
+                    id="isActive"
+                    checked={watch("isActive")}
+                    onCheckedChange={(val) =>
+                      setValue("isActive", Boolean(val), {
+                        shouldValidate: true,
+                      })
+                    }
+                  />
                 </div>
               </div>
             </div>

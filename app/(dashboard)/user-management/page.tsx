@@ -111,7 +111,7 @@ export default function UsersPage() {
         password: values.password,
         phoneNumber: values.phoneNumber,
         roleId: role.id,
-        isActive: true,
+        isActive: values.isActive,
         ...(values.password && { password: values.password }),
       };
 
@@ -158,7 +158,8 @@ export default function UsersPage() {
         editing.username === values.username &&
         editing.email === values.email &&
         editing.phoneNumber === values.phoneNumber &&
-        editing.role === values.role;
+        editing.role === values.role &&
+        editing.isActive === values.isActive; // ✅ ADD THIS
 
       if (isSame) {
         toast.info("No changes detected - nothing to update 🤔");
@@ -172,7 +173,7 @@ export default function UsersPage() {
         email: values.email,
         phoneNumber: values.phoneNumber,
         roleId: role.id,
-        isActive: editing.isActive
+        isActive: values.isActive,
       };
 
       await editUser({
