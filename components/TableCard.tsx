@@ -50,6 +50,9 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
   const [, setTick] = useState(0);
   const [seatDialog, setSeatDialog] = useState(false);
   const [guestInput, setGuestInput] = useState("");
+  const [localStartTimes, setLocalStartTimes] = useState<
+    Record<number, number>
+  >({});
 
   // ⏱️ Re-render timer every second
   useEffect(() => {
@@ -60,6 +63,22 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
   }, [table.enableTimeRate, setTick]);
 
   // ✅ Seat Guests
+  // const handleSeatGuests = async () => {
+  //   const count = parseInt(guestInput);
+
+  //   if (count > 0 && count <= table.capacity) {
+  //     await updateTable({
+  //       id: table.id,
+  //       data: {
+  //         status: "OCCUPIED",
+  //       },
+  //     });
+
+  //     setSeatDialog(false);
+  //     setGuestInput("");
+  //   }
+  // };
+
   const handleSeatGuests = async () => {
     const count = parseInt(guestInput);
 
@@ -68,12 +87,33 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
         id: table.id,
         data: {
           status: "OCCUPIED",
+          guestCount: count,
         },
       });
+
+      // ✅ set frontend start time
+      setLocalStartTimes((prev) => ({
+        ...prev,
+        [table.id]: Date.now(),
+      }));
 
       setSeatDialog(false);
       setGuestInput("");
     }
+  };
+
+  const startTime = localStartTimes[table.id];
+  const getElapsedSeconds = () => {
+    if (!startTime) return 0;
+    return Math.floor((Date.now() - startTime) / 1000);
+  };
+
+  const getTotalAmount = () => {
+    if (!startTime || !table.enableTimeRate) return 0;
+
+    const minutes = getElapsedSeconds() / 60;
+
+    return minutes * table.ratePerMinute * table.guestCount;
   };
 
   return (
@@ -122,17 +162,18 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
           <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
             <span className="flex items-center gap-1">
               <Users className="h-3 w-3" />
-              {`${table.capacity ?? 0}/${table.guestCount ?? 0}`}
-              {table.capacity}
+              {`${table.guestCount ?? 0}/${table.capacity ?? 0}`}
+              {/* {table.capacity} */}
             </span>
 
-            {table.enableTimeRate && (
-              <span className="flex items-center gap-1 text-warning font-mono font-medium">
-                <Timer className="h-3 w-3 animate-pulse-soft" />
-                {table.enableTimeRate &&
-                  table.startTime &&
-                  formatDuration(Date.now() - table.startTime)}
-              </span>
+            {table.enableTimeRate && startTime && (
+              <div className="flex flex-col text-xs font-mono">
+                <span>⏱ {Math.floor(getElapsedSeconds() / 60)}m</span>
+
+                <span className="text-green-600 font-semibold">
+                  ₹ {getTotalAmount().toFixed(2)}
+                </span>
+              </div>
             )}
           </div>
 
@@ -188,12 +229,12 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
                 }}
               >
                 {isPending ? (
-                    "Loading..."
-                  ) : (
-                    <>
-                      <LogOut className="h-3 w-3 mr-1" /> Clear
-                    </>
-                  )}
+                  "Loading..."
+                ) : (
+                  <>
+                    <LogOut className="h-3 w-3 mr-1" /> Clear
+                  </>
+                )}
               </Button>
             )}
 
@@ -247,12 +288,12 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
                 }}
               >
                 {isPending ? (
-                    "Loading..."
-                  ) : (
-                    <>
-                      <CheckCircle className="h-3 w-3 mr-1" /> Mark Ready
-                    </>
-                  )}
+                  "Loading..."
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 mr-1" /> Mark Ready
+                  </>
+                )}
               </Button>
             )}
           </div>

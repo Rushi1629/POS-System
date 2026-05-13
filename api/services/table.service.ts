@@ -20,6 +20,7 @@ export const fetchAllTables = async (): Promise<FetchTableResponse[]> => {
     ratePerMinute: u.ratePerMinute,
     qrCode: u.qrCode ?? null,
     isActive: u.isActive,
+    guestCount: u.guestCount,
   }));
 };
 

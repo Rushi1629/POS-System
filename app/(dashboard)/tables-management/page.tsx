@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 // import { categoryLabels } from "@/types/types";
 import { useFetchTables } from "@/api/hooks/useTable";
-import { TABLE_TYPE_LABELS, TABLE_TYPES, TableType } from "@/types/table-types";
+import { TABLE_TYPE_LABELS, TABLE_TYPES, TableType , FetchTableResponse } from "@/types/table-types";
 
 export default function TablesManagement() {
   const [filter, setFilter] = useState<TableType | "ALL">("ALL");
@@ -22,6 +22,8 @@ export default function TablesManagement() {
     ratePerMinute: t.ratePerMinute,
     qrCode: t.qrCode,
     isActive: t.isActive,
+    guestCount: t.guestCount,
+    startTime: t.startTime,
   }));
 
   // id: number;

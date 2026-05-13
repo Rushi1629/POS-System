@@ -1,26 +1,26 @@
-import { tableSchema } from "@/Schema/tableSchema";
-import { z } from "zod";
-
 export interface CreateTablePayload {
   name: string;
-  type: TableType; // ✅ fixed
-  status: TableStatus; // ✅ fixed
+  type: TableType;
+  status: TableStatus;
   capacity: number;
   enableTimeRate: boolean;
-  ratePerMinute: number; // we’ll discuss below
+  ratePerMinute: number;
   isActive: boolean;
+  guestCount: number;
 }
 
 export interface FetchTableResponse {
   id: number;
   name: string;
-  type: TableType; // ✅ fixed
-  status: TableStatus; // ✅ fixed
+  type: TableType;
+  status: TableStatus;
   capacity: number;
   enableTimeRate: boolean;
   ratePerMinute: number;
   qrCode: string | null;
   isActive: boolean;
+  guestCount: number;
+  startTime?: string;
 }
 
 export const TABLE_TYPES = ["FAMILY", "POD", "HALL"] as const;
@@ -29,7 +29,16 @@ export const TABLE_STATUS = ["AVAILABLE", "OCCUPIED", "RESERVED", "CLEANING"] as
 export type TableType = typeof TABLE_TYPES[number];
 export type TableStatus = typeof TABLE_STATUS[number];
 
-export type TableFormValues = z.infer<typeof tableSchema>;
+export type TableFormValues = {
+  name: string;
+  type: TableType;
+  status: TableStatus;
+  capacity: number;
+  enableTimeRate: boolean;
+  ratePerMinute: number;
+  isActive: boolean;
+  guestCount: number;
+};
 
 export const statusMap: Record<
   TableStatus,

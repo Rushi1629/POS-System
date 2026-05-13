@@ -81,42 +81,6 @@ import {
 import { isEqual } from "lodash-es";
 import TableStatusCustom from "@/components/TableStatus";
 
-const seed: FetchTableResponse[] = [
-  {
-    id: 2000001,
-    name: "H-1",
-    type: "HALL",
-    status: "AVAILABLE",
-    capacity: 4,
-    enableTimeRate: true,
-    ratePerMinute: 1.25,
-    qrCode: null,
-    isActive: true,
-  },
-  {
-    id: 1,
-    name: "P-1",
-    type: "POD",
-    status: "OCCUPIED",
-    capacity: 4,
-    enableTimeRate: true,
-    ratePerMinute: 1.25,
-    qrCode: null,
-    isActive: true,
-  },
-  {
-    id: 2,
-    name: "F-1",
-    type: "FAMILY",
-    status: "RESERVED",
-    capacity: 6,
-    enableTimeRate: false,
-    ratePerMinute: 0,
-    qrCode: null,
-    isActive: true,
-  },
-];
-
 function Tables() {
   const { data: tables = [] } = useFetchTables();
   const { mutateAsync: createTable, isPending: isCreating } = useCreateTable();
@@ -293,6 +257,7 @@ function Tables() {
           enableTimeRate: data.enableTimeRate,
           ratePerMinute: data.ratePerMinute,
           isActive: data.isActive,
+          guestCount: data.guestCount,
         };
 
         const isSame = isEqual(
@@ -304,6 +269,7 @@ function Tables() {
             enableTimeRate: editing.enableTimeRate,
             ratePerMinute: editing.ratePerMinute,
             isActive: editing.isActive,
+            guestCount: editing.guestCount,
           },
           payload,
         );

@@ -13,21 +13,22 @@ export const tableSchema = z
       message: "Select valid status",
     }),
 
-    capacity: z.preprocess(
-      (val) => Number(val),
-      z.number().min(1, "Capacity must be at least 1"),
-    ),
+    capacity: z.number().min(1, "Capacity must be at least 1"),
 
     enableTimeRate: z.boolean(),
 
-    ratePerMinute: z.preprocess(
-      (val) => (val === "" ? 0 : Number(val)),
-      z.number().min(0, "Rate must be ≥ 0"),
-    ),
+    ratePerMinute: z.number().min(0, "Rate must be ≥ 0"),
 
     isActive: z.boolean(),
+
+    guestCount: z.number().min(1, "Guest count must be at least 1"),
+  })
+  .refine((data) => data.guestCount <= data.capacity, {
+    message: "Guest count cannot exceed capacity",
+    path: ["guestCount"],
   })
   .refine((data) => (data.enableTimeRate ? data.ratePerMinute > 0 : true), {
     message: "Rate must be > 0 when enabled",
     path: ["ratePerMinute"],
   });
+

@@ -30,6 +30,8 @@ import { Switch } from "./ui/switch";
 import { Button } from "./ui/button";
 import { useForm } from "react-hook-form";
 import { Loader2, Pencil, Plus } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler } from "react-hook-form";
 
 function TableDialog({
   open,
@@ -52,6 +54,7 @@ function TableDialog({
     setValue,
     formState: { errors },
   } = useForm<TableFormValues>({
+    resolver: zodResolver(tableSchema),
     defaultValues: {
       name: "",
       type: "FAMILY",
@@ -60,28 +63,41 @@ function TableDialog({
       enableTimeRate: false,
       ratePerMinute: 0,
       isActive: true,
+      guestCount: 1,
     },
   });
 
   useEffect(() => {
-    if (open) {
-      if (initial) {
-        reset({
-          name: initial.name,
-          type: initial.type,
-          status: initial.status,
-          capacity: initial.capacity,
-          enableTimeRate: initial.enableTimeRate,
-          ratePerMinute: Number(initial.ratePerMinute) || 0,
-          isActive: initial.isActive,
-        });
-      } else {
-        reset();
-      }
+    if (!open) return;
+
+    console.log("TableDialog opened with initial:", initial);
+
+    if (initial) {
+      reset({
+        name: initial.name,
+        type: initial.type,
+        status: initial.status,
+        capacity: initial.capacity,
+        enableTimeRate: initial.enableTimeRate,
+        ratePerMinute: Number(initial.ratePerMinute) || 0,
+        isActive: initial.isActive,
+        guestCount: Number(initial.guestCount) || 0,
+      });
+    } else {
+      reset({
+        name: "",
+        type: "FAMILY",
+        status: "AVAILABLE",
+        capacity: 4,
+        enableTimeRate: false,
+        ratePerMinute: 0,
+        isActive: true,
+        guestCount: 1,
+      });
     }
   }, [open, initial, reset]);
 
-  const onSubmit = (data: TableFormValues) => {
+  const onSubmit: SubmitHandler<TableFormValues> = (data) => {
     onSave(data);
   };
 
@@ -175,6 +191,21 @@ function TableDialog({
                 </p>
               )}
             </div>
+          </div>
+
+          <div className="grid gap-1.5">
+            <Label htmlFor="guestCount">Guest Count</Label>
+            <Input
+              id="guestCount"
+              type="number"
+              placeholder="Enter guest count"
+              {...register("guestCount", { valueAsNumber: true })}
+            />
+            {errors.guestCount && (
+              <p className="text-xs text-destructive">
+                {errors.guestCount.message}
+              </p>
+            )}
           </div>
 
           <div className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2.5">

@@ -13,34 +13,6 @@ import { DemoCredential } from "@/types/types";
 import { useAppDispatch } from "@/store/hooks";
 import { useForm } from "react-hook-form";
 
-const demoCredentials: DemoCredential[] = [
-  {
-    role: "admin",
-    roleLabel: "Admin",
-    email: "maria.alvarez@cafepos.app",
-    password: "Admin@Cafe2026",
-    accent: "border-red-500/40 hover:border-red-400/70 hover:bg-red-500/5",
-    dot: "bg-red-400",
-  },
-  {
-    role: "manager",
-    roleLabel: "Manager",
-    email: "james.okafor@cafepos.app",
-    password: "Mgr@Cafe2026",
-    accent: "border-sky-500/40 hover:border-sky-400/70 hover:bg-sky-500/5",
-    dot: "bg-sky-400",
-  },
-  {
-    role: "cashier",
-    roleLabel: "Cashier",
-    email: "priya.sharma@cafepos.app",
-    password: "Cash@Cafe2026",
-    accent:
-      "border-emerald-500/40 hover:border-emerald-400/70 hover:bg-emerald-500/5",
-    dot: "bg-emerald-400",
-  },
-];
-
 export default function LoginForm() {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -49,16 +21,28 @@ export default function LoginForm() {
   // Login API mutation using custom hook
   const loginMutation = useLogin();
 
-  useEffect(() => {
-    if (loginMutation.isSuccess) {
-      toast.success("Login successful 🎉");
-      setTimeout(() => router.push("/customer"), 800);
-    }
+  // useEffect(() => {
+  //   if (loginMutation.isSuccess) {
+  //     toast.success("Login successful 🎉");
+  //     setTimeout(() => router.push("/customer"), 800);
+  //   }
 
-    if (loginMutation.isError) {
-      toast.error((loginMutation.error as Error)?.message || "Login failed");
+  //   if (loginMutation.isError) {
+  //     toast.error((loginMutation.error as Error)?.message || "Login failed");
+  //   }
+  // }, [loginMutation.isSuccess, loginMutation.isError]);
+
+  const handleLogin = async (data: any) => {
+    try {
+      const res = await loginMutation.mutateAsync(data);
+
+      toast.success("Login successful 🎉");
+
+      router.push("/user-management");
+    } catch (error) {
+      toast.error("Login failed");
     }
-  }, [loginMutation.isSuccess, loginMutation.isError]);
+  };
 
   const {
     register,
@@ -207,9 +191,7 @@ export default function LoginForm() {
 
               <form
                 autoComplete="off"
-                onSubmit={handleSubmit((data) => {
-                  loginMutation.mutate(data);
-                })}
+                onSubmit={handleSubmit(handleLogin)}
                 className="space-y-4"
               >
                 {/* Email */}
