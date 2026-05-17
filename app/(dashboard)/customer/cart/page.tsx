@@ -2,7 +2,7 @@
 
 import OrderSummary from "@/components/OrderSummary";
 import CartItemCard from "@/components/CartItemCard";
-import { menuItems } from "@/lib/data";
+// import { menuItems } from "@/lib/data";
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
