@@ -15,16 +15,13 @@ const CartView = () => {
 
   const cart = useSelector((state: RootState) => state.cart?.items ?? {});
 
-  // const addItem = (id: string) => dispatch(addItemAction(id));
-  // const removeItem = (id: string) => dispatch(removeItemAction(id));
-
-  // const handleIncrement = (id: string) => dispatch(addItemAction(id));
-  // const handleDecrement = (id: string) => dispatch(removeItemAction(id));
-
   // ✅ Convert cart → UI items (optimized)
   const items = useMemo(() => {
     return Object.values(cart);
   }, [cart]);
+
+  console.log(items,"items");
+  
 
   // ✅ Derived values (memoized)
   const { subtotal, totalQty } = useMemo(() => {

@@ -4,8 +4,9 @@ export type CartItem = {
   description?: string;
   price: number;
   quantity: number;
-  isVeg?: boolean;
+  menuType?: "Veg" | "NonVeg";
   isBest?: boolean;
+  imageUrl: string; 
 };
 
 export type CartState = {

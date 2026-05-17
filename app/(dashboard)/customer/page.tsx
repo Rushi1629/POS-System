@@ -78,6 +78,10 @@ export default function CustomerDashboard() {
           name: item.name,
           price: item.price,
           quantity: 1, // reducer will override if needed
+          menuType: item.menuType,
+          // isBest: item.isBest,
+          imageUrl: item.imageUrl,
+          description: item.description,
         }),
       );
     },

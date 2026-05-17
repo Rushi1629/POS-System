@@ -64,7 +64,7 @@ const MenuItemCard = ({
         </p>
 
         <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-border/40">
-          <p className="text-base font-bold text-foreground font-bold tabular-nums text-primary">
+          <p className="text-base font-bold tabular-nums text-primary">
             ₹{item.price}
           </p>
           {quantity > 0 ? (
