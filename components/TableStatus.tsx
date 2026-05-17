@@ -6,6 +6,10 @@ import { Badge } from "./ui/badge";
 const TableStatusCustom = ({ status }: { status: TableStatus }) => {
   const config = statusMap[status];
 
+  if (!config) {
+    return <Badge className="rounded-full px-3 py-1">Unknown</Badge>;
+  }
+
   return (
     <Badge
       className={`rounded-full border-0 px-3 py-1 font-medium ${config.className}`}

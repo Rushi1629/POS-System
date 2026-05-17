@@ -1,43 +1,55 @@
 export interface CreateTablePayload {
   name: string;
   type: TableType;
-  status: TableStatus;
+  // status: TableStatus;
   capacity: number;
   enableTimeRate: boolean;
   ratePerMinute: number;
   isActive: boolean;
+  // guestCount: number;
+}
+
+export interface EditTableSessionPayload {
+  tableId: number;
   guestCount: number;
+  status: TableStatus;
+  notes: string;
 }
 
 export interface FetchTableResponse {
   id: number;
   name: string;
   type: TableType;
-  status: TableStatus;
+  tableStatus: TableStatus;
   capacity: number;
   enableTimeRate: boolean;
   ratePerMinute: number;
   qrCode: string | null;
   isActive: boolean;
-  guestCount: number;
-  startTime?: string;
+  // guestCount: number;
+  // startTime?: string;
 }
 
 export const TABLE_TYPES = ["FAMILY", "POD", "HALL"] as const;
-export const TABLE_STATUS = ["AVAILABLE", "OCCUPIED", "RESERVED", "CLEANING"] as const;
+export const TABLE_STATUS = [
+  "AVAILABLE",
+  "OCCUPIED",
+  "RESERVED",
+  "CLEANING",
+] as const;
 
-export type TableType = typeof TABLE_TYPES[number];
-export type TableStatus = typeof TABLE_STATUS[number];
+export type TableType = (typeof TABLE_TYPES)[number];
+export type TableStatus = (typeof TABLE_STATUS)[number];
 
 export type TableFormValues = {
   name: string;
   type: TableType;
-  status: TableStatus;
+  // tableStatus: TableStatus;
   capacity: number;
   enableTimeRate: boolean;
   ratePerMinute: number;
   isActive: boolean;
-  guestCount: number;
+  // guestCount: number;
 };
 
 export const statusMap: Record<

@@ -5,25 +5,25 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 // import { categoryLabels } from "@/types/types";
 import { useFetchTables } from "@/api/hooks/useTable";
-import { TABLE_TYPE_LABELS, TABLE_TYPES, TableType , FetchTableResponse } from "@/types/table-types";
+import { TABLE_TYPE_LABELS, TABLE_TYPES, TableType , FetchTableResponse, EditTableSessionPayload } from "@/types/table-types";
 
 export default function TablesManagement() {
   const [filter, setFilter] = useState<TableType | "ALL">("ALL");
 
   const { data: tables = [], isLoading } = useFetchTables();
 
+  const [sessions, setSessions] = useState<Record<number, EditTableSessionPayload>>({});
+
   const mappedTables = tables.map((t) => ({
     id: t.id,
     name: t.name,
     type: t.type,
-    status: t.status,
+    tableStatus: t.tableStatus,
     capacity: t.capacity,
     enableTimeRate: t.enableTimeRate,
     ratePerMinute: t.ratePerMinute,
     qrCode: t.qrCode,
     isActive: t.isActive,
-    guestCount: t.guestCount,
-    startTime: t.startTime,
   }));
 
   // id: number;
@@ -128,7 +128,7 @@ export default function TablesManagement() {
                 {/* Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {tables.map((table) => (
-                    <TableCard key={table.id} table={table} />
+                    <TableCard key={table.id} table={table} session={sessions[table.id]} />
                   ))}
                 </div>
               </div>
@@ -142,7 +142,7 @@ export default function TablesManagement() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filtered.map((table) => (
-            <TableCard key={table.id} table={table} />
+            <TableCard key={table.id} table={table} session={sessions[table.id]} />
           ))}
         </div>
       )}

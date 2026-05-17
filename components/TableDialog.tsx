@@ -58,12 +58,12 @@ function TableDialog({
     defaultValues: {
       name: "",
       type: "FAMILY",
-      status: "AVAILABLE",
+      // status: "AVAILABLE",
       capacity: 4,
       enableTimeRate: false,
       ratePerMinute: 0,
       isActive: true,
-      guestCount: 1,
+      // guestCount: 1,
     },
   });
 
@@ -76,23 +76,23 @@ function TableDialog({
       reset({
         name: initial.name,
         type: initial.type,
-        status: initial.status,
+        // status: initial.status,
         capacity: initial.capacity,
         enableTimeRate: initial.enableTimeRate,
         ratePerMinute: Number(initial.ratePerMinute) || 0,
         isActive: initial.isActive,
-        guestCount: Number(initial.guestCount) || 0,
+        // guestCount: Number(initial.guestCount) || 0,
       });
     } else {
       reset({
         name: "",
         type: "FAMILY",
-        status: "AVAILABLE",
+        // status: "AVAILABLE",
         capacity: 4,
         enableTimeRate: false,
         ratePerMinute: 0,
         isActive: true,
-        guestCount: 1,
+        // guestCount: 1,
       });
     }
   }, [open, initial, reset]);
@@ -142,27 +142,6 @@ function TableDialog({
               </Select>
             </div>
             <div className="grid gap-1.5">
-              <Label>Status</Label>
-              <Select
-                value={watch("status")}
-                onValueChange={(v) => setValue("status", v as TableStatus)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="">
-                  {TABLE_STATUS.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="grid gap-1.5">
               <Label htmlFor="cap">Capacity</Label>
               <Input
                 id="cap"
@@ -176,6 +155,9 @@ function TableDialog({
                 </p>
               )}
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
               <Label htmlFor="rate">Rate / minute (₹)</Label>
               <Input
@@ -191,21 +173,6 @@ function TableDialog({
                 </p>
               )}
             </div>
-          </div>
-
-          <div className="grid gap-1.5">
-            <Label htmlFor="guestCount">Guest Count</Label>
-            <Input
-              id="guestCount"
-              type="number"
-              placeholder="Enter guest count"
-              {...register("guestCount", { valueAsNumber: true })}
-            />
-            {errors.guestCount && (
-              <p className="text-xs text-destructive">
-                {errors.guestCount.message}
-              </p>
-            )}
           </div>
 
           <div className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2.5">

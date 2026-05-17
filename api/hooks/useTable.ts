@@ -3,6 +3,7 @@ import {
   createTable,
   deleteTableById,
   editTableById,
+  editTableSession,
   fetchAllTables,
 } from "../services/table.service";
 import { FetchTableResponse } from "@/types/table-types";
@@ -55,6 +56,19 @@ export const useEditTable = () => {
     }) => editTableById(id, data),
 
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tables"] });
+    },
+  });
+};
+
+
+export const useEditTableSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: editTableSession,
+    onSuccess: () => {
+      // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
   });

@@ -83,6 +83,8 @@ import TableStatusCustom from "@/components/TableStatus";
 
 function Tables() {
   const { data: tables = [] } = useFetchTables();
+  console.log(tables,"tables");
+  
   const { mutateAsync: createTable, isPending: isCreating } = useCreateTable();
 
   const { mutateAsync: updateTable, isPending: isEditing } = useEditTable();
@@ -107,7 +109,7 @@ function Tables() {
     return items
       .filter((t) => (typeFilter === "all" ? true : t.type === typeFilter))
       .filter((t) =>
-        statusFilter === "all" ? true : t.status === statusFilter,
+        statusFilter === "all" ? true : t.tableStatus === statusFilter,
       )
       .filter((t) => t.name.toLowerCase().includes(search.toLowerCase()));
   }, [items, search, typeFilter, statusFilter]);
@@ -115,7 +117,7 @@ function Tables() {
   const stats = useMemo(
     () => ({
       total: items.length,
-      available: items.filter((t) => t.status === "AVAILABLE").length,
+      available: items.filter((t) => t.tableStatus === "AVAILABLE").length,
       active: items.filter((t) => t.isActive).length,
     }),
     [items],
@@ -166,7 +168,7 @@ function Tables() {
       {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => <TableStatusCustom status={row.original.status} />,
+        cell: ({ row }) => <TableStatusCustom status={row.original.tableStatus} />,
       },
       {
         accessorKey: "isActive",
@@ -252,24 +254,24 @@ function Tables() {
         const payload = {
           name: data.name,
           type: data.type,
-          status: data.status,
+          // status: data.status,
           capacity: data.capacity,
           enableTimeRate: data.enableTimeRate,
           ratePerMinute: data.ratePerMinute,
           isActive: data.isActive,
-          guestCount: data.guestCount,
+          // guestCount: data.guestCount,
         };
 
         const isSame = isEqual(
           {
             name: editing.name,
             type: editing.type,
-            status: editing.status,
+            // status: editing.status,
             capacity: editing.capacity,
             enableTimeRate: editing.enableTimeRate,
             ratePerMinute: editing.ratePerMinute,
             isActive: editing.isActive,
-            guestCount: editing.guestCount,
+            // guestCount: editing.guestCount,
           },
           payload,
         );

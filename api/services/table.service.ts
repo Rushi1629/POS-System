@@ -1,4 +1,8 @@
-import { CreateTablePayload, FetchTableResponse } from "@/types/table-types";
+import {
+  CreateTablePayload,
+  EditTableSessionPayload,
+  FetchTableResponse,
+} from "@/types/table-types";
 import { fetcher } from "../client";
 
 export const createTable = (data: CreateTablePayload) =>
@@ -14,13 +18,13 @@ export const fetchAllTables = async (): Promise<FetchTableResponse[]> => {
     id: u.id,
     name: u.name,
     type: u.type,
-    status: u.status,
+    tableStatus: u.tableStatus,
     capacity: Number(u.capacity),
     enableTimeRate: u.enableTimeRate,
     ratePerMinute: u.ratePerMinute,
     qrCode: u.qrCode ?? null,
     isActive: u.isActive,
-    guestCount: u.guestCount,
+    // guestCount: u.guestCount,
   }));
 };
 
@@ -41,3 +45,9 @@ export const deleteTableById = async (id: number): Promise<void> => {
     method: "DELETE",
   });
 };
+
+export const editTableSession = (data: EditTableSessionPayload) =>
+  fetcher("/table/table-session", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });

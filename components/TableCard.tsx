@@ -39,13 +39,23 @@ import {
 } from "@/types/types";
 import { useAppDispatch } from "@/store/hooks";
 import { formatDuration } from "@/utils/utils";
-import { useEditTable } from "@/api/hooks/useTable";
-import { FetchTableResponse } from "@/types/table-types";
+import { useEditTable, useEditTableSession } from "@/api/hooks/useTable";
+import {
+  EditTableSessionPayload,
+  FetchTableResponse,
+} from "@/types/table-types";
 
-export function TableCard({ table }: { table: FetchTableResponse }) {
+export function TableCard({
+  table,
+  session,
+}: {
+  table: FetchTableResponse;
+  session: EditTableSessionPayload;
+}) {
   // const dispatch = useAppDispatch();
 
-  const { mutateAsync: updateTable, isPending } = useEditTable();
+  // const { mutateAsync: updateTable, isPending } = useEditTable();
+  const { mutateAsync: updateTableSession, isPending } = useEditTableSession();
 
   const [, setTick] = useState(0);
   const [seatDialog, setSeatDialog] = useState(false);
@@ -62,33 +72,15 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
     }
   }, [table.enableTimeRate, setTick]);
 
-  // ✅ Seat Guests
-  // const handleSeatGuests = async () => {
-  //   const count = parseInt(guestInput);
-
-  //   if (count > 0 && count <= table.capacity) {
-  //     await updateTable({
-  //       id: table.id,
-  //       data: {
-  //         status: "OCCUPIED",
-  //       },
-  //     });
-
-  //     setSeatDialog(false);
-  //     setGuestInput("");
-  //   }
-  // };
-
   const handleSeatGuests = async () => {
     const count = parseInt(guestInput);
 
     if (count > 0 && count <= table.capacity) {
-      await updateTable({
-        id: table.id,
-        data: {
-          status: "OCCUPIED",
-          guestCount: count,
-        },
+      await updateTableSession({
+        tableId: table.id,
+        guestCount: count,
+        status: "OCCUPIED",
+        notes: "",
       });
 
       // ✅ set frontend start time
@@ -113,18 +105,18 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
 
     const minutes = getElapsedSeconds() / 60;
 
-    return minutes * table.ratePerMinute * table.guestCount;
+    return minutes * table.ratePerMinute * session?.guestCount;
   };
 
   return (
     <>
       <Card
-        className={`relative overflow-hidden transition-all hover:shadow-md border p-0 ${statusBg[table.status]} ${
-          table.status === "AVAILABLE"
+        className={`relative overflow-hidden transition-all hover:shadow-md border p-0 ${statusBg[table.tableStatus]} ${
+          table.tableStatus === "AVAILABLE"
             ? "border-[#2eb860]/30"
-            : table.status === "OCCUPIED"
+            : table.tableStatus === "OCCUPIED"
               ? "border-[#dc2828]/30"
-              : table.status === "RESERVED"
+              : table.tableStatus === "RESERVED"
                 ? "border-[#3374db]/30"
                 : "border-[#f59f0a]/30"
         }`}
@@ -132,11 +124,11 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
         {/* Top color strip */}
         <div
           className={`absolute top-0 left-0 right-0 h-[0.9px] ${
-            table.status === "AVAILABLE"
+            table.tableStatus === "AVAILABLE"
               ? "bg-[#2eb860]"
-              : table.status === "OCCUPIED"
+              : table.tableStatus === "OCCUPIED"
                 ? "bg-[#dc2828]"
-                : table.status === "RESERVED"
+                : table.tableStatus === "RESERVED"
                   ? "bg-[#3374db]"
                   : "bg-[#f59f0a]"
           }`}
@@ -152,9 +144,9 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
 
             <Badge
               variant="outline"
-              className={`text-xs capitalize ${statusStyles[table.status]}`}
+              className={`text-xs capitalize ${statusStyles[table.tableStatus]}`}
             >
-              {statusLabels[table.status]}
+              {statusLabels[table.tableStatus]}
             </Badge>
           </div>
 
@@ -162,7 +154,7 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
           <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
             <span className="flex items-center gap-1">
               <Users className="h-3 w-3" />
-              {`${table.guestCount ?? 0}/${table.capacity ?? 0}`}
+              {`${session?.guestCount ?? 0}/${table.capacity ?? 0}`}
               {/* {table.capacity} */}
             </span>
 
@@ -180,7 +172,7 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
           {/* Actions */}
           <div className="flex gap-1.5 flex-wrap">
             {/* 🟢 Available */}
-            {table.status === "AVAILABLE" && (
+            {table.tableStatus === "AVAILABLE" && (
               <>
                 <Button
                   size="sm"
@@ -197,9 +189,11 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
                   disabled={isPending}
                   className="text-xs h-7"
                   onClick={async () => {
-                    await updateTable({
-                      id: table.id,
-                      data: { status: "RESERVED" },
+                    await updateTableSession({
+                      tableId: table.id,
+                      guestCount: session?.guestCount ?? 0,
+                      status: "RESERVED",
+                      notes: "",
                     });
                   }}
                 >
@@ -215,16 +209,18 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
             )}
 
             {/* 🔴 Occupied */}
-            {table.status === "OCCUPIED" && (
+            {table.tableStatus === "OCCUPIED" && (
               <Button
                 size="sm"
                 variant="outline"
                 disabled={isPending}
                 className="text-xs h-7"
                 onClick={async () => {
-                  await updateTable({
-                    id: table.id,
-                    data: { status: "CLEANING" },
+                  await updateTableSession({
+                    tableId: table.id,
+                    guestCount: session?.guestCount ?? 0,
+                    status: "CLEANING",
+                    notes: "",
                   });
                 }}
               >
@@ -239,7 +235,7 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
             )}
 
             {/* 🔵 Reserved */}
-            {table.status === "RESERVED" && (
+            {table.tableStatus === "RESERVED" && (
               <>
                 <Button
                   size="sm"
@@ -256,9 +252,11 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
                   className="text-xs h-7"
                   disabled={isPending}
                   onClick={async () => {
-                    await updateTable({
-                      id: table.id,
-                      data: { status: "AVAILABLE" },
+                    await updateTableSession({
+                      tableId: table.id,
+                      guestCount: session?.guestCount ?? 0,
+                      status: "AVAILABLE",
+                      notes: "",
                     });
                   }}
                 >
@@ -274,16 +272,18 @@ export function TableCard({ table }: { table: FetchTableResponse }) {
             )}
 
             {/* 🟡 Cleaning */}
-            {table.status === "CLEANING" && (
+            {table.tableStatus === "CLEANING" && (
               <Button
                 size="sm"
                 variant="outline"
                 className="text-xs h-7"
                 disabled={isPending}
                 onClick={async () => {
-                  await updateTable({
-                    id: table.id,
-                    data: { status: "AVAILABLE" },
+                  await updateTableSession({
+                    tableId: table.id,
+                    guestCount: session?.guestCount ?? 0,
+                    status: "AVAILABLE",
+                    notes: "",
                   });
                 }}
               >
