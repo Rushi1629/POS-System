@@ -1,18 +1,23 @@
-import { MenuItem } from "@/lib/data";
+// import { MenuItem } from "@/lib/data";
 import { AnimatePresence, motion } from "framer-motion";
 import VegBadge from "./VegBadge";
 import { Badge } from "./ui/badge";
 import { Minus, Plus, Star } from "lucide-react";
 import { Button } from "./ui/button";
 import React from "react";
+import { FetchMenuResponse } from "@/types/menu-types";
 
-const MenuItemCard = ({ item, quantity, onAdd, onRemove }: {
-  item: MenuItem;
+const MenuItemCard = ({
+  item,
+  quantity,
+  onAdd,
+  onRemove,
+}: {
+  item: FetchMenuResponse;
   quantity: number;
   onAdd: () => void;
   onRemove: () => void;
-}) =>
- {
+}) => {
   return (
     <motion.div
       layout
@@ -22,34 +27,30 @@ const MenuItemCard = ({ item, quantity, onAdd, onRemove }: {
       className="bg-card rounded-2xl border border-border/60 hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group"
     >
       {/* Image placeholder / colored header */}
-      <div className="relative h-36 bg-gradient-to-br from-primary/10 via-accent/5 to-secondary overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-5xl opacity-60 group-hover:scale-110 transition-transform duration-300">
-            {item.category === "hot-coffee"
-              ? "☕"
-              : item.category === "coolers"
-                ? "🍹"
-                : item.category === "fries"
-                  ? "🍟"
-                  : item.category === "burgers"
-                    ? "🍔"
-                    : item.category === "smoothie"
-                      ? "🥤"
-                      : item.category === "chef-special"
-                        ? "👨‍🍳"
-                        : "🍽️"}
-          </span>
-        </div>
+      <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-primary/10 to-accent">
+        {item.imageUrl ? (
+          <img
+            src={item.imageUrl}
+            alt={item.name}
+            className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <span className="text-5xl font-bold text-primary/40 group-hover:scale-110 transition-transform duration-300">
+              {item.name.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        )}
         <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-          <VegBadge isVeg={item.isVeg} />
-          {item.isBestseller && (
+          <VegBadge isVeg={item.menuType === "Veg"} />
+          {/* {item.isBestseller && (
             <Badge
               variant="secondary"
               className="bg-[#e25f28] text-primary-foreground border-0 text-[10px] px-1.5 py-0 font-semibold gap-0.5 shadow-sm"
             >
               <Star className="w-2.5 h-2.5 fill-primary-foreground" /> Best
             </Badge>
-          )}
+          )} */}
         </div>
       </div>
 
@@ -63,7 +64,9 @@ const MenuItemCard = ({ item, quantity, onAdd, onRemove }: {
         </p>
 
         <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-border/40">
-          <p className="text-base font-bold text-foreground">₹{item.price}</p>
+          <p className="text-base font-bold text-foreground font-bold tabular-nums text-primary">
+            ₹{item.price}
+          </p>
           {quantity > 0 ? (
             <motion.div
               initial={{ scale: 0.8 }}
@@ -100,6 +103,6 @@ const MenuItemCard = ({ item, quantity, onAdd, onRemove }: {
       </div>
     </motion.div>
   );
-}
+};
 
 export default React.memo(MenuItemCard);

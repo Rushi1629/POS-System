@@ -12,24 +12,28 @@ import {
   ChevronDown,
   ChevronRightCircleIcon,
   ChevronUp,
+  RotateCcw,
+  RotateCw,
   Search,
   SearchIcon,
 } from "lucide-react";
-import { menuItems } from "@/lib/data";
+// import { menuItems } from "@/lib/data";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CategoryPill from "@/components/CategoryPill";
 import MenuItemCard from "@/components/MenuItemCard";
+import MenuItemSkeleton from "@/components/MenuItemSkeleton";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { addItemAction, removeItemAction } from "@/store/cart/cartSlice";
 import { useRouter } from "next/navigation";
 import { useFetchCategories } from "@/api/hooks/useCategory";
 import { Input } from "@/components/input";
+import { useFetchMenus } from "@/api/hooks/useMenu";
 
 export default function CustomerDashboard() {
-  const [activeCategory, setActiveCategory] = useState("chef-special");
+  const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedSection, setExpandedSection] = useState(true);
   const categoryScrollRef = useRef<HTMLDivElement>(null);
@@ -46,6 +50,10 @@ export default function CustomerDashboard() {
     return allCategory.filter((c) => c.isActive === true);
   }, [allCategory]);
 
+  const { data: menuItems = [], isLoading } = useFetchMenus();
+
+  console.log(menuItems, "menuItems");
+
   useEffect(() => {
     console.log("✅ categories updated:", allCategory);
   }, [allCategory]);
@@ -57,10 +65,10 @@ export default function CustomerDashboard() {
 
   const menuMap = useMemo(() => {
     return Object.fromEntries(menuItems.map((i) => [i.id, i]));
-  }, []);
+  }, [menuItems]);
 
   const addToCart = useCallback(
-    (itemId: string) => {
+    (itemId: number) => {
       const item = menuMap[itemId];
       if (!item) return;
 
@@ -77,7 +85,7 @@ export default function CustomerDashboard() {
   );
 
   const removeFromCart = useCallback(
-    (id: string) => {
+    (id: number) => {
       dispatch(removeItemAction(id));
     },
     [dispatch],
@@ -97,48 +105,53 @@ export default function CustomerDashboard() {
   // ✅ Filter logic
   const filteredItems = useMemo(() => {
     return menuItems.filter((item) => {
-      const matchesCategory = item.category === activeCategory;
+      const matchesCategory = activeCategory
+        ? item.category.id === activeCategory
+        : true;
       const matchesSearch = item.name
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
 
       return searchQuery ? matchesSearch : matchesCategory;
     });
-  }, [activeCategory, searchQuery]);
+  }, [menuItems, activeCategory, searchQuery]);
 
+  console.log(filteredItems, "filter");
   const activeCategoryData = useMemo(() => {
-    return categories.find((c) => c.id === activeCategory);
-  }, [activeCategory]);
+    return categories.find((c) => Number(c.id) === activeCategory);
+  }, [categories, activeCategory]);
+
+  function resetFilters() {
+    setSearchQuery("");
+  }
 
   return (
     <>
       {/* 🔍 Search + Filter */}
-      <div className="w-full bg-transparent flex flex-col md:flex-row gap-4 md:items-center md:justify-between mb-3">
-        <div className="relative">
-          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
-          <Input
-            type="text"
-            placeholder="Search food..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
+      <div className="w-full mb-4">
+        {/* <div className="flex flex-col md:flex-row gap-3 md:items-center"> */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 min-w-[260px] max-w-2xl">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search food, drinks..."
+              className="h-12 rounded-full border-border bg-card pl-9 pr-4 text-sm shadow-sm"
+            />
+          </div>
+          <Button
+            variant="outline"
+            className="h-12 gap-2 rounded-full bg-card px-5 shadow-sm"
+            onClick={() => {
+              setSearchQuery("");
+              setActiveCategory(null);
+            }}
+          >
+            <RotateCcw className="h-4 w-4" /> Reset
+          </Button>
         </div>
-        <div className="w-full md:w-56">
-          <Select>
-            <SelectTrigger className="h-10 rounded-xl border border-border bg-background">
-              <SelectValue placeholder="Sort / Filter" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="popular">Popular</SelectItem>
-              <SelectItem value="price_low">Price: Low to High</SelectItem>
-              <SelectItem value="price_high">Price: High to Low</SelectItem>
-              <SelectItem value="rating">Top Rated</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {/* </div> */}
       </div>
 
       <div className="bg-[#f9f7f5] flex flex-col w-full relative">
@@ -153,8 +166,8 @@ export default function CustomerDashboard() {
                 <CategoryPill
                   key={cat.id}
                   category={cat}
-                  isActive={activeCategory === cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
+                  isActive={Number(activeCategory) === Number(cat.id)}
+                  onClick={() => setActiveCategory(Number(cat.id))}
                 />
               ))}
             </div>
@@ -191,20 +204,29 @@ export default function CustomerDashboard() {
               transition={{ duration: 0.25 }}
               className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
             >
-              {filteredItems.map((item) => (
-                <MenuItemCard
-                  key={item.id}
-                  item={item}
-                  quantity={cart[item.id]?.quantity || 0}
-                  onAdd={() => addToCart(item.id)}
-                  onRemove={() => removeFromCart(item.id)}
-                />
-              ))}
+              {isLoading ? (
+                // 🔥 Skeleton Loader Grid
+                Array.from({ length: 8 }).map((_, i) => (
+                  <MenuItemSkeleton key={i} />
+                ))
+              ) : (
+                <>
+                  {filteredItems.map((item) => (
+                    <MenuItemCard
+                      key={item.id}
+                      item={item}
+                      quantity={cart[item.id]?.quantity || 0}
+                      onAdd={() => addToCart(item.id)}
+                      onRemove={() => removeFromCart(item.id)}
+                    />
+                  ))}
 
-              {filteredItems.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground text-sm w-full">
-                  No items found
-                </div>
+                  {filteredItems.length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground text-sm w-full">
+                      No items found
+                    </div>
+                  )}
+                </>
               )}
             </motion.div>
           )}

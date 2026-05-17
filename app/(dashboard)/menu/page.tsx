@@ -80,7 +80,7 @@ import MenuDialog from "@/components/MenuDialog";
 import StatusPill from "@/components/StatusPill";
 import VegBadge from "@/components/VegBadge";
 import Thumb from "@/components/Thumb";
-import { MenuItem } from "@/types/types";
+import { Category, MenuItem } from "@/types/types";
 import StatCard from "@/components/StatCard";
 import MenuCard from "@/components/MenuCard";
 import {
@@ -96,6 +96,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { allCategory } from "@/types/menu-types";
 
 function MenuPage() {
   const { data: items = [], isLoading } = useFetchMenus();
@@ -347,6 +348,7 @@ function MenuPage() {
           name: data.name,
           description: data.description,
           price: data.price,
+          menuType: data.menuType,
           available: data.available,
           categoryId: data.categoryId,
         };
@@ -356,6 +358,7 @@ function MenuPage() {
             name: editing.name,
             description: editing.description,
             price: Number(editing.price),
+            menuType: editing.menuType,
             available: editing.available,
             categoryId: editing.category?.id,
           },
@@ -404,6 +407,11 @@ function MenuPage() {
       toast.error("Delete failed ❌");
     }
   }
+
+  const mapCategoryToAllCategory = (c: Category): allCategory => ({
+    id: Number(c.id), // ✅ FIX
+    name: c.name,
+  });
 
   return (
     <div className="">
@@ -475,7 +483,7 @@ function MenuPage() {
               <SelectContent>
                 <SelectItem value="all">All categories</SelectItem>
 
-                {(isFetchingCategories || isFetching) ? (
+                {isFetchingCategories || isFetching ? (
                   <SelectItem value="loading" disabled>
                     Loading...
                   </SelectItem>
@@ -681,7 +689,7 @@ function MenuPage() {
           setDialogOpen(o);
           if (!o) setEditing(null);
         }}
-        allCategory={allCategory}
+        allCategory={allCategory.map(mapCategoryToAllCategory)}
         initial={editing}
         onSave={handleSave}
         loading={isCreating || isUpdating}

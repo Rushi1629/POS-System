@@ -304,7 +304,7 @@ export type MenuItem = {
   description: string;
   available: boolean;
   imageUrl?: string | null;
-  category: { id: string; name: string };
+  category: { id: number; name: string };
   subMenuItems: SubMenuItem[];
 };
 

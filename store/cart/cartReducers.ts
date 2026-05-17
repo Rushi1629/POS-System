@@ -12,7 +12,7 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
   }
 };
 
-export const removeItem = (state: CartState, action: PayloadAction<string>) => {
+export const removeItem = (state: CartState, action: PayloadAction<number>) => {
   const id = action.payload;
 
   if (!state.items[id]) return;

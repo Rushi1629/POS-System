@@ -11,7 +11,7 @@ export interface SubMenuItem {
 }
 
 export interface allCategory {
-  id: string;
+  id: number;
   name: string;
 }
 
