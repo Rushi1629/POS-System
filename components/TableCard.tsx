@@ -38,7 +38,7 @@ import {
   Table,
 } from "@/types/types";
 import { useAppDispatch } from "@/store/hooks";
-import { formatDuration } from "@/utils/utils";
+import { formatDuration, formatMinutes } from "@/utils/utils";
 import {
   useEditTable,
   useEditTableSession,
@@ -163,7 +163,7 @@ export function TableCard({
                   <>
                     <span className="flex items-center gap-1">
                       <Timer className="h-3 w-3" />
-                      {totalMinutes} m
+                      {formatMinutes(totalMinutes)}
                     </span>
 
                     <span className="text-green-600 font-semibold">

@@ -31,5 +31,14 @@ function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+// 🧠 Format minutes to "X hr Y min" format
+function formatMinutes(minutes: number): string {
+  if (minutes < 60) {
+    return `${minutes} min`;
+  }
+  const hrs = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return mins > 0 ? `${hrs} hr ${mins} min` : `${hrs} hr`;
+}
 
-export { formatDuration, getPageNumbers, delay };
+export { formatDuration, getPageNumbers, delay, formatMinutes };
