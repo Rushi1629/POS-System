@@ -3,13 +3,11 @@
 import { TableCard } from "@/components/TableCard";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-// import { categoryLabels } from "@/types/types";
 import { useEditTableSession, useFetchTables } from "@/api/hooks/useTable";
 import {
   TABLE_TYPE_LABELS,
   TABLE_TYPES,
   TableType,
-  FetchTableResponse,
   EditTableSessionPayload,
 } from "@/types/table-types";
 import { useQueryClient } from "@tanstack/react-query";
@@ -19,8 +17,6 @@ export default function TablesManagement() {
 
   const { data: tables = [], isLoading } = useFetchTables();
 
-  // const [sessions, setSessions] = useState<Record<number, EditTableSessionPayload>>({});
-
   const [guestMap, setGuestMap] = useState<Record<number, number>>({});
 
   const [loadingTableId, setLoadingTableId] = useState<number | null>(null);
@@ -28,7 +24,7 @@ export default function TablesManagement() {
   const { mutateAsync: updateTableSession, isPending: isPending } =
     useEditTableSession();
 
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   const handleUpdateSession = async (payload: EditTableSessionPayload) => {
     try {
@@ -63,22 +59,10 @@ export default function TablesManagement() {
     isActive: t.isActive,
   }));
 
-  // id: number;
-  // name: string;
-  // type: TableType; // ✅ fixed
-  // status: TableStatus; // ✅ fixed
-  // capacity: number;
-  // enableTimeRate: boolean;
-  // ratePerMinute: number;
-  // qrCode: string | null;
-  // isActive: boolean;
-
   const filtered =
     filter === "ALL"
       ? mappedTables
       : mappedTables.filter((t) => t.type === filter);
-
-  // const isEmpty = filtered.length === 0;
 
   const groupedTables = mappedTables.reduce(
     (acc, table) => {

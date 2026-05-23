@@ -78,16 +78,6 @@ export const useEditTableSession = () => {
   });
 };
 
-// export const useFetchLiveCharge = () => {
-//   return useQuery<getTableLiveChargeResponse>({
-//     queryKey: ["tables"],
-//     queryFn: () => getTableLiveCharge,
-//     refetchOnWindowFocus: false,
-//     retry: false,
-//     staleTime: 0,
-//   });
-// };
-
 export const useFetchLiveCharge = (id?: number) => {
   return useQuery({
     queryKey: ["liveCharge", id],

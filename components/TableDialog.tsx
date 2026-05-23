@@ -63,6 +63,7 @@ function TableDialog({
       enableTimeRate: false,
       ratePerMinute: 0,
       isActive: true,
+      chargePerPerson: false,
       // guestCount: 1,
     },
   });
@@ -81,6 +82,7 @@ function TableDialog({
         enableTimeRate: initial.enableTimeRate,
         ratePerMinute: Number(initial.ratePerMinute) || 0,
         isActive: initial.isActive,
+        chargePerPerson: initial.chargePerPerson,
         // guestCount: Number(initial.guestCount) || 0,
       });
     } else {
@@ -92,6 +94,7 @@ function TableDialog({
         enableTimeRate: false,
         ratePerMinute: 0,
         isActive: true,
+        chargePerPerson: false,
         // guestCount: 1,
       });
     }
@@ -185,6 +188,19 @@ function TableDialog({
             <Switch
               checked={watch("enableTimeRate")}
               onCheckedChange={(v) => setValue("enableTimeRate", v)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2.5">
+            <div>
+              <p className="text-sm font-medium">Charge per person</p>
+              <p className="text-xs text-muted-foreground">
+                Charge a fixed amount per person
+              </p>
+            </div>
+            <Switch
+              checked={watch("chargePerPerson")}
+              onCheckedChange={(v) => setValue("chargePerPerson", v)}
             />
           </div>
 

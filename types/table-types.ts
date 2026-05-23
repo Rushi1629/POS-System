@@ -1,12 +1,11 @@
 export interface CreateTablePayload {
   name: string;
   type: TableType;
-  // status: TableStatus;
   capacity: number;
   enableTimeRate: boolean;
+  chargePerPerson : boolean;
   ratePerMinute: number;
   isActive: boolean;
-  // guestCount: number;
 }
 
 export interface EditTableSessionPayload {
@@ -62,13 +61,11 @@ export type TableStatus = (typeof TABLE_STATUS)[number];
 export type TableFormValues = {
   name: string;
   type: TableType;
-  // tableStatus: TableStatus;
   capacity: number;
   enableTimeRate: boolean;
   ratePerMinute: number;
-  chargePerPerson?: boolean;
+  chargePerPerson: boolean;
   isActive: boolean;
-  // guestCount: number;
 };
 
 export const statusMap: Record<

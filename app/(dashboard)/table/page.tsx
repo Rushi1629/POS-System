@@ -29,6 +29,9 @@ import {
   Rotate3D,
   RotateCcw,
   RotateCw,
+  Check,
+  TimerIcon,
+  User2,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -83,8 +86,8 @@ import TableStatusCustom from "@/components/TableStatus";
 
 function Tables() {
   const { data: tables = [] } = useFetchTables();
-  console.log(tables,"tables");
-  
+  console.log(tables, "tables");
+
   const { mutateAsync: createTable, isPending: isCreating } = useCreateTable();
 
   const { mutateAsync: updateTable, isPending: isEditing } = useEditTable();
@@ -168,7 +171,37 @@ function Tables() {
       {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => <TableStatusCustom status={row.original.tableStatus} />,
+        cell: ({ row }) => (
+          <TableStatusCustom status={row.original.tableStatus} />
+        ),
+      },
+      {
+        accessorKey: "chargePerPerson",
+        header: "Charge per Person",
+        cell: ({ row }) => (
+          <span
+            className={`inline-flex items-center gap-1.5 text-xs font-medium ${
+              row.original.chargePerPerson ? "text-chart-2" : "text-chart-5"
+            }`}
+          >
+            <User2 className="h-3.5 w-3.5" />
+            {row.original.chargePerPerson ? "True" : "False"}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "enableTimeRate",
+        header: "Enable Time Rate",
+        cell: ({ row }) => (
+          <span
+            className={`inline-flex items-center gap-1.5 text-xs font-medium ${
+              row.original.enableTimeRate ? "text-chart-2" : "text-chart-5"
+            }`}
+          >
+            <TimerIcon className="h-3.5 w-3.5" />
+            {row.original.enableTimeRate ? "True" : "False"}
+          </span>
+        ),
       },
       {
         accessorKey: "isActive",
@@ -176,7 +209,7 @@ function Tables() {
         cell: ({ row }) => (
           <span
             className={`inline-flex items-center gap-1.5 text-xs font-medium ${
-              row.original.isActive ? "text-chart-2" : "text-muted-foreground"
+              row.original.isActive ? "text-chart-2" : "text-chart-5"
             }`}
           >
             <Power className="h-3.5 w-3.5" />
@@ -254,24 +287,22 @@ function Tables() {
         const payload = {
           name: data.name,
           type: data.type,
-          // status: data.status,
           capacity: data.capacity,
           enableTimeRate: data.enableTimeRate,
           ratePerMinute: data.ratePerMinute,
           isActive: data.isActive,
-          // guestCount: data.guestCount,
+          chargePerPerson: data.chargePerPerson,
         };
 
         const isSame = isEqual(
           {
             name: editing.name,
             type: editing.type,
-            // status: editing.status,
             capacity: editing.capacity,
             enableTimeRate: editing.enableTimeRate,
             ratePerMinute: editing.ratePerMinute,
             isActive: editing.isActive,
-            // guestCount: editing.guestCount,
+            chargePerPerson: editing.chargePerPerson,
           },
           payload,
         );

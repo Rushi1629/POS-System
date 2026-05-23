@@ -20,6 +20,8 @@ export const tableSchema = z
     ratePerMinute: z.number().min(0, "Rate must be ≥ 0"),
 
     isActive: z.boolean(),
+    
+    chargePerPerson: z.boolean(),
 
     // guestCount: z.number().min(1, "Guest count must be at least 1"),
   })

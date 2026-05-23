@@ -202,6 +202,12 @@ input:-internal-autofill-selected {
   scrollbar-width: none; /* Firefox */
 }
 
+:where(.custom-space-y>:not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(.25rem * 6) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(.25rem * 6) * calc(1 - var(--tw-space-y-reverse)));
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -315,7 +321,7 @@ input:-internal-autofill-selected {
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  --chart-5: #ff2056;
   --sidebar: oklch(0.208 0.042 265.755);
   --sidebar-foreground: oklch(0.984 0.003 247.858);
   --sidebar-primary: oklch(0.488 0.243 264.376);
