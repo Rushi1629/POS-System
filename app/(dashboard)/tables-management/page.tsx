@@ -4,15 +4,50 @@ import { TableCard } from "@/components/TableCard";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 // import { categoryLabels } from "@/types/types";
-import { useFetchTables } from "@/api/hooks/useTable";
-import { TABLE_TYPE_LABELS, TABLE_TYPES, TableType , FetchTableResponse, EditTableSessionPayload } from "@/types/table-types";
+import { useEditTableSession, useFetchTables } from "@/api/hooks/useTable";
+import {
+  TABLE_TYPE_LABELS,
+  TABLE_TYPES,
+  TableType,
+  FetchTableResponse,
+  EditTableSessionPayload,
+} from "@/types/table-types";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function TablesManagement() {
   const [filter, setFilter] = useState<TableType | "ALL">("ALL");
 
   const { data: tables = [], isLoading } = useFetchTables();
 
-  const [sessions, setSessions] = useState<Record<number, EditTableSessionPayload>>({});
+  // const [sessions, setSessions] = useState<Record<number, EditTableSessionPayload>>({});
+
+  const [guestMap, setGuestMap] = useState<Record<number, number>>({});
+
+  const [loadingTableId, setLoadingTableId] = useState<number | null>(null);
+
+  const { mutateAsync: updateTableSession, isPending: isPending } =
+    useEditTableSession();
+
+    const queryClient = useQueryClient();
+
+  const handleUpdateSession = async (payload: EditTableSessionPayload) => {
+    try {
+      setLoadingTableId(payload.tableId);
+
+      await updateTableSession(payload);
+
+      queryClient.invalidateQueries({
+        queryKey: ["liveCharge", payload.tableId],
+      });
+
+      setGuestMap((prev) => ({
+        ...prev,
+        [payload.tableId]: payload.guestCount,
+      }));
+    } finally {
+      setLoadingTableId(null);
+    }
+  };
 
   const mappedTables = tables.map((t) => ({
     id: t.id,
@@ -22,6 +57,8 @@ export default function TablesManagement() {
     capacity: t.capacity,
     enableTimeRate: t.enableTimeRate,
     ratePerMinute: t.ratePerMinute,
+    chargePerPerson: (t as any).chargePerPerson,
+    guestCount: (t as any).guestCount ?? 0,
     qrCode: t.qrCode,
     isActive: t.isActive,
   }));
@@ -128,7 +165,13 @@ export default function TablesManagement() {
                 {/* Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {tables.map((table) => (
-                    <TableCard key={table.id} table={table} session={sessions[table.id]} />
+                    <TableCard
+                      key={table.id}
+                      table={table}
+                      guestCount={guestMap[table.id] ?? 0}
+                      onUpdateSession={handleUpdateSession}
+                      isPending={loadingTableId === table.id}
+                    />
                   ))}
                 </div>
               </div>
@@ -142,7 +185,13 @@ export default function TablesManagement() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filtered.map((table) => (
-            <TableCard key={table.id} table={table} session={sessions[table.id]} />
+            <TableCard
+              key={table.id}
+              table={table}
+              guestCount={guestMap[table.id] ?? 0}
+              onUpdateSession={handleUpdateSession}
+              isPending={loadingTableId === table.id}
+            />
           ))}
         </div>
       )}

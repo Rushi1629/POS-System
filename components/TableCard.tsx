@@ -39,7 +39,11 @@ import {
 } from "@/types/types";
 import { useAppDispatch } from "@/store/hooks";
 import { formatDuration } from "@/utils/utils";
-import { useEditTable, useEditTableSession } from "@/api/hooks/useTable";
+import {
+  useEditTable,
+  useEditTableSession,
+  useFetchLiveCharge,
+} from "@/api/hooks/useTable";
 import {
   EditTableSessionPayload,
   FetchTableResponse,
@@ -47,24 +51,19 @@ import {
 
 export function TableCard({
   table,
-  session,
+  onUpdateSession,
+  guestCount,
+  isPending,
 }: {
   table: FetchTableResponse;
-  session: EditTableSessionPayload;
+  guestCount: number;
+  onUpdateSession: (data: EditTableSessionPayload) => Promise<any>;
+  isPending: boolean;
 }) {
-  // const dispatch = useAppDispatch();
-
-  // const { mutateAsync: updateTable, isPending } = useEditTable();
-  const { mutateAsync: updateTableSession, isPending } = useEditTableSession();
-
   const [, setTick] = useState(0);
   const [seatDialog, setSeatDialog] = useState(false);
   const [guestInput, setGuestInput] = useState("");
-  const [localStartTimes, setLocalStartTimes] = useState<
-    Record<number, number>
-  >({});
 
-  // ⏱️ Re-render timer every second
   useEffect(() => {
     if (table.enableTimeRate) {
       const interval = setInterval(() => setTick((t) => t + 1), 1000);
@@ -72,40 +71,34 @@ export function TableCard({
     }
   }, [table.enableTimeRate, setTick]);
 
+  const isOccupied = table.tableStatus === "OCCUPIED";
+
+  const {
+    data: liveData,
+    isLoading,
+    error,
+    status,
+    isFetching,
+  } = useFetchLiveCharge(isOccupied ? table.id : undefined);
+
+  const totalMinutes = liveData?.totalMinutes ?? 0;
+
+  const currentCharge = liveData?.currentCharge ?? 0;
+
   const handleSeatGuests = async () => {
     const count = parseInt(guestInput);
 
     if (count > 0 && count <= table.capacity) {
-      await updateTableSession({
+      await onUpdateSession({
         tableId: table.id,
         guestCount: count,
         status: "OCCUPIED",
-        notes: "",
+        notes: "N/A",
       });
-
-      // ✅ set frontend start time
-      setLocalStartTimes((prev) => ({
-        ...prev,
-        [table.id]: Date.now(),
-      }));
 
       setSeatDialog(false);
       setGuestInput("");
     }
-  };
-
-  const startTime = localStartTimes[table.id];
-  const getElapsedSeconds = () => {
-    if (!startTime) return 0;
-    return Math.floor((Date.now() - startTime) / 1000);
-  };
-
-  const getTotalAmount = () => {
-    if (!startTime || !table.enableTimeRate) return 0;
-
-    const minutes = getElapsedSeconds() / 60;
-
-    return minutes * table.ratePerMinute * session?.guestCount;
   };
 
   return (
@@ -154,17 +147,30 @@ export function TableCard({
           <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
             <span className="flex items-center gap-1">
               <Users className="h-3 w-3" />
-              {`${session?.guestCount ?? 0}/${table.capacity ?? 0}`}
+              {`${table.guestCount ?? 0}/${table.capacity ?? 0}`}
               {/* {table.capacity} */}
             </span>
 
-            {table.enableTimeRate && startTime && (
-              <div className="flex flex-col text-xs font-mono">
-                <span>⏱ {Math.floor(getElapsedSeconds() / 60)}m</span>
+            {table.enableTimeRate && table.tableStatus === "OCCUPIED" && (
+              <div className="flex text-xs gap-3">
+                {isLoading && (
+                  <span className="text-yellow-600">Loading...</span>
+                )}
+                {error && (
+                  <span className="text-red-600">Error: {error.message}</span>
+                )}
+                {!isLoading && !error && (
+                  <>
+                    <span className="flex items-center gap-1">
+                      <Timer className="h-3 w-3" />
+                      {totalMinutes} m
+                    </span>
 
-                <span className="text-green-600 font-semibold">
-                  ₹ {getTotalAmount().toFixed(2)}
-                </span>
+                    <span className="text-green-600 font-semibold">
+                      ₹ {currentCharge.toFixed(2)}
+                    </span>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -189,9 +195,9 @@ export function TableCard({
                   disabled={isPending}
                   className="text-xs h-7"
                   onClick={async () => {
-                    await updateTableSession({
+                    await onUpdateSession({
                       tableId: table.id,
-                      guestCount: session?.guestCount ?? 0,
+                      guestCount: guestCount,
                       status: "RESERVED",
                       notes: "",
                     });
@@ -216,9 +222,9 @@ export function TableCard({
                 disabled={isPending}
                 className="text-xs h-7"
                 onClick={async () => {
-                  await updateTableSession({
+                  await onUpdateSession({
                     tableId: table.id,
-                    guestCount: session?.guestCount ?? 0,
+                    guestCount: guestCount,
                     status: "CLEANING",
                     notes: "",
                   });
@@ -252,9 +258,9 @@ export function TableCard({
                   className="text-xs h-7"
                   disabled={isPending}
                   onClick={async () => {
-                    await updateTableSession({
+                    await onUpdateSession({
                       tableId: table.id,
-                      guestCount: session?.guestCount ?? 0,
+                      guestCount: guestCount,
                       status: "AVAILABLE",
                       notes: "",
                     });
@@ -279,9 +285,9 @@ export function TableCard({
                 className="text-xs h-7"
                 disabled={isPending}
                 onClick={async () => {
-                  await updateTableSession({
+                  await onUpdateSession({
                     tableId: table.id,
-                    guestCount: session?.guestCount ?? 0,
+                    guestCount: guestCount,
                     status: "AVAILABLE",
                     notes: "",
                   });
