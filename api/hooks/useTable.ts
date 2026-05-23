@@ -5,8 +5,13 @@ import {
   editTableById,
   editTableSession,
   fetchAllTables,
+  getTableLiveCharge,
 } from "../services/table.service";
-import { FetchTableResponse } from "@/types/table-types";
+import {
+  FetchTableResponse,
+  getTableLiveChargeResponse,
+  EditTablePayload,
+} from "@/types/table-types";
 
 export const useCreateTable = () => {
   const queryClient = useQueryClient();
@@ -52,7 +57,7 @@ export const useEditTable = () => {
       data,
     }: {
       id: number;
-      data: Partial<FetchTableResponse>;
+      data: EditTablePayload;
     }) => editTableById(id, data),
 
     onSuccess: () => {
@@ -60,7 +65,6 @@ export const useEditTable = () => {
     },
   });
 };
-
 
 export const useEditTableSession = () => {
   const queryClient = useQueryClient();
@@ -71,5 +75,32 @@ export const useEditTableSession = () => {
       // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
+  });
+};
+
+// export const useFetchLiveCharge = () => {
+//   return useQuery<getTableLiveChargeResponse>({
+//     queryKey: ["tables"],
+//     queryFn: () => getTableLiveCharge,
+//     refetchOnWindowFocus: false,
+//     retry: false,
+//     staleTime: 0,
+//   });
+// };
+
+export const useFetchLiveCharge = (id?: number) => {
+  return useQuery({
+    queryKey: ["liveCharge", id],
+    queryFn: async () => {
+      console.log("🔄 Fetching live charge for table:", id);
+      const res = await getTableLiveCharge(id as number);
+      console.log("📊 Live charge result:", res);
+      return res ?? { totalMinutes: 0, currentCharge: 0 };
+    },
+    enabled: !!id, // 🔥 Only run when id is available
+    refetchInterval: 60000, // ✅ Fetch every 5 seconds for LIVE updates
+    staleTime: 4000, // Keep data fresh for 4 seconds before marking stale
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    retry: 1, // Retry once on failure
   });
 };

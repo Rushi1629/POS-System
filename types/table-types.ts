@@ -16,6 +16,23 @@ export interface EditTableSessionPayload {
   notes: string;
 }
 
+export interface EditTablePayload {
+  name?: string;
+  type?: TableType;
+  tableStatus?: TableStatus;
+  capacity?: number;
+  enableTimeRate?: boolean;
+  ratePerMinute?: number;
+  chargePerPerson?: boolean;
+  qrCode?: string | null;
+  isActive?: boolean;
+  guestCount?: number;
+}
+
+export interface getTableLiveChargeResponse {
+  totalMinutes: number;
+  currentCharge: number;
+}
 export interface FetchTableResponse {
   id: number;
   name: string;
@@ -24,9 +41,10 @@ export interface FetchTableResponse {
   capacity: number;
   enableTimeRate: boolean;
   ratePerMinute: number;
+  chargePerPerson: boolean;
   qrCode: string | null;
   isActive: boolean;
-  // guestCount: number;
+  guestCount: number;
   // startTime?: string;
 }
 
@@ -48,6 +66,7 @@ export type TableFormValues = {
   capacity: number;
   enableTimeRate: boolean;
   ratePerMinute: number;
+  chargePerPerson?: boolean;
   isActive: boolean;
   // guestCount: number;
 };
