@@ -148,7 +148,6 @@ export function TableCard({
             <span className="flex items-center gap-1">
               <Users className="h-3 w-3" />
               {`${table.guestCount ?? 0}/${table.capacity ?? 0}`}
-              {/* {table.capacity} */}
             </span>
 
             {table.enableTimeRate && table.tableStatus === "OCCUPIED" && (
