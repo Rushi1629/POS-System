@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   fetchAllCategoriesCustomer,
   fetchAllMenusCustomer,
+  fetchTableByToken,
 } from "../services/customer.service";
 import { Category } from "@/types/types";
 
@@ -19,6 +20,16 @@ export const useFetchCategoriesCustomer = () => {
   return useQuery<Category[]>({
     queryKey: ["categories"],
     queryFn: fetchAllCategoriesCustomer,
+    refetchOnWindowFocus: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
+
+export const useFetchTableByToken = (token: any) => {
+  return useQuery({
+    queryKey: ["table", token],
+    queryFn: () => fetchTableByToken(token),
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

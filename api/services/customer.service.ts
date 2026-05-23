@@ -32,3 +32,22 @@ export const fetchAllCategoriesCustomer = async (): Promise<
     createdAt: new Date(u.createdAt).getTime(), // ✅ FIX (important)
   }));
 };
+
+export const fetchTableByToken = async (token: any) => {
+  const res = await fetcher(`/table/token/${token}`);
+
+  return res.data.map((u: any) => ({
+    id: u.id,
+    name: u.name,
+    type: u.type,
+    tableStatus: u.tableStatus,
+    capacity: Number(u.capacity),
+    guestCount: Number(u.guestCount ?? 0),
+    enableTimeRate: u.enableTimeRate,
+    ratePerMinute: Number(u.ratePerMinute),
+    chargePerPerson: Boolean(u.chargePerPerson),
+    qrCodeImageUrl: u.qrCode ?? null,
+    tableToken: u.tableToken,
+    isActive: u.isActive,
+  }));
+};
