@@ -347,7 +347,7 @@ export const navItems: NavItem[] = [
     icon: User2,
     href: "/customer",
     group: "Operations",
-    roles: [],
+    roles: ["Super Admin"],
   },
   {
     id: "nav-tables-management",
