@@ -10,16 +10,15 @@ import { useAppDispatch } from "@/store/hooks";
 import { loadCartFromDB } from "@/lib/db";
 import { setCartAction } from "../../store/cart/cartSlice";
 import { store } from "../../store/store";
+import { usePathname } from "next/navigation";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // const pathname = usePathname();
-
-  // // ✅ Show sidebar only for /admin routes
-  // const showSidebar = pathname.startsWith("/admin");
+  const pathname = usePathname();
+  const showSidebar = pathname !== "/customer";
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -34,9 +33,11 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar - Desktop only */}
-      <div className="hidden md:block">
-        <Sidebar />
-      </div>
+      {showSidebar && (
+        <div className="hidden md:block">
+          <Sidebar />
+        </div>
+      )}
       {/* <div className="hidden md:block w-64 bg-gray-900 text-white">
       </div> */}
 

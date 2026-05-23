@@ -39,7 +39,7 @@ export default function Sidebar() {
   const logoutMutation = useLogout();
   // const user = useAppSelector((state) => state.auth.user);
   const queryClient = useQueryClient();
-  const { data: user, isLoading, isError } = useProfile();
+  const { data: user, isLoading, isError } = useProfile({ enabled: pathname !== "/customer" });
 
   const handleLogout = async () => {
     try {

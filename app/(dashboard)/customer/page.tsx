@@ -28,9 +28,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { addItemAction, removeItemAction } from "@/store/cart/cartSlice";
 import { useRouter } from "next/navigation";
-import { useFetchCategories } from "@/api/hooks/useCategory";
 import { Input } from "@/components/input";
-import { useFetchMenus } from "@/api/hooks/useMenu";
+import {
+  useFetchCategoriesCustomer,
+  useFetchMenusCustomer,
+} from "@/api/hooks/useCustomer";
 
 export default function CustomerDashboard() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
@@ -44,13 +46,13 @@ export default function CustomerDashboard() {
     isPending: isFetchingCategories,
     isFetching,
     isError,
-  } = useFetchCategories();
+  } = useFetchCategoriesCustomer();
 
   const categories = useMemo(() => {
     return allCategory.filter((c) => c.isActive === true);
   }, [allCategory]);
 
-  const { data: menuItems = [], isLoading } = useFetchMenus();
+  const { data: menuItems = [], isLoading } = useFetchMenusCustomer();
 
   console.log(menuItems, "menuItems");
 

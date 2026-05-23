@@ -30,12 +30,13 @@ export const useLogout = () => {
   });
 };
 
-export const useProfile = () => {
-  return useQuery({
+export const useProfile = (options?: any) => {
+  return useQuery<any>({
     queryKey: ["me"],
     queryFn: fetchUserProfile,
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0, // 🔥 IMPORTANT (always fresh)
+    ...(options || {}),
   });
 };

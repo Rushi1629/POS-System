@@ -13,27 +13,40 @@ type Props = {
 };
 
 export default function AuthInitializer({ children }: Props) {
-  const { data: user, isLoading, isError } = useProfile();
+  const pathname = usePathname();
+  const { data: user, isLoading, isError, refetch } = useProfile({ enabled: false });
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const pathname = usePathname();
 
   useEffect(() => {
+    // Public routes that should NOT trigger profile fetch or redirects
+    const publicPaths = ["/customer", "/login", "/register"];
+    if (publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+      return;
+    }
+
+    // Trigger the profile fetch when on protected routes.
+    refetch();
+
     // 🚫 Wait until loading finishes
     if (isLoading) return;
 
-    // ❌ If error → logout
+    // ❌ If error → logout (only redirect when not already on login/register)
     if (isError) {
       dispatch(clearUser());
-      router.replace("/login");
+      if (pathname !== "/login" && pathname !== "/register") {
+        router.replace("/login");
+      }
       return;
     }
 
     console.log("AuthInitializer user:", user);
 
-    // ❌ No user → redirect
+    // ❌ No user → redirect (only when not on login/register)
     if (!user) {
-      router.replace("/login");
+      if (pathname !== "/login" && pathname !== "/register") {
+        router.replace("/login");
+      }
       return;
     }
 
