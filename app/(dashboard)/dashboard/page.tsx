@@ -142,7 +142,7 @@ const page = () => {
 
       {/* Sales + Orders */}
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2 border-border/60 shadow-[var(--shadow-card)]">
+        <Card className="lg:col-span-2 border-border/60 shadow-[--shadow-card]">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-base">Sales Trend</CardTitle>
@@ -169,7 +169,7 @@ const page = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-border/60 shadow-[var(--shadow-card)]">
+        <Card className="border-border/60 shadow-[--shadow-card]">
           <CardHeader>
             <CardTitle className="text-base">Order Status</CardTitle>
             <p className="text-xs text-muted-foreground">
@@ -184,7 +184,7 @@ const page = () => {
 
       {/* Top items + Payments + Inventory */}
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="border-border/60 shadow-[var(--shadow-card)]">
+        <Card className="border-border/60 shadow-[--shadow-card]">
           <CardHeader>
             <CardTitle className="text-base">Top-Selling Items</CardTitle>
             <p className="text-xs text-muted-foreground">
@@ -195,7 +195,7 @@ const page = () => {
             <TopItemsChart />
           </CardContent>
         </Card>
-        <Card className="border-border/60 shadow-[var(--shadow-card)]">
+        <Card className="border-border/60 shadow-[--shadow-card]">
           <CardHeader>
             <CardTitle className="text-base">Payment Methods</CardTitle>
             <p className="text-xs text-muted-foreground">
@@ -206,7 +206,7 @@ const page = () => {
             <PaymentMethodsChart />
           </CardContent>
         </Card>
-        <Card className="border-border/60 shadow-[var(--shadow-card)]">
+        <Card className="border-border/60 shadow-[--shadow-card]">
           <CardHeader>
             <CardTitle className="text-base">Inventory Levels</CardTitle>
             <p className="text-xs text-muted-foreground">
@@ -228,7 +228,7 @@ const page = () => {
       </div>
 
       {/* Expenses vs Revenue */}
-      <Card className="border-border/60 shadow-[var(--shadow-card)]">
+      <Card className="border-border/60 shadow-[--shadow-card]">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="text-base">Revenue vs Expenses</CardTitle>

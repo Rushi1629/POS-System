@@ -82,7 +82,7 @@ export default function Sidebar() {
         className={`
     relative flex flex-col bg-stone-900 border-r border-stone-800 
     transition-all duration-300 ease-in-out overflow-visible
-    ${collapsed ? "w-[64px]" : "w-[240px]"}
+    ${collapsed ? "w-16" : "w-60"}
     h-full z-20
   `}
       >

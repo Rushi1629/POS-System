@@ -25,9 +25,9 @@ type Props = {
 
 export function FilterBar(p: Props) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-[var(--shadow-card)] lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-[--shadow-card] lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-1 flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-[180px]">
+        <div className="relative flex-1 min-w-45">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={p.query}
@@ -48,7 +48,7 @@ export function FilterBar(p: Props) {
 
       <div className="flex flex-wrap items-center gap-2">
         <Select value={p.category} onValueChange={p.onCategoryChange}>
-          <SelectTrigger className="h-10 w-[140px] rounded-full">
+          <SelectTrigger className="h-10 w-35 rounded-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -60,7 +60,7 @@ export function FilterBar(p: Props) {
           </SelectContent>
         </Select>
         <Select value={p.shift} onValueChange={p.onShiftChange}>
-          <SelectTrigger className="h-10 w-[120px] rounded-full">
+          <SelectTrigger className="h-10 w-30 rounded-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -71,7 +71,7 @@ export function FilterBar(p: Props) {
           </SelectContent>
         </Select>
         <Select value={p.payment} onValueChange={p.onPaymentChange}>
-          <SelectTrigger className="h-10 w-[130px] rounded-full">
+          <SelectTrigger className="h-10 w-32.5 rounded-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

@@ -137,7 +137,7 @@ export default function CustomerDashboard() {
       <div className="w-full mb-4">
         {/* <div className="flex flex-col md:flex-row gap-3 md:items-center"> */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[260px] max-w-2xl">
+          <div className="relative flex-1 min-w-65 max-w-2xl">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={searchQuery}

@@ -325,7 +325,7 @@ export default function LoginForm() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="text-center text-xs mt-6 font-semibold bg-gradient-to-r from-red-400 via-yellow-300 to-red-400 bg-clip-text text-transparent"
+            className="text-center text-xs mt-6 font-semibold bg-linear-to-r from-red-400 via-yellow-300 to-red-400 bg-clip-text text-transparent"
           >
             Cafe POS · Internal staff tool · Unauthorized access is prohibited
           </motion.p>

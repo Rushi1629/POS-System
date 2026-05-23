@@ -21,7 +21,7 @@ const tone: Record<string, string> = {
 
 export function RecentOrders() {
   return (
-    <Card className="border-border/60 shadow-[var(--shadow-card)]">
+    <Card className="border-border/60 shadow-[--shadow-card]">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle className="text-base">Recent Orders</CardTitle>

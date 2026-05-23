@@ -21,7 +21,7 @@ export function ApiLoader({
     >
       <div className="relative flex flex-col items-center gap-6 rounded-2xl border border-border/40 bg-card/70 px-10 py-8 shadow-2xl backdrop-blur-xl">
         {/* Ambient glow */}
-        <div className="pointer-events-none absolute -inset-1 -z-10 rounded-2xl bg-gradient-to-br from-amber-500/20 via-orange-400/10 to-rose-500/20 blur-xl" />
+        <div className="pointer-events-none absolute -inset-1 -z-10 rounded-2xl bg-linear-to-br from-amber-500/20 via-orange-400/10 to-rose-500/20 blur-xl" />
 
         {/* Cup with rising steam */}
         <div className="relative flex h-20 w-20 items-end justify-center">
@@ -40,7 +40,7 @@ export function ApiLoader({
           </div>
 
           {/* Cup */}
-          <div className="relative flex h-14 w-16 items-center justify-center rounded-b-2xl rounded-t-md bg-gradient-to-b from-amber-700 to-amber-900 shadow-inner">
+          <div className="relative flex h-14 w-16 items-center justify-center rounded-b-2xl rounded-t-md bg-linear-to-b from-amber-700 to-amber-900 shadow-inner">
             <Coffee className="h-6 w-6 text-amber-100/90" strokeWidth={2.2} />
             {/* Handle */}
             <span className="absolute -right-3 top-3 h-6 w-4 rounded-r-full border-4 border-amber-800" />
