@@ -3,6 +3,7 @@ import {
   fetchAllCategoriesCustomer,
   fetchAllMenusCustomer,
   fetchTableByToken,
+  fetchTableByTokenCustomer,
 } from "../services/customer.service";
 import { Category } from "@/types/types";
 
@@ -40,7 +41,7 @@ export const useFetchTableByToken = (token: any) => {
 export const useFetchTableByTokenCustomer = (token: any) => {
   return useQuery({
     queryKey: ["table", token],
-    queryFn: () => fetchTableByToken(token),
+    queryFn: () => fetchTableByTokenCustomer(token),
     enabled: !!token,
     refetchOnWindowFocus: false,
     retry: false,
