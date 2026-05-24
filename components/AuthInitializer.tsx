@@ -27,7 +27,7 @@ export default function AuthInitializer({ children }: Props) {
     }
 
     // Trigger the profile fetch when on protected routes.
-    refetch();
+    // refetch();
 
     // 🚫 Wait until loading finishes
     if (isLoading) return;
@@ -44,12 +44,12 @@ export default function AuthInitializer({ children }: Props) {
     console.log("AuthInitializer user:", user);
 
     // ❌ No user → redirect (only when not on login/register)
-    if (!user) {
-      if (pathname !== "/login" && pathname !== "/register") {
-        router.replace("/login");
-      }
-      return;
-    }
+    // if (!user) {
+    //   if (pathname !== "/login" && pathname !== "/register") {
+    //     router.replace("/login");
+    //   }
+    //   return;
+    // }
 
     // ✅ Set user in store
     dispatch(setUser(user));
