@@ -47,7 +47,7 @@ export const fetchTableByToken = async (token: any) => {
     enableTimeRate: u.enableTimeRate,
     ratePerMinute: Number(u.ratePerMinute),
     chargePerPerson: Boolean(u.chargePerPerson),
-    qrCodeImageUrl: u.qrCode ?? null,
+    qrCodeImageUrl: u.qrCodeImageUrl ?? null,
     tableToken: u.tableToken,
     isActive: u.isActive,
   };

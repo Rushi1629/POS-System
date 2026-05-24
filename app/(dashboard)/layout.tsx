@@ -31,10 +31,7 @@ export default function DashboardLayout({
     isError: isTableError,
   } = useFetchTableByToken(tableToken);
 
-  const table = tableData;
-
-  console.log(tableData,"data");
-  
+  const table = tableData;  
 
   useEffect(() => {
     const load = async () => {
