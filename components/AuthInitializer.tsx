@@ -19,7 +19,6 @@ export default function AuthInitializer({ children }: Props) {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    debugger;
     // Public routes that should NOT trigger profile fetch or redirects
     const publicPaths = ["/customer", "/login", "/register"];
     if (publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {

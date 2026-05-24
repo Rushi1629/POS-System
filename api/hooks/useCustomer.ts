@@ -36,3 +36,14 @@ export const useFetchTableByToken = (token: any) => {
     staleTime: 0,
   });
 };
+
+export const useFetchTableByTokenCustomer = (token: any) => {
+  return useQuery({
+    queryKey: ["table", token],
+    queryFn: () => fetchTableByToken(token),
+    enabled: !!token,
+    refetchOnWindowFocus: false,
+    retry: false,
+    staleTime: 0,
+  });
+};
