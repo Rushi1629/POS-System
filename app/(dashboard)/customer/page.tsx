@@ -51,6 +51,10 @@ export default function CustomerDashboard() {
     isError: isTableError,
   } = useFetchTableByToken(tableToken);
 
+  const table = tableData;
+
+  // console.log("tableToken:", tableToken, "tableData:", table);
+
   const {
     data: allCategory = [],
     isPending: isFetchingCategories,
@@ -143,13 +147,25 @@ export default function CustomerDashboard() {
 
   return (
     <>
-      {tableData && (
-        <div className="mb-4 px-4 py-2 bg-yellow-50 rounded-md border">
-          <p className="text-sm">
-            Seated at table <strong>{tableData.name}</strong>
-          </p>
+      {/* {tableToken && isLoadingTable && (
+        <div className="mb-4 px-4 py-2 bg-blue-50 rounded-md border border-blue-200 text-sm">
+          Looking up table for token <strong>{tableToken}</strong>...
         </div>
       )}
+
+      {tableToken && isTableError && (
+        <div className="mb-4 px-4 py-2 bg-red-50 rounded-md border border-red-200 text-sm text-red-700">
+          Could not find table for token <strong>{tableToken}</strong>.
+        </div>
+      )}
+
+      {table && (
+        <div className="mb-4 px-4 py-2 bg-yellow-50 rounded-md border">
+          <p className="text-sm">
+            Seated at table <strong>{table.name}</strong>
+          </p>
+        </div>
+      )} */}
       {/* 🔍 Search + Filter */}
       <div className="w-full mb-4">
         {/* <div className="flex flex-col md:flex-row gap-3 md:items-center"> */}

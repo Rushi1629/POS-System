@@ -35,8 +35,9 @@ export const fetchAllCategoriesCustomer = async (): Promise<
 
 export const fetchTableByToken = async (token: any) => {
   const res = await fetcher(`/table/token/${token}`);
+  const u = res.data;
 
-  return res.data.map((u: any) => ({
+  return {
     id: u.id,
     name: u.name,
     type: u.type,
@@ -49,5 +50,5 @@ export const fetchTableByToken = async (token: any) => {
     qrCodeImageUrl: u.qrCode ?? null,
     tableToken: u.tableToken,
     isActive: u.isActive,
-  }));
+  };
 };
