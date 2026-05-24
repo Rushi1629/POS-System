@@ -11,7 +11,7 @@ import { loadCartFromDB } from "@/lib/db";
 import { setCartAction } from "../../store/cart/cartSlice";
 import { store } from "../../store/store";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useFetchTableByToken } from "@/api/hooks/useCustomer";
+import { useFetchTableByToken, useFetchTableByTokenCustomer } from "@/api/hooks/useCustomer";
 
 export default function DashboardLayout({
   children,
@@ -29,7 +29,7 @@ export default function DashboardLayout({
     data: tableData,
     isLoading: isLoadingTable,
     isError: isTableError,
-  } = useFetchTableByToken(tableToken);
+  } = useFetchTableByTokenCustomer(tableToken);
 
   const table = tableData;  
 

@@ -52,6 +52,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import ApiLoader from "@/components/ApiLoader";
 
 export default function CustomerDashboard() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
@@ -65,13 +66,18 @@ export default function CustomerDashboard() {
   const searchParams = useSearchParams();
   const tableToken = searchParams?.get("tableToken");
 
-  const { data: tableData, isLoading: isLoadingTable } =
-    useFetchTableByTokenCustomer(tableToken);
+  const {
+    data: tableData,
+    isLoading: isLoadingTable,
+    refetch: refetchTable,
+  } = useFetchTableByTokenCustomer(tableToken);
 
   const table = tableData;
 
   const isSessionStarted =
-    (table?.guestCount ?? 0) > 0 || table?.tableStatus === "OCCUPIED";
+    table?.tableStatus === "OCCUPIED" && (table?.guestCount ?? 0) > 0;
+
+  const isOccupied = table?.tableStatus === "OCCUPIED";
 
   useEffect(() => {
     if (table && table.guestCount === 0 && table.tableStatus !== "OCCUPIED") {
@@ -187,6 +193,7 @@ export default function CustomerDashboard() {
         });
 
         // 🔥 THIS LINE FIXES EVERYTHING
+        await refetchTable();
 
         setGuestCountDialog(false);
         setGuestInput("");
@@ -195,6 +202,10 @@ export default function CustomerDashboard() {
       }
     }
   };
+
+  if (isLoadingTable) {
+    return <ApiLoader message="Loading table..." />;
+  }
 
   return (
     <>
@@ -216,7 +227,7 @@ export default function CustomerDashboard() {
         </div>
       )}
 
-      {isSessionStarted && (
+      {isOccupied && (
         <>
           <div className="w-full mb-4">
             {/* <div className="flex flex-col md:flex-row gap-3 md:items-center"> */}
@@ -379,20 +390,20 @@ export default function CustomerDashboard() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <p className="text-xs text-orange-700">Table Name</p>
-                    <p className="text-sm font-semibold text-orange-900">
+                    <p className="text-xs font-semibold text-orange-900">
                       {table.name}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-orange-700">Capacity</p>
-                    <p className="text-sm font-semibold text-orange-900">
+                    <p className="text-xs font-semibold text-orange-900">
                       {table.capacity}{" "}
                       {table.capacity === 1 ? "Guest" : "Guests"}
                     </p>
                   </div>
                   <div className="col-span-2">
                     <p className="text-xs text-orange-700">Type</p>
-                    <p className="text-sm font-semibold text-orange-900">
+                    <p className="text-xs font-semibold text-orange-900">
                       {table.type}
                     </p>
                   </div>
@@ -415,7 +426,7 @@ export default function CustomerDashboard() {
                     value={guestInput}
                     onChange={(e) => setGuestInput(e.target.value)}
                     placeholder={`Enter 1 to ${table.capacity} guests`}
-                    className="pl-9 border text-amber-600 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0 [-moz-appearance:textfield]"
+                    className="pl-9"
                     autoFocus
                   />
                 </div>
