@@ -30,6 +30,7 @@ export const useFetchTableByToken = (token: any) => {
   return useQuery({
     queryKey: ["table", token],
     queryFn: () => fetchTableByToken(token),
+    enabled: !!token,
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

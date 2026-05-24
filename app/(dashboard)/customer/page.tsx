@@ -21,6 +21,8 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useFetchTableByToken } from "@/api/hooks/useCustomer";
 import CategoryPill from "@/components/CategoryPill";
 import MenuItemCard from "@/components/MenuItemCard";
 import MenuItemSkeleton from "@/components/MenuItemSkeleton";
@@ -40,6 +42,14 @@ export default function CustomerDashboard() {
   const [expandedSection, setExpandedSection] = useState(true);
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tableToken = searchParams?.get("tableToken");
+
+  const {
+    data: tableData,
+    isLoading: isLoadingTable,
+    isError: isTableError,
+  } = useFetchTableByToken(tableToken);
 
   const {
     data: allCategory = [],
@@ -133,6 +143,13 @@ export default function CustomerDashboard() {
 
   return (
     <>
+      {tableData && (
+        <div className="mb-4 px-4 py-2 bg-yellow-50 rounded-md border">
+          <p className="text-sm">
+            Seated at table <strong>{tableData.name}</strong>
+          </p>
+        </div>
+      )}
       {/* 🔍 Search + Filter */}
       <div className="w-full mb-4">
         {/* <div className="flex flex-col md:flex-row gap-3 md:items-center"> */}
