@@ -14,9 +14,14 @@ type Props = {
 
 export default function AuthInitializer({ children }: Props) {
   const pathname = usePathname();
-  const { data: user, isLoading, isError, refetch } = useProfile({ enabled: false });
   const router = useRouter();
   const dispatch = useAppDispatch();
+  
+  // Disable profile fetch for public customer routes (QR-based sessions)
+  // Profile is only needed for authenticated staff routes
+  const isPublicCustomerRoute = pathname === "/customer" || pathname.startsWith("/customer/");
+  
+  const { data: user, isLoading, isError, refetch } = useProfile({ enabled: !isPublicCustomerRoute });
 
   useEffect(() => {
     // Public routes that should NOT trigger profile fetch or redirects

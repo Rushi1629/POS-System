@@ -5,6 +5,7 @@ import {
   editTableById,
   editTableSession,
   fetchAllTables,
+  fetchTableByToken,
   getTableLiveCharge,
 } from "../services/table.service";
 import {
@@ -92,5 +93,16 @@ export const useFetchLiveCharge = (id?: number) => {
     staleTime: 4000, // Keep data fresh for 4 seconds before marking stale
     refetchOnWindowFocus: true, // Refetch when window regains focus
     retry: 1, // Retry once on failure
+  });
+};
+
+export const useFetchTableByToken = (token: any) => {
+  return useQuery({
+    queryKey: ["table", token],
+    queryFn: () => fetchTableByToken(token),
+    enabled: !!token,
+    refetchOnWindowFocus: false,
+    retry: false,
+    staleTime: 0,
   });
 };

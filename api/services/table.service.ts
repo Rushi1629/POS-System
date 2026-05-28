@@ -116,3 +116,23 @@ export const getTableLiveCharge = async (
   }
 };
 
+export const fetchTableByToken = async (token: any) => {
+  const res = await fetcher(`/table/token/${token}`);
+  const u = res.data;
+
+  return {
+    id: u.id,
+    name: u.name,
+    type: u.type,
+    tableStatus: u.tableStatus,
+    capacity: Number(u.capacity),
+    guestCount: Number(u.guestCount ?? 0),
+    enableTimeRate: u.enableTimeRate,
+    ratePerMinute: Number(u.ratePerMinute),
+    chargePerPerson: Boolean(u.chargePerPerson),
+    qrCodeImageUrl: u.qrCodeImageUrl ?? null,
+    tableToken: u.tableToken,
+    isActive: u.isActive,
+  };
+};
+

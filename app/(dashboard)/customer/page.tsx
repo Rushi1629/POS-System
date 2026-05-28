@@ -1,35 +1,19 @@
 "use client";
 
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   ChevronDown,
   ChevronRightCircleIcon,
   ChevronUp,
-  CirclePoundSterlingIcon,
   RotateCcw,
-  RotateCw,
   Search,
-  SearchIcon,
-  User2,
   UserCheck2,
   Users,
 } from "lucide-react";
-// import { menuItems } from "@/lib/data";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import {
-  useFetchTableByToken,
-  useFetchTableByTokenCustomer,
-} from "@/api/hooks/useCustomer";
+import { useFetchTableByTokenCustomer } from "@/api/hooks/useCustomer";
 import CategoryPill from "@/components/CategoryPill";
 import MenuItemCard from "@/components/MenuItemCard";
 import MenuItemSkeleton from "@/components/MenuItemSkeleton";
@@ -53,6 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import ApiLoader from "@/components/ApiLoader";
+import { useProfile } from "@/api/hooks/useAuth";
 
 export default function CustomerDashboard() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
@@ -72,15 +57,22 @@ export default function CustomerDashboard() {
     refetch: refetchTable,
   } = useFetchTableByTokenCustomer(tableToken);
 
+  // Only fetch profile if NOT a public QR customer session
+  const { data: profile } = useProfile({ enabled: !tableToken });
+
+  console.log(profile, "profile");
+
+  const isAdmin =
+    !tableToken &&
+    profile?.role?.name &&
+    ["Super Admin", "Admin"].includes(profile.role.name);
+
   const table = tableData;
 
-  console.log(table,"table");
-  
+  console.log(table, "table");
 
   const isSessionStarted =
     table?.tableStatus === "OCCUPIED" && (table?.guestCount ?? 0) > 0;
-
-  const isOccupied = table?.tableStatus === "OCCUPIED";
 
   useEffect(() => {
     if (!table) return;
@@ -209,10 +201,10 @@ export default function CustomerDashboard() {
     }
   };
 
-  if (isLoadingTable || !table) {
+  if (!isAdmin && (isLoadingTable || !table)) {
     return <ApiLoader message="Loading table..." />;
   }
-  if (!isSessionStarted) {
+  if (!isAdmin && !isSessionStarted) {
     return (
       <>
         <div className="h-screen flex items-center justify-center">
@@ -231,12 +223,13 @@ export default function CustomerDashboard() {
           </div>
         </div>
 
-        <Dialog open={guestCountDialog}>
-          <DialogContent className="sm:max-w-sm max-w-lg max-h-[90vh] flex flex-col">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Welcome to {table.name}
+        {table && (
+          <Dialog open={guestCountDialog}>
+            <DialogContent className="sm:max-w-sm max-w-lg max-h-[90vh] flex flex-col">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Welcome to {table.name}
               </DialogTitle>
               <DialogDescription>
                 Please enter the number of guests at your table.
@@ -329,29 +322,13 @@ export default function CustomerDashboard() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        )}
       </>
     );
   }
 
   return (
     <>
-      {/* {!isSessionStarted && (
-        <div className="h-screen flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <Users className="h-16 w-16 mx-auto text-muted-foreground" />
-            <h2 className="text-2xl font-bold">Please Confirm Guest Count</h2>
-            <p className="text-muted-foreground">
-              Enter the number of guests to continue browsing the menu
-            </p>
-            <Button
-              onClick={() => setGuestCountDialog(true)}
-              className="bg-[#e25f28] hover:bg-[#d14f1f]"
-            >
-              Enter Guest Count
-            </Button>
-          </div>
-        </div>
-      )} */}
 
       {/* {isOccupied && ( */}
       <>
