@@ -459,7 +459,7 @@ export default function CustomerDashboard() {
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={() => router.push("/customer/cart")}
+                  onClick={() => router.push(`/customer/cart?tableToken=${tableToken}`)}
                   className="font-semibold text-[#e25f28] bg-[#f1edea]"
                 >
                   View Cart <ChevronRightCircleIcon />

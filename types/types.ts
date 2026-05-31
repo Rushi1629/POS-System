@@ -18,6 +18,7 @@ import {
   AtSign,
   Lock,
   User2,
+  Receipt,
 } from "lucide-react";
 
 export type TableStatus = "available" | "occupied" | "reserved" | "cleaning";
@@ -354,6 +355,14 @@ export const navItems: NavItem[] = [
     label: "Tables-Management",
     icon: Table2,
     href: "/tables-management",
+    group: "Operations",
+    roles: ["Super Admin"],
+  },
+  {
+    id: "nav-order-management",
+    label: "Order Management",
+    icon: Receipt,
+    href: "/orders-management",
     group: "Operations",
     roles: ["Super Admin"],
   },

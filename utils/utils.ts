@@ -41,4 +41,7 @@ function formatMinutes(minutes: number): string {
   return mins > 0 ? `${hrs} hr ${mins} min` : `${hrs} hr`;
 }
 
-export { formatDuration, getPageNumbers, delay, formatMinutes };
+const fmt = (n: number | string) =>
+  `₹${Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+export { formatDuration, getPageNumbers, delay, formatMinutes, fmt };

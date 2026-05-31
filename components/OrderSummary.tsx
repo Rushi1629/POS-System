@@ -48,12 +48,16 @@ interface OrderSummaryProps {
   itemCount: number;
   subtotal: number;
   gstRate?: number;
+  isPlacingOrder?: boolean;
+  onPlaceOrder?: () => void;
 }
 
 const OrderSummary = ({
   itemCount,
   subtotal,
   gstRate = 5,
+  isPlacingOrder = false,
+  onPlaceOrder,
 }: OrderSummaryProps) => {
   const [showCoupon, setShowCoupon] = useState(false);
   const [couponInput, setCouponInput] = useState("");
@@ -235,9 +239,13 @@ const OrderSummary = ({
         </span>
       </div>
 
-      <Button className="w-full mt-5 h-12 text-base font-semibold rounded-xl bg-[#e66b19] text-primary-foreground hover:bg-[#e66b19]/90 shadow-lg shadow-[#e66b19]/20">
+      <Button
+        className="w-full mt-5 h-12 text-base font-semibold rounded-xl bg-[#e66b19] text-primary-foreground hover:bg-[#e66b19]/90 shadow-lg shadow-[#e66b19]/20"
+        onClick={onPlaceOrder}
+        disabled={isPlacingOrder || itemCount === 0 || !onPlaceOrder}
+      >
         <ShoppingBag className="h-5 w-5 mr-2" />
-        Place Order
+        {isPlacingOrder ? "Placing order..." : "Place Order"}
       </Button>
     </div>
   );

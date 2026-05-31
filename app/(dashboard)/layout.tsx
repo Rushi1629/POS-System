@@ -19,7 +19,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const showSidebar = pathname !== "/customer";
+  const showSidebar = !pathname.startsWith("/customer");
   const dispatch = useAppDispatch();
 
   const searchParams = useSearchParams();

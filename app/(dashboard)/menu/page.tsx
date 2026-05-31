@@ -427,7 +427,7 @@ function MenuPage() {
         <Button
           size="lg"
           onClick={openCreate}
-          className="gap-2 bg-primary text-primary-foreground shadow-[var(--shadow-elegant)] hover:bg-primary/90"
+          className="gap-2 bg-primary text-primary-foreground shadow-(--shadow-elegant) hover:bg-primary/90"
         >
           <Plus className="h-4 w-4" />
           New Menu Item
@@ -477,7 +477,7 @@ function MenuPage() {
               value={categoryFilter}
               onValueChange={(v) => setCategoryFilter(v)}
             >
-              <SelectTrigger className="h-11 w-[170px] rounded-full">
+              <SelectTrigger className="h-11 w-42.5 rounded-full">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -505,7 +505,7 @@ function MenuPage() {
               value={statusFilter}
               onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}
             >
-              <SelectTrigger className="h-11 w-[170px] rounded-full">
+              <SelectTrigger className="h-11 w-42.5 rounded-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -615,7 +615,7 @@ function MenuPage() {
                 value={String(pageSize)}
                 onValueChange={(v) => table.setPageSize(Number(v))}
               >
-                <SelectTrigger className="h-8 w-[110px] rounded-full">
+                <SelectTrigger className="h-8 w-27.5 rounded-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
