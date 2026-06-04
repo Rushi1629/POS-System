@@ -56,7 +56,7 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col min-w-0">
         <Header table={table} />
 
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto pb-20 bg-[#f9f7f5] scrollbar-orange">
+        <main className="flex-1 p-6 lg:p-8 overflow-y-auto pb-20 bg-(--background) scrollbar-orange">
           <Suspense
             fallback={<SecretCafeLoader message="Loading dashboard..." />}
           >

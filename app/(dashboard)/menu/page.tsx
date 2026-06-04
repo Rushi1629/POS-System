@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   type ColumnDef,
   type PaginationState,
@@ -108,12 +108,14 @@ function MenuPage() {
     data: allCategory = [],
     isPending: isFetchingCategories,
     isFetching,
-    isError,
+    isError: categoryError,
   } = useFetchCategories();
 
   useEffect(() => {
-    console.log("✅ categories updated:", allCategory);
-  }, [allCategory]);
+    if (categoryError) {
+      toast.error("Failed to load categories");
+    }
+  }, [categoryError]);
 
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"grid" | "table">("table");
@@ -340,7 +342,6 @@ function MenuPage() {
 
   async function handleSave(formData: FormData) {
     try {
-      // console.log("handleSave called", { isEditing: !!editing });
       if (editing) {
         const data = JSON.parse(String(formData.get("data") || "{}"));
 
@@ -373,7 +374,6 @@ function MenuPage() {
           return;
         }
 
-        console.log("Updating menu...");
         await updateMenu({
           id: String(editing.id),
           formData: formData,
@@ -381,16 +381,13 @@ function MenuPage() {
 
         toast.success("Menu updated 👍");
       } else {
-        console.log("Creating new menu...");
         await createMenu(formData);
-        console.log("Menu created successfully");
         toast.success("Menu created 🥳");
       }
 
       setDialogOpen(false);
       setEditing(null);
     } catch (err) {
-      console.error("handleSave error:", err);
       toast.error("Something went wrong while saving ❌");
     }
   }
@@ -540,6 +537,13 @@ function MenuPage() {
       {filtered.length === 0 ? (
         <Card className="mt-6 border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            {isLoading ? (
+              <>
+                <div className="h-14 w-14 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+                <h3 className="mt-4 text-lg font-semibold">Loading menu items...</h3>
+              </>
+            ) : (
+              <>
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
               <UtensilsCrossed className="h-6 w-6" />
             </div>
@@ -550,6 +554,8 @@ function MenuPage() {
             <Button onClick={openCreate} className="mt-5 gap-2">
               <Plus className="h-4 w-4" /> New Menu Item
             </Button>
+              </>
+            )}
           </CardContent>
         </Card>
       ) : view === "grid" ? (

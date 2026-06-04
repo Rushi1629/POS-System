@@ -356,10 +356,10 @@ export default function CustomerDashboard() {
           {/* </div> */}
         </div>
 
-        <div className="bg-[#f9f7f5] flex flex-col w-full relative">
+        <div className="bg-(--background) flex flex-col w-full relative">
           {/* 📂 Category Scroll */}
           {!searchQuery && (
-            <div className="sticky z-20 bg-[#f9f7f5] backdrop-blur-xl border-b border-border/30">
+            <div className="sticky z-20 bg-(--background) backdrop-blur-xl border-b border-border/30">
               <div
                 ref={categoryScrollRef}
                 className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide"

@@ -204,7 +204,6 @@ function CategoriesPage() {
               aria-label="More"
               className="h-9 w-9"
             >
-              <MoreHorizontal className="h-4 w-4" />
             </Button>
           </div>
         ),
@@ -368,31 +367,21 @@ function CategoriesPage() {
               </SelectContent>
             </Select>
 
-            <div className="flex items-center rounded-full border p-1 bg-white">
+            <div className="flex items-center rounded-full border p-1">
               <Button
                 size="sm"
+                variant={view === "table" ? "default" : "ghost"}
                 onClick={() => setView("table")}
-                className={`h-8 rounded-full px-3 transition-colors
-                  ${
-                    view === "table"
-                      ? "bg-[#f77f00] text-white hover:bg-[color-mix(in_oklab,#f77f00_90%,transparent)]"
-                      : "bg-transparent text-black hover:bg-[#f8e5cb]"
-                  }
-                `}
+                className="h-8 rounded-full px-3"
               >
                 <ListIcon className="h-4 w-4" />
               </Button>
 
               <Button
                 size="sm"
+                variant={view === "grid" ? "default" : "ghost"}
                 onClick={() => setView("grid")}
-                className={`h-8 rounded-full px-3 transition-colors
-                  ${
-                    view === "grid"
-                      ? "bg-[#f77f00] text-white hover:bg-[color-mix(in_oklab,#f77f00_90%,transparent)]"
-                      : "bg-transparent text-black hover:bg-[#f8e5cb]"
-                  }
-                `}
+                className="h-8 rounded-full px-3"
               >
                 <LayoutGrid className="h-4 w-4" />
               </Button>
@@ -405,19 +394,39 @@ function CategoriesPage() {
       {filtered.length === 0 ? (
         <Card className="mt-6 border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <ImagePlus className="h-6 w-6" />
-            </div>
-            <h3 className="mt-4 text-lg font-semibold">No categories found</h3>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Try adjusting your search, or create your first category.
-            </p>
-            <Button
-              onClick={openCreate}
-              className="mt-5 gap-2 bg-[#f77f00] hover:bg-[#f77f00]/90 text-white px-6 py-2 rounded-md"
-            >
-              <Plus className="h-4 w-4" /> New Category
-            </Button>
+            {isLoading ? (
+              <>
+                <div className="h-14 w-14 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+                <h3 className="mt-4 text-lg font-semibold">
+                  Loading menu items...
+                </h3>
+              </>
+            ) : error ? (
+              <>
+                <XCircle className="h-14 w-14 text-destructive" />
+                <h3 className="mt-4 text-lg font-semibold">
+                  Something went wrong
+                </h3>
+              </>
+            ) : (
+              <>
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <ImagePlus className="h-6 w-6" />
+                </div>
+                <h3 className="mt-4 text-lg font-semibold">
+                  No categories found
+                </h3>
+                <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                  Try adjusting your search, or create your first category.
+                </p>
+                <Button
+                  onClick={openCreate}
+                  className="mt-5 gap-2 bg-[#f77f00] hover:bg-[#f77f00]/90 text-white px-6 py-2 rounded-md"
+                >
+                  <Plus className="h-4 w-4" /> New Category
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
       ) : view === "grid" ? (
