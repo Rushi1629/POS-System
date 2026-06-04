@@ -43,6 +43,9 @@ export const useUpdateMenu = () => {
       // 🔥 refresh menus
       queryClient.invalidateQueries({ queryKey: ["menus"] });
     },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
+    },
   });
 };
 
@@ -55,6 +58,9 @@ export const useDeleteMenu = () => {
       queryClient.invalidateQueries({
         queryKey: ["menus"],
       });
+    },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
     },
   });
 };

@@ -16,6 +16,9 @@ export const useCreateCategory = () => {
       // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
+    },
   });
 };
 
@@ -39,6 +42,9 @@ export const useEditCategory = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
+    },
   });
 };
 
@@ -51,6 +57,9 @@ export const useDeleteCategory = () => {
       queryClient.invalidateQueries({
         queryKey: ["categories"],
       });
+    },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
     },
   });
 };

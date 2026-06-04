@@ -1,6 +1,12 @@
 import { Order, STATUS_META } from "@/types/order-types";
 import React from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
 import { Receipt } from "lucide-react";
 import { Badge } from "./ui/badge";
 import InfoTile from "./InfoTile";
@@ -18,7 +24,7 @@ const OrderDetailDialog = ({
   const status = STATUS_META[order.status];
   return (
     <Dialog open={!!order} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="sm:max-w-160 max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Receipt className="h-5 w-5 text-primary" />
@@ -41,7 +47,7 @@ const OrderDetailDialog = ({
           <InfoTile label="Payment" value={order.paymentStatus} />
         </div>
 
-        <div className="max-h-[300px] space-y-2 overflow-y-auto rounded-xl border border-border p-3">
+        <div className="flex-1 min-h-0 overflow-y-auto rounded-xl border border-border space-y-2 p-3 no-scrollbar">
           {order.items.map((i) => (
             <div
               key={i.id}

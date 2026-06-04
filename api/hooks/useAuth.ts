@@ -27,6 +27,9 @@ export const useLogout = () => {
     onSuccess: () => {
       queryClient.clear();
     },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
+    },
   });
 };
 

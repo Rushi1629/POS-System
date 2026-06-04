@@ -11,11 +11,12 @@ import {
   clearCartAction,
   removeItemAction,
 } from "@/store/cart/cartSlice";
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchTableByTokenCustomer } from "@/api/hooks/useCustomer";
 import { useCreateOrder } from "@/api/hooks/useOrder";
 import { clearCartDB } from "@/lib/db";
+import ApiLoader from "@/components/ApiLoader";
 
 const CartView = () => {
   const dispatch = useDispatch();
@@ -23,11 +24,16 @@ const CartView = () => {
   const searchParams = useSearchParams();
   const tableToken = searchParams?.get("tableToken");
 
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const { data: tableData } = useFetchTableByTokenCustomer(tableToken);
   const tableId = tableData?.id;
 
-  console.log(tableId,"datatable");
-  
+  console.log(tableId, "datatable");
 
   const cart = useSelector((state: RootState) => state.cart?.items ?? {});
 
@@ -39,7 +45,8 @@ const CartView = () => {
   const [orderError, setOrderError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState("");
 
-  const { mutateAsync: placeOrder, isPending: isPlacingOrder } = useCreateOrder();
+  const { mutateAsync: placeOrder, isPending: isPlacingOrder } =
+    useCreateOrder();
 
   const handlePlaceOrder = useCallback(async () => {
     if (items.length === 0) {
@@ -50,7 +57,7 @@ const CartView = () => {
 
     if (!tableId) {
       setOrderError(
-        "Unable to place order. Please open the cart from a table QR or refresh the page."
+        "Unable to place order. Please open the cart from a table QR or refresh the page.",
       );
       setOrderSuccess("");
       return;
@@ -76,8 +83,7 @@ const CartView = () => {
     }
   }, [items, placeOrder, tableId, dispatch, router]);
 
-  console.log(items,"items");
-  
+  console.log(items, "items");
 
   // ✅ Derived values (memoized)
   const { subtotal, totalQty } = useMemo(() => {
@@ -90,6 +96,10 @@ const CartView = () => {
       { subtotal: 0, totalQty: 0 },
     );
   }, [items]);
+
+  if (!hasMounted) {
+    return <ApiLoader message="Loading your Cart items..." />;
+  }
 
   return (
     <div className="flex flex-col xl:flex-row gap-8">

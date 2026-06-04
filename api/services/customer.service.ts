@@ -1,6 +1,7 @@
 import { FetchMenuResponse, FetchMenusApiResponse } from "@/types/menu-types";
 import { fetcher } from "../client";
 import { FetchCategoriesResponse } from "@/types/types";
+import { EditTableSessionPayload } from "@/types/table-types";
 
 export const fetchAllMenusCustomer = async (): Promise<FetchMenuResponse[]> => {
   const res: FetchMenusApiResponse = await fetcher("/customer/menu");
@@ -52,3 +53,9 @@ export const fetchTableByTokenCustomer = async (token: any) => {
     isActive: u.isActive,
   };
 };
+
+export const editTableSessionCustomer = (data: EditTableSessionPayload) =>
+  fetcher("/customer/table/table-session", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });

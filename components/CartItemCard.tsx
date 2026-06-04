@@ -25,11 +25,19 @@ const CartItemCard = ({
       <div className="flex items-start gap-4">
         {/* ✅ IMAGE */}
         <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-muted">
-          <img
-            src={item.imageUrl || "/placeholder.png"}
-            alt={item.name}
-            className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-          />
+          {item.imageUrl ? (
+            <img
+              src={item.imageUrl || "/placeholder.png"}
+              alt={item.name}
+              className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full w-full bg-muted">
+              <span className="text-2xl font-bold text-primary/50">
+                {item.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* CONTENT */}

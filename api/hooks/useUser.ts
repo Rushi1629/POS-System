@@ -17,6 +17,9 @@ export const useCreateUser = () => {
       // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
+    },
   });
 };
 
@@ -50,6 +53,9 @@ export const useDeleteUser = () => {
         queryKey: ["users"],
       });
     },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
+    },
   });
 };
 
@@ -62,6 +68,9 @@ export const useEditUser = () => {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
     },
   });
 };

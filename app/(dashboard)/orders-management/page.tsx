@@ -23,201 +23,19 @@ import OrderDetailDialog from "@/components/OrderDetailDialog";
 import StatCard from "@/components/StatCard";
 import { fmt } from "@/utils/utils";
 import OrderStatusCard from "@/components/orderStatusCard";
-
-const SAMPLE: Order[] = [
-  {
-    id: 1,
-    tableId: 2090002,
-    orderNumber: "ORD-1780233494254",
-    orderType: "DINE_IN",
-    status: "PENDING",
-    paymentStatus: "UNPAID",
-    subtotal: "387.75",
-    taxAmount: "0",
-    discountAmount: "0",
-    serviceCharge: "0",
-    timeChargeAmount: null,
-    totalAmount: "387.75",
-    notes: "Need Fast Service",
-    items: [
-      {
-        id: 1,
-        orderId: 1,
-        quantity: 2,
-        unitPrice: "129.25",
-        totalPrice: "258.5",
-        notes: "Low Sugar",
-        isCancelled: false,
-        menuItem: {
-          id: 30001,
-          name: "Veg Cheese Burger",
-          price: "129.25",
-          menuType: "Veg",
-        },
-        subMenuItem: null,
-      },
-      {
-        id: 2,
-        orderId: 1,
-        quantity: 1,
-        unitPrice: "129.25",
-        totalPrice: "129.25",
-        notes: null,
-        isCancelled: false,
-        menuItem: {
-          id: 60001,
-          name: "Non Veg Cheese Burger",
-          price: "129.25",
-          menuType: "Non Veg",
-        },
-        subMenuItem: null,
-      },
-    ],
-  },
-  {
-    id: 2,
-    tableId: 2090005,
-    orderNumber: "ORD-1780233512881",
-    orderType: "TAKEAWAY",
-    status: "PREPARING",
-    paymentStatus: "PAID",
-    subtotal: "540.00",
-    taxAmount: "27.00",
-    discountAmount: "0",
-    serviceCharge: "0",
-    timeChargeAmount: null,
-    totalAmount: "567.00",
-    notes: null,
-    items: [
-      {
-        id: 3,
-        orderId: 2,
-        quantity: 2,
-        unitPrice: "180.00",
-        totalPrice: "360.00",
-        notes: "Extra cheese",
-        isCancelled: false,
-        menuItem: {
-          id: 40001,
-          name: "Margherita Pizza",
-          price: "180.00",
-          menuType: "Veg",
-        },
-        subMenuItem: {
-          id: 1,
-          name: "Extra Cheese",
-          price: "10.50",
-          menuType: "Veg",
-        },
-      },
-      {
-        id: 4,
-        orderId: 2,
-        quantity: 3,
-        unitPrice: "60.00",
-        totalPrice: "180.00",
-        notes: null,
-        isCancelled: false,
-        menuItem: {
-          id: 70001,
-          name: "Cold Coffee",
-          price: "60.00",
-          menuType: "Veg",
-        },
-        subMenuItem: null,
-      },
-    ],
-  },
-  {
-    id: 3,
-    tableId: 2090001,
-    orderNumber: "ORD-1780233601122",
-    orderType: "DINE_IN",
-    status: "COMPLETED",
-    paymentStatus: "PAID",
-    subtotal: "950.00",
-    taxAmount: "47.50",
-    discountAmount: "50",
-    serviceCharge: "20",
-    timeChargeAmount: "15.00",
-    totalAmount: "982.50",
-    notes: "Birthday celebration",
-    items: [
-      {
-        id: 5,
-        orderId: 3,
-        quantity: 1,
-        unitPrice: "450.00",
-        totalPrice: "450.00",
-        notes: null,
-        isCancelled: false,
-        menuItem: {
-          id: 80001,
-          name: "Paneer Tikka Platter",
-          price: "450.00",
-          menuType: "Veg",
-        },
-        subMenuItem: null,
-      },
-      {
-        id: 6,
-        orderId: 3,
-        quantity: 2,
-        unitPrice: "250.00",
-        totalPrice: "500.00",
-        notes: "Spicy",
-        isCancelled: false,
-        menuItem: {
-          id: 90001,
-          name: "Chicken Biryani",
-          price: "250.00",
-          menuType: "Non Veg",
-        },
-        subMenuItem: null,
-      },
-    ],
-  },
-  {
-    id: 4,
-    tableId: 2090003,
-    orderNumber: "ORD-1780233699871",
-    orderType: "DELIVERY",
-    status: "CANCELLED",
-    paymentStatus: "REFUNDED",
-    subtotal: "220.00",
-    taxAmount: "11.00",
-    discountAmount: "0",
-    serviceCharge: "0",
-    timeChargeAmount: null,
-    totalAmount: "231.00",
-    notes: null,
-    items: [
-      {
-        id: 7,
-        orderId: 4,
-        quantity: 1,
-        unitPrice: "220.00",
-        totalPrice: "220.00",
-        notes: null,
-        isCancelled: true,
-        menuItem: {
-          id: 30001,
-          name: "Veg Cheese Burger Combo",
-          price: "220.00",
-          menuType: "Veg",
-        },
-        subMenuItem: null,
-      },
-    ],
-  },
-];
+import { useFetchOrders } from "@/api/hooks/useOrder";
+import ApiLoader from "@/components/ApiLoader";
 
 const page = () => {
-  const [orders] = useState<Order[]>(SAMPLE);
+  // const [orders] = useState<Order[]>(SAMPLE);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [detail, setDetail] = useState<Order | null>(null);
+
+  const { data, isLoading, isError } = useFetchOrders();
+
+  const orders = data ?? [];
 
   const filtered = useMemo(() => {
     return orders.filter((o) => {
@@ -248,6 +66,7 @@ const page = () => {
       completed: orders.filter((o) => o.status === "COMPLETED").length,
     };
   }, [orders]);
+  if (isLoading) return <ApiLoader message="Fetching orders..." />;
   return (
     <div>
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">

@@ -23,6 +23,9 @@ export const useCreateTable = () => {
       // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
+    },
   });
 };
 
@@ -46,6 +49,9 @@ export const useDeleteTable = () => {
         queryKey: ["tables"],
       });
     },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
+    },
   });
 };
 
@@ -64,6 +70,9 @@ export const useEditTable = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
+    },
   });
 };
 
@@ -75,6 +84,9 @@ export const useEditTableSession = () => {
     onSuccess: () => {
       // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["tables"] });
+    },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
     },
   });
 };
