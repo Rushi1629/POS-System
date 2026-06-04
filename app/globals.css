@@ -15,8 +15,6 @@ input:-internal-autofill-selected {
   body {
     @apply bg-background text-foreground;
   }
-  html {
-  }
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -247,14 +245,3 @@ input:-internal-autofill-selected {
   --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-glow));
   --shadow-elegant: 0 10px 30px -10px color-mix(in oklab, var(--primary) 40%, transparent);
 }
-
-/* @layer base {
-  * {
-    border-color: var(--color-border);
-  }
-
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-  }
-} */

@@ -80,7 +80,7 @@ export default function Sidebar() {
     <>
       <aside
         className={`
-    relative flex flex-col bg-stone-900 border-r border-stone-800 
+    relative flex flex-col bg-stone-900 border-r border-stone-800 dark:bg-(--background)
     transition-all duration-300 ease-in-out overflow-visible
     ${collapsed ? "w-16" : "w-60"}
     h-full z-20
