@@ -19,9 +19,20 @@ export const cartSyncMiddleware: Middleware =
       // ✅ IMPORTANT: clone to remove proxy
       const items = structuredClone(state.cart.items);
 
-      console.log("SYNCING CART:", items);
+      // Try to detect tableToken from current URL (if running in browser)
+      let tableToken: string | undefined = undefined;
+      try {
+        if (typeof window !== "undefined") {
+          const params = new URLSearchParams(window.location.search);
+          tableToken = params.get("tableToken") ?? undefined;
+        }
+      } catch (e) {
+        // ignore
+      }
 
-      saveCartToDB(items).catch(console.error);
+      console.log("SYNCING CART (token):", tableToken, items);
+
+      saveCartToDB(items, tableToken).catch(console.error);
     }, 300); // 300ms debounce
 
     return result;

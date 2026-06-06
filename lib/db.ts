@@ -22,30 +22,35 @@ export const getDB = () => {
 
 // ✅ Save full cart
 export const saveCartToDB = async (
-  items: Record<string, CartItem>
+  items: Record<string, CartItem>,
+  tableToken?: string,
 ): Promise<void> => {
   try {
     const db = await getDB();
+    const key = tableToken ? `cartItems:${tableToken}` : `cartItems:${tableToken}`;
 
-    await db.put(STORE_NAME, items, "cartItems");
+    await db.put(STORE_NAME, items, key);
 
-    console.log("✅ Saved to DB:", items);
-    const check = await db.get(STORE_NAME, "cartItems");
+    console.log("✅ Saved to DB:", key, items);
+    const check = await db.get(STORE_NAME, key);
     console.log("AFTER SAVE READ:", check);
   } catch (err) {
     console.error("DB ERROR:", err);
   }
 };
 
-export const loadCartFromDB = async (): Promise<Record<string, CartItem>> => {
+export const loadCartFromDB = async (
+  tableToken?: string,
+): Promise<Record<string, CartItem>> => {
   if (typeof window === "undefined") return {};
 
   try {
     const db = await getDB();
+    const key = tableToken ? `cartItems:${tableToken}` : `cartItems:${tableToken}`;
 
-    const items = await db.get("cart", "cartItems");
+    const items = await db.get(STORE_NAME, key);
 
-    console.log("LOADED FROM DB:", items);
+    console.log("LOADED FROM DB:", key, items);
 
     return items || {};
   } catch (err) {
@@ -55,9 +60,17 @@ export const loadCartFromDB = async (): Promise<Record<string, CartItem>> => {
 };
 
 // ✅ Clear DB
-export const clearCartDB = async () => {
+export const clearCartDB = async (tableToken?: string) => {
   if (typeof window === "undefined") return;
 
   const db = await getDB();
-  await db.clear("cart");
+  if (tableToken) {
+    const key = `cartItems:${tableToken}`;
+    await db.delete(STORE_NAME, key);
+    console.log("CLEARED CART DB KEY:", key);
+  } else {
+    // fallback: clear all cart entries
+    await db.clear(STORE_NAME);
+    console.log("CLEARED ENTIRE CART STORE");
+  }
 };

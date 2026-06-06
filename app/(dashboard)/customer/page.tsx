@@ -254,10 +254,16 @@ export default function CustomerDashboard() {
                         {table.capacity === 1 ? "Guest" : "Guests"}
                       </p>
                     </div>
-                    <div className="col-span-2">
+                    <div>
                       <p className="text-xs text-orange-700">Type</p>
                       <p className="text-xs font-semibold text-orange-900">
                         {table.type}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-orange-700">Rate Per Minute / Guest</p>
+                      <p className="text-xs font-semibold text-orange-900">
+                        {table.ratePerMinute ? `₹ ${table.ratePerMinute.toFixed(2)}` : "N/A"}
                       </p>
                     </div>
                   </div>

@@ -15,7 +15,8 @@ import { useMemo, useState, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchTableByTokenCustomer } from "@/api/hooks/useCustomer";
 import { useCreateOrder } from "@/api/hooks/useOrder";
-import { clearCartDB } from "@/lib/db";
+import { clearCartDB, loadCartFromDB, saveCartToDB } from "@/lib/db";
+import { setCartAction } from "@/store/cart/cartSlice";
 import ApiLoader from "@/components/ApiLoader";
 
 const CartView = () => {
@@ -73,15 +74,15 @@ const CartView = () => {
           quantity: item.quantity,
         })),
       });
-      dispatch(clearCartAction());
-      await clearCartDB();
+      // dispatch(clearCartAction());
+      // await clearCartDB(tableToken ?? undefined);
       setOrderSuccess("Order placed successfully.");
       router.push(`/customer?tableToken=${tableToken}`);
     } catch (err: any) {
       setOrderError(err?.message ?? "Failed to place order. Please try again.");
       setOrderSuccess("");
     }
-  }, [items, placeOrder, tableId, dispatch, router]);
+  }, [items, placeOrder, tableId, router]);
 
   console.log(items, "items");
 
@@ -96,6 +97,30 @@ const CartView = () => {
       { subtotal: 0, totalQty: 0 },
     );
   }, [items]);
+  // Load cart for this tableToken from IndexedDB on mount / when token changes
+  useEffect(() => {
+    if (!hasMounted) return;
+    let mounted = true;
+    const load = async () => {
+      const itemsFromDB = await loadCartFromDB(tableToken ?? undefined);
+      if (!mounted) return;
+      if (itemsFromDB && Object.keys(itemsFromDB).length > 0) {
+        dispatch(setCartAction(itemsFromDB));
+      }
+    };
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [tableToken, hasMounted]);
+
+  // Persist cart to IndexedDB when it changes (per tableToken)
+  useEffect(() => {
+    if (!hasMounted) return;
+    // debounce not necessary for now
+    saveCartToDB(cart, tableToken ?? undefined);
+  }, [cart, tableToken, hasMounted]);
 
   if (!hasMounted) {
     return <ApiLoader message="Loading your Cart items..." />;

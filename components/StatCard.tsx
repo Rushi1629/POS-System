@@ -10,7 +10,7 @@ function StatCard({
   label: string;
   value: number;
   icon: React.ReactNode;
-  tint: "primary" | "emerald" | "muted" | "nonveg";
+  tint: "primary" | "emerald" | "muted" | "nonveg" | "amber";
 }) {
   const tintCls =
     tint === "primary"
@@ -19,7 +19,9 @@ function StatCard({
         ? "bg-chart-2/15 text-chart-2"
         : tint === "nonveg"
           ? "bg-red-500/15 text-red-600"
-          : "bg-muted text-muted-foreground";
+          : tint === "amber"
+            ? "bg-amber-500/15 text-amber-600 dark:text-amber-300"
+            : "bg-muted text-muted-foreground";
   return (
     <Card className="border-border/70 shadow-sm transition-shadow hover:shadow-md">
       <CardContent className="flex items-center justify-between p-6">

@@ -26,7 +26,7 @@ export default function Header({ table }: Props) {
 
       <div className="flex items-baseline justify-between w-full gap-3">
         <h1 className="font-semibold text-lg">{formattedRoute}</h1>
-        <div>
+        <div className="flex items-center gap-2">
           <ThemeToggle />
           {table?.name && (
             <span className="flex items-center gap-2 text-sm text-muted-foreground p-2 rounded-md border bg-linear-to-r from-primary/10 to-secondary/10 font-semibold">

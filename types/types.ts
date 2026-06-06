@@ -19,6 +19,7 @@ import {
   Lock,
   User2,
   Receipt,
+  ChefHat,
 } from "lucide-react";
 
 export type TableStatus = "available" | "occupied" | "reserved" | "cleaning";
@@ -355,7 +356,15 @@ export const navItems: NavItem[] = [
     label: "Tables-Management",
     icon: Table2,
     href: "/tables-management",
-    group: "Operations",
+    group: "Management",
+    roles: ["Super Admin"],
+  },
+  {
+    id: "nav-chef-management",
+    label: "Chef Management",
+    icon: ChefHat,
+    href: "/chef-management",
+    group: "Management",
     roles: ["Super Admin"],
   },
   {
@@ -363,7 +372,7 @@ export const navItems: NavItem[] = [
     label: "Order Management",
     icon: Receipt,
     href: "/orders-management",
-    group: "Operations",
+    group: "Management",
     roles: ["Super Admin"],
   },
   {
