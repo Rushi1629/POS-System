@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { z } from "zod";
@@ -48,17 +49,23 @@ interface OrderSummaryProps {
   itemCount: number;
   subtotal: number;
   gstRate?: number;
+  orderNotes?: string;
+  onOrderNotesChange?: (notes: string) => void;
   isPlacingOrder?: boolean;
   onPlaceOrder?: () => void;
 }
 
-const OrderSummary = ({
-  itemCount,
-  subtotal,
-  gstRate = 5,
-  isPlacingOrder = false,
-  onPlaceOrder,
-}: OrderSummaryProps) => {
+const OrderSummary = (props: OrderSummaryProps) => {
+  const {
+    itemCount,
+    subtotal,
+    gstRate = 5,
+    orderNotes = "",
+    onOrderNotesChange,
+    isPlacingOrder = false,
+    onPlaceOrder,
+  } = props;
+
   const [showCoupon, setShowCoupon] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<
@@ -116,6 +123,18 @@ const OrderSummary = ({
           <span className="text-foreground font-medium">
             ₹{subtotal.toLocaleString()}
           </span>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-muted-foreground">
+            Order notes
+          </label>
+          <Textarea
+            value={orderNotes ?? ""}
+            onChange={(e) => onOrderNotesChange?.(e.target.value)}
+            placeholder="Add order note"
+            className="mt-2"
+            rows={3}
+          />
         </div>
 
         {appliedCoupon && (

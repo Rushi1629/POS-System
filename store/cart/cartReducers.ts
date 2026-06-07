@@ -24,6 +24,15 @@ export const removeItem = (state: CartState, action: PayloadAction<number>) => {
   }
 };
 
+export const updateItemNote = (
+  state: CartState,
+  action: PayloadAction<{ id: number; notes?: string }>,
+) => {
+  const { id, notes } = action.payload;
+  if (!state.items[id]) return;
+  state.items[id].notes = notes;
+};
+
 export const clearCart = (state: CartState) => {
   state.items = {};
 };

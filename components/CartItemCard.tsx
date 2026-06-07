@@ -2,6 +2,7 @@
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import React from "react";
 import { CartItem } from "@/types/cart-types";
 
@@ -10,6 +11,7 @@ interface CartItemCardProps {
   onIncrement: () => void;
   onDecrement: () => void;
   onRemove: () => void;
+  onNoteChange?: (notes: string) => void;
 }
 
 const CartItemCard = ({
@@ -17,6 +19,7 @@ const CartItemCard = ({
   onIncrement,
   onDecrement,
   onRemove,
+  onNoteChange,
 }: CartItemCardProps) => {
   const total = item.price * item.quantity;
 
@@ -78,6 +81,17 @@ const CartItemCard = ({
               <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
                 {item.description}
               </p>
+              <div className="mt-3">
+                <label className="block text-sm font-medium text-muted-foreground">
+                  Item notes
+                </label>
+                <Input
+                  value={item.notes ?? ""}
+                  onChange={(e) => onNoteChange?.(e.target.value)}
+                  placeholder="Add note for this item"
+                  className="mt-2"
+                />
+              </div>
             </div>
 
             {/* PRICE */}

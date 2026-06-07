@@ -16,7 +16,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchTableByTokenCustomer } from "@/api/hooks/useCustomer";
 import { useCreateOrder } from "@/api/hooks/useOrder";
 import { clearCartDB, loadCartFromDB, saveCartToDB } from "@/lib/db";
-import { setCartAction } from "@/store/cart/cartSlice";
+import {
+  setCartAction,
+  updateItemNoteAction,
+} from "@/store/cart/cartSlice";
 import ApiLoader from "@/components/ApiLoader";
 
 const CartView = () => {
@@ -45,6 +48,7 @@ const CartView = () => {
 
   const [orderError, setOrderError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState("");
+  const [orderNotes, setOrderNotes] = useState("");
 
   const { mutateAsync: placeOrder, isPending: isPlacingOrder } =
     useCreateOrder();
@@ -68,10 +72,11 @@ const CartView = () => {
     try {
       await placeOrder({
         tableId,
-        notes: "Order placed from customer cart",
+        notes: orderNotes || undefined,
         orderItems: items.map((item) => ({
           menuItemId: item.id,
           quantity: item.quantity,
+          notes: item.notes || undefined,
         })),
       });
       // dispatch(clearCartAction());
@@ -137,6 +142,9 @@ const CartView = () => {
             onIncrement={() => dispatch(addItemAction(item))}
             onDecrement={() => dispatch(removeItemAction(item.id))}
             onRemove={() => dispatch(removeItemAction(item.id))}
+            onNoteChange={(notes) =>
+              dispatch(updateItemNoteAction({ id: item.id, notes }))
+            }
           />
         ))}
 
@@ -152,6 +160,8 @@ const CartView = () => {
         <OrderSummary
           itemCount={totalQty}
           subtotal={subtotal}
+          orderNotes={orderNotes}
+          onOrderNotesChange={setOrderNotes}
           isPlacingOrder={isPlacingOrder}
           onPlaceOrder={handlePlaceOrder}
         />
