@@ -35,12 +35,12 @@ export default function DashboardLayout({
 
   useEffect(() => {
     const load = async () => {
-      const items = await loadCartFromDB();
+      const items = await loadCartFromDB(tableToken ?? undefined);
       dispatch(setCartAction(items));
     };
 
     load();
-  }, []);
+  }, [tableToken]);
 
   return (
     <div className="flex h-screen overflow-hidden">
