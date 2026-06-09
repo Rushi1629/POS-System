@@ -1,4 +1,4 @@
-const BASE_URL = "https://secretcafe-api-production.up.railway.app/api/v1";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const fetcher = async (
   endpoint: string,
