@@ -13,8 +13,8 @@ import {
 } from "@/store/cart/cartSlice";
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useFetchTableByTokenCustomer } from "@/api/hooks/useCustomer";
-import { useCreateOrder } from "@/api/hooks/useOrder";
+import { useFetchTableByTokenCustomer } from "@/client/hooks/useCustomer";
+import { useCreateOrder } from "@/client/hooks/useOrder";
 import { clearCartDB, loadCartFromDB, saveCartToDB } from "@/lib/db";
 import {
   setCartAction,

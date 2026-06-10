@@ -58,7 +58,7 @@ import {
   useDeleteCategory,
   useEditCategory,
   useFetchCategories,
-} from "@/api/hooks/useCategory";
+} from "@/client/hooks/useCategory";
 import {
   ColumnDef,
   flexRender,

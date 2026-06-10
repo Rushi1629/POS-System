@@ -43,7 +43,7 @@ import {
   useEditTable,
   useEditTableSession,
   useFetchLiveCharge,
-} from "@/api/hooks/useTable";
+} from "@/client/hooks/useTable";
 import {
   EditTableSessionPayload,
   FetchTableResponse,

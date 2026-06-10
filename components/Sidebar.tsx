@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { useLogout, useProfile } from "@/api/hooks/useAuth";
+import { useLogout, useProfile } from "@/client/hooks/useAuth";
 import { clearUser } from "@/store/auth/authSlice";
 import {
   AlertDialog,

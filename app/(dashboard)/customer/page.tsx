@@ -18,7 +18,7 @@ import {
   useFetchTableByTokenCustomer,
   useFetchCategoriesCustomer,
   useFetchMenusCustomer,
-} from "@/api/hooks/useCustomer";
+} from "@/client/hooks/useCustomer";
 import CategoryPill from "@/components/CategoryPill";
 import MenuItemCard from "@/components/MenuItemCard";
 import MenuItemSkeleton from "@/components/MenuItemSkeleton";
@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import ApiLoader from "@/components/ApiLoader";
-import { useProfile } from "@/api/hooks/useAuth";
+import { useProfile } from "@/client/hooks/useAuth";
 
 export default function CustomerDashboard() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);

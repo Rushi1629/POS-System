@@ -23,7 +23,7 @@ import OrderDetailDialog from "@/components/OrderDetailDialog";
 import StatCard from "@/components/StatCard";
 import { fmt } from "@/utils/utils";
 import OrderStatusCard from "@/components/orderStatusCard";
-import { useFetchOrders } from "@/api/hooks/useOrder";
+import { useFetchOrders } from "@/client/hooks/useOrder";
 import ApiLoader from "@/components/ApiLoader";
 
 const page = () => {
