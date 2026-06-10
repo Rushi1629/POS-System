@@ -88,8 +88,8 @@ import {
   useDeleteMenu,
   useFetchMenus,
   useUpdateMenu,
-} from "@/api/hooks/useMenu";
-import { useFetchCategories } from "@/api/hooks/useCategory";
+} from "@/client/hooks/useMenu";
+import { useFetchCategories } from "@/client/hooks/useCategory";
 import { isEqual } from "lodash-es";
 import {
   HoverCard,

@@ -36,7 +36,7 @@ import {
   useEditUser,
   useFetchRoles,
   useFetchUsers,
-} from "@/api/hooks/useUser";
+} from "@/client/hooks/useUser";
 import ApiLoader from "@/components/ApiLoader";
 
 import { isEqual } from "lodash-es";

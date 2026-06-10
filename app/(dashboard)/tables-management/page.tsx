@@ -3,7 +3,7 @@
 import { TableCard } from "@/components/TableCard";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useEditTableSession, useFetchTables } from "@/api/hooks/useTable";
+import { useEditTableSession, useFetchTables } from "@/client/hooks/useTable";
 import {
   TABLE_TYPE_LABELS,
   TABLE_TYPES,

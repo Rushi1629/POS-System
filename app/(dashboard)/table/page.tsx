@@ -80,7 +80,7 @@ import {
   useDeleteTable,
   useEditTable,
   useFetchTables,
-} from "@/api/hooks/useTable";
+} from "@/client/hooks/useTable";
 import { isEqual } from "lodash-es";
 import TableStatusCustom from "@/components/TableStatus";
 
