@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Toaster } from "sonner";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useLogin } from "@/api/hooks/useAuth";
+import { useLogin } from "@/client/hooks/useAuth";
 import SecretCafeLoader from "@/components/SecretCafeLoader";
 import { DemoCredential } from "@/types/types";
 import { useAppDispatch } from "@/store/hooks";

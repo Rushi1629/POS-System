@@ -11,7 +11,7 @@ import { loadCartFromDB } from "@/lib/db";
 import { setCartAction } from "../../store/cart/cartSlice";
 import { store } from "../../store/store";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useFetchTableByTokenCustomer } from "@/api/hooks/useCustomer";
+import { useFetchTableByTokenCustomer } from "@/client/hooks/useCustomer";
 
 export default function DashboardLayout({
   children,
