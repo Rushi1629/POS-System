@@ -8,8 +8,6 @@ const withPWA = withPWAInit({
   skipWaiting: true,
 });
 
-console.log("NODE_ENV =", process.env.NODE_ENV);
-
 const nextConfig: NextConfig = {
   turbopack: {},
   allowedDevOrigins: ["192.168.0.100"],
