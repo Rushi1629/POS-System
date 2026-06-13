@@ -38,11 +38,11 @@ function OrderCard({ order, onView }: { order: Order; onView: () => void }) {
     >
       <div className="flex flex-col gap-4 p-5 lg:flex-row lg:items-center">
         {/* Left: Identity */}
-        <div className="flex items-center gap-4 lg:w-[280px]">
+        <div className="flex items-center gap-4 lg:w-70">
           <div
             className={cn(
               "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border",
-              status.cls,
+              status?.cls,
             )}
           >
             <Receipt className="h-5 w-5" />
@@ -69,10 +69,10 @@ function OrderCard({ order, onView }: { order: Order; onView: () => void }) {
           </Badge>
           <Badge
             variant="outline"
-            className={cn("rounded-full border gap-1.5", status.cls)}
+            className={cn("rounded-full border gap-1.5", status?.cls)}
           >
-            <span className={cn("h-1.5 w-1.5 rounded-full", status.dot)} />{" "}
-            {status.label}
+            <span className={cn("h-1.5 w-1.5 rounded-full", status?.dot)} />{" "}
+            {status?.label}
           </Badge>
           <Badge
             variant="outline"

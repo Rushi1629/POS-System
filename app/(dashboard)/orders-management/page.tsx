@@ -170,8 +170,8 @@ const page = () => {
               </p>
             </div>
           ) : (
-            filtered.map((o) => (
-              <OrderCard key={o.id} order={o} onView={() => setDetail(o)} />
+            filtered.map((o,m) => (
+              <OrderCard key={`${o.id}-${m}`} order={o} onView={() => setDetail(o)} />
             ))
           )}
         </div>
