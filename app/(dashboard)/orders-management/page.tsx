@@ -1,6 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Order, STATUS_META } from "@/types/order-types";
+import {
+  OrderAdminChef,
+  STATUS_META,
+} from "@/types/order-types";
 import {
   CheckCircle2,
   CircleDollarSign,
@@ -8,8 +11,7 @@ import {
   Receipt,
   Search,
 } from "lucide-react";
-import React, { useMemo, useState } from "react";
-import orderStatusCard from "@/components/orderStatusCard";
+import { useMemo, useState } from "react";
 import { Input } from "@/components/input";
 import {
   Select,
@@ -20,28 +22,42 @@ import {
 } from "@/components/ui/select";
 import OrderCard from "@/components/OrderCard";
 import OrderDetailDialog from "@/components/OrderDetailDialog";
-import StatCard from "@/components/StatCard";
 import { fmt } from "@/utils/utils";
 import OrderStatusCard from "@/components/orderStatusCard";
-import { useFetchOrders } from "@/client/hooks/useOrder";
+import {
+  useFetchOrdersTableWise,
+} from "@/client/hooks/useOrder";
 import ApiLoader from "@/components/ApiLoader";
 
 const page = () => {
-  // const [orders] = useState<Order[]>(SAMPLE);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [detail, setDetail] = useState<Order | null>(null);
+  const [detail, setDetail] = useState<OrderAdminChef | null>(null);
 
-  const { data, isLoading, isError } = useFetchOrders();
+  const {
+    data: tableWiseData,
+    isLoading: isTableWiseLoading,
+    isError: isTableWiseError,
+  } = useFetchOrdersTableWise();
 
-  const orders = data ?? [];
+  const orders = useMemo<OrderAdminChef[]>(() => {
+    if (!tableWiseData?.data) return [];
+
+    return tableWiseData.data.flatMap((table) =>
+      table.orders.map((order) => ({
+        ...order,
+        tableName: table.tableName,
+      })),
+    );
+  }, [tableWiseData]);
 
   console.log(orders, "orders");
 
   const filtered = useMemo(() => {
     return orders.filter((o) => {
-      if (statusFilter !== "all" && o.orderStatus !== statusFilter) return false;
+      if (statusFilter !== "all" && o.orderStatus !== statusFilter)
+        return false;
       if (typeFilter !== "all" && o.orderType !== typeFilter) return false;
       if (query) {
         const q = query.toLowerCase();
@@ -68,7 +84,7 @@ const page = () => {
       completed: orders.filter((o) => o.orderStatus === "COMPLETED").length,
     };
   }, [orders]);
-  if (isLoading) return <ApiLoader message="Fetching orders..." />;
+  if (isTableWiseLoading) return <ApiLoader message="Fetching orders..." />;
   return (
     <div>
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -143,7 +159,7 @@ const page = () => {
               <SelectItem value="all">All status</SelectItem>
               {Object.keys(STATUS_META).map((s) => (
                 <SelectItem key={s} value={s}>
-                  {STATUS_META[s as Order["orderStatus"]].label}
+                  {STATUS_META[s as OrderAdminChef["orderStatus"]].label}
                 </SelectItem>
               ))}
             </SelectContent>

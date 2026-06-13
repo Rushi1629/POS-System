@@ -1,5 +1,4 @@
-import { Order, STATUS_META } from "@/types/order-types";
-import React from "react";
+import { OrderAdminChef, STATUS_META } from "@/types/order-types";
 import {
   Dialog,
   DialogContent,
@@ -17,21 +16,21 @@ const OrderDetailDialog = ({
   order,
   onOpenChange,
 }: {
-  order: Order | null;
+  order: OrderAdminChef | null;
   onOpenChange: (open: boolean) => void;
 }) => {
   if (!order) return null;
-  const status = STATUS_META[order.status];
+  const status = STATUS_META[order.orderStatus];
   return (
     <Dialog open={!!order} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-160 max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Receipt className="h-5 w-5 text-primary" />
-            Order #{order.id}
+            Order #{order.orderId}
             <Badge
               variant="outline"
-              className={cn("ml-2 rounded-full border", status.cls)}
+              className={cn("ml-2 rounded-full border", status?.cls)}
             >
               {status.label}
             </Badge>
@@ -48,9 +47,9 @@ const OrderDetailDialog = ({
         </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto rounded-xl border border-border space-y-2 p-3 no-scrollbar">
-          {order.items.map((i) => (
+          {order.items.map((i, idx) => (
             <div
-              key={i.id}
+              key={i.orderId + idx}
               className="flex items-center justify-between gap-3 rounded-lg bg-muted/40 p-2.5"
             >
               <div className="flex items-center gap-2">

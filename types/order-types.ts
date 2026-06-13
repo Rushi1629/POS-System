@@ -17,9 +17,15 @@ export type MenuItem = {
   menuType: string;
 };
 
-export type OrderItemAdmin = {
+export type OrderItemCustomer = {
   orderItemId: number;
-  orderItemStatus: "PENDING" | "PREPARING" | "READY" | "SERVED" | "COMPLETED" | "CANCELLED";
+  orderItemStatus:
+    | "PENDING"
+    | "PREPARING"
+    | "READY"
+    | "SERVED"
+    | "COMPLETED"
+    | "CANCELLED";
   orderId: number;
   quantity: number;
   unitPrice: string;
@@ -30,12 +36,18 @@ export type OrderItemAdmin = {
   subMenuItem: MenuItem | null;
 };
 
-export type Order = {
+export type CustomerOrder = {
   orderId: number;
   tableId: number;
   orderNumber: string;
   orderType: "DINE_IN" | "TAKEAWAY" | "DELIVERY";
-  orderStatus: "PENDING" | "PREPARING" | "READY" | "SERVED" | "COMPLETED" | "CANCELLED";
+  orderStatus:
+    | "PENDING"
+    | "PREPARING"
+    | "READY"
+    | "SERVED"
+    | "COMPLETED"
+    | "CANCELLED";
   paymentStatus: "UNPAID" | "PAID" | "REFUNDED";
   subtotal: string;
   taxAmount: string;
@@ -44,11 +56,11 @@ export type Order = {
   timeChargeAmount: string | null;
   totalAmount: string;
   notes: string | null;
-  items: OrderItemAdmin[];
+  items: OrderItemCustomer[];
 };
 
 export const STATUS_META: Record<
-  Order["orderStatus"],
+  CustomerOrder["orderStatus"],
   { label: string; cls: string; dot: string }
 > = {
   PENDING: {
@@ -83,14 +95,65 @@ export const STATUS_META: Record<
   },
 };
 
-export const PAY_META: Record<Order["paymentStatus"], string> = {
+export const PAY_META: Record<CustomerOrder["paymentStatus"], string> = {
   UNPAID: "bg-rose-500/10 text-rose-600 border-rose-500/30",
   PAID: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
   REFUNDED: "bg-muted text-muted-foreground border-border",
 };
 
-export const TYPE_META: Record<Order["orderType"], string> = {
+export const TYPE_META: Record<CustomerOrder["orderType"], string> = {
   DINE_IN: "bg-primary/10 text-primary border-primary/30",
   TAKEAWAY: "bg-orange-500/10 text-orange-600 border-orange-500/30",
   DELIVERY: "bg-blue-500/10 text-blue-600 border-blue-500/30",
 };
+
+export interface GetOrdersResponseAdminChef {
+  status: boolean;
+  message: string;
+  data: TableOrders[];
+}
+
+export interface TableOrders {
+  tableId: number;
+  tableName: string;
+  orders: OrderAdminChef[];
+}
+
+export interface OrderAdminChef {
+  orderId: number;
+  orderStatus: "PENDING" | "COMPLETED" | "CANCELLED";
+  tableId: number;
+  tableName: string;
+  orderNumber: string;
+  orderType: "DINE_IN" | "TAKEAWAY" | "DELIVERY";
+  paymentStatus: "UNPAID" | "PAID";
+  subtotal: string;
+  taxAmount: string;
+  discountAmount: string;
+  serviceCharge: string;
+  timeChargeAmount: string | null;
+  totalAmount: string;
+  notes: string | null;
+  items: OrderItemNew[];
+}
+
+export interface OrderItemNew {
+  orderItemId: number;
+  orderItemStatus: "PENDING" | "PREPARING" | "SERVED";
+  orderId: number;
+  quantity: number;
+  unitPrice: string;
+  totalPrice: string;
+  notes: string | null;
+  isCancelled: boolean;
+  menuItem: MenuItemNew;
+  subMenuItem: MenuItemNew | null;
+}
+
+export interface MenuItemNew {
+  menuItemId: number;
+  id: number;
+  name: string;
+  price: string;
+  menuType: "Veg" | "Non Veg";
+}

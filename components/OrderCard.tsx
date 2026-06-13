@@ -21,11 +21,11 @@ import {
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { fmt } from "@/utils/utils";
-import { Order, PAY_META, STATUS_META, TYPE_META } from "@/types/order-types";
+import { OrderAdminChef, PAY_META, STATUS_META, TYPE_META } from "@/types/order-types";
 import { Badge } from "./ui/badge";
 import BillRow from "./BillRow";
 
-function OrderCard({ order, onView }: { order: Order; onView: () => void }) {
+function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => void }) {
   const [open, setOpen] = useState(false);
   const status = STATUS_META[order.orderStatus];
   console.log(status,"stsatis");
@@ -57,6 +57,7 @@ function OrderCard({ order, onView }: { order: Order; onView: () => void }) {
             <p className="mt-0.5 text-base font-bold">Order #{order.orderId}</p>
             <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
               <Table2 className="h-3 w-3" /> Table {order.tableId}
+              <Table2 className="h-3 w-3" /> Table Name {order.tableName}
             </div>
           </div>
         </div>

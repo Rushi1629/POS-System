@@ -1,4 +1,8 @@
-import { CreateOrderRequest, Order } from "@/types/order-types";
+import {
+  CreateOrderRequest,
+  CustomerOrder,
+  GetOrdersResponseAdminChef,
+} from "@/types/order-types";
 import { fetcher } from "../client";
 
 export const createOrder = (data: CreateOrderRequest) =>
@@ -7,7 +11,7 @@ export const createOrder = (data: CreateOrderRequest) =>
     body: JSON.stringify(data),
   });
 
-  export const fetchAllOrders = async (): Promise<Order[]> => {
+export const fetchAllOrders = async (): Promise<CustomerOrder[]> => {
   const res: any = await fetcher("/order");
   console.log("API response:", res);
 
@@ -30,3 +34,12 @@ export const createOrder = (data: CreateOrderRequest) =>
     items: u.items,
   }));
 };
+
+
+export const fetchAllOrdersTableWise =
+  async (): Promise<GetOrdersResponseAdminChef> => {
+    const res = await fetcher("/order/table-orders");
+    console.log("API response new:", res);
+
+    return res;
+  };
