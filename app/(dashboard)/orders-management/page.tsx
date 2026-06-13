@@ -37,9 +37,11 @@ const page = () => {
 
   const orders = data ?? [];
 
+  console.log(orders, "orders");
+
   const filtered = useMemo(() => {
     return orders.filter((o) => {
-      if (statusFilter !== "all" && o.status !== statusFilter) return false;
+      if (statusFilter !== "all" && o.orderStatus !== statusFilter) return false;
       if (typeFilter !== "all" && o.orderType !== typeFilter) return false;
       if (query) {
         const q = query.toLowerCase();
@@ -58,12 +60,12 @@ const page = () => {
     return {
       total: orders.length,
       pending: orders.filter((o) =>
-        ["PENDING", "PREPARING", "READY"].includes(o.status),
+        ["PENDING", "PREPARING", "READY"].includes(o.orderStatus),
       ).length,
       revenue: orders
         .filter((o) => o.paymentStatus === "PAID")
         .reduce((s, o) => s + Number(o.totalAmount), 0),
-      completed: orders.filter((o) => o.status === "COMPLETED").length,
+      completed: orders.filter((o) => o.orderStatus === "COMPLETED").length,
     };
   }, [orders]);
   if (isLoading) return <ApiLoader message="Fetching orders..." />;
@@ -141,7 +143,7 @@ const page = () => {
               <SelectItem value="all">All status</SelectItem>
               {Object.keys(STATUS_META).map((s) => (
                 <SelectItem key={s} value={s}>
-                  {STATUS_META[s as Order["status"]].label}
+                  {STATUS_META[s as Order["orderStatus"]].label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -170,8 +172,12 @@ const page = () => {
               </p>
             </div>
           ) : (
-            filtered.map((o,m) => (
-              <OrderCard key={`${o.id}-${m}`} order={o} onView={() => setDetail(o)} />
+            filtered.map((o, m) => (
+              <OrderCard
+                key={`${o.orderId}-${m}`}
+                order={o}
+                onView={() => setDetail(o)}
+              />
             ))
           )}
         </div>

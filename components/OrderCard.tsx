@@ -27,7 +27,9 @@ import BillRow from "./BillRow";
 
 function OrderCard({ order, onView }: { order: Order; onView: () => void }) {
   const [open, setOpen] = useState(false);
-  const status = STATUS_META[order.status];
+  const status = STATUS_META[order.orderStatus];
+  console.log(status,"stsatis");
+  
   const totalQty = order.items.reduce((s, i) => s + i.quantity, 0);
 
   return (
@@ -52,7 +54,7 @@ function OrderCard({ order, onView }: { order: Order; onView: () => void }) {
               <Hash className="h-3 w-3" />
               <span className="truncate">{order.orderNumber}</span>
             </div>
-            <p className="mt-0.5 text-base font-bold">Order #{order.id}</p>
+            <p className="mt-0.5 text-base font-bold">Order #{order.orderId}</p>
             <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
               <Table2 className="h-3 w-3" /> Table {order.tableId}
             </div>
@@ -156,7 +158,7 @@ function OrderCard({ order, onView }: { order: Order; onView: () => void }) {
                   const isVeg = i.menuItem.menuType === "Veg";
                   return (
                     <div
-                      key={i.id}
+                      key={i.orderItemId}
                       className={cn(
                         "flex items-start gap-3 p-3",
                         i.isCancelled && "opacity-60",
@@ -209,6 +211,23 @@ function OrderCard({ order, onView }: { order: Order; onView: () => void }) {
                           <p className="mt-1 inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-700">
                             <StickyNote className="h-3 w-3" /> {i.notes}
                           </p>
+                        )}
+                        {i.orderItemStatus && (
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "mt-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold",
+                              STATUS_META[i.orderItemStatus]?.cls,
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                "h-1.5 w-1.5 rounded-full",
+                                STATUS_META[i.orderItemStatus]?.dot,
+                              )}
+                            />
+                            {STATUS_META[i.orderItemStatus]?.label || i.orderItemStatus}
+                          </Badge>
                         )}
                       </div>
                       <p className="shrink-0 text-sm font-bold tabular-nums">

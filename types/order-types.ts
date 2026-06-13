@@ -18,7 +18,8 @@ export type MenuItem = {
 };
 
 export type OrderItemAdmin = {
-  id: number;
+  orderItemId: number;
+  orderItemStatus: "PENDING" | "PREPARING" | "READY" | "SERVED" | "COMPLETED" | "CANCELLED";
   orderId: number;
   quantity: number;
   unitPrice: string;
@@ -30,11 +31,11 @@ export type OrderItemAdmin = {
 };
 
 export type Order = {
-  id: number;
+  orderId: number;
   tableId: number;
   orderNumber: string;
   orderType: "DINE_IN" | "TAKEAWAY" | "DELIVERY";
-  status: "PENDING" | "PREPARING" | "READY" | "SERVED" | "COMPLETED" | "CANCELLED";
+  orderStatus: "PENDING" | "PREPARING" | "READY" | "SERVED" | "COMPLETED" | "CANCELLED";
   paymentStatus: "UNPAID" | "PAID" | "REFUNDED";
   subtotal: string;
   taxAmount: string;
@@ -47,7 +48,7 @@ export type Order = {
 };
 
 export const STATUS_META: Record<
-  Order["status"],
+  Order["orderStatus"],
   { label: string; cls: string; dot: string }
 > = {
   PENDING: {

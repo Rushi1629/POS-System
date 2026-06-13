@@ -11,15 +11,14 @@ export const createOrder = (data: CreateOrderRequest) =>
   const res: any = await fetcher("/order");
   console.log("API response:", res);
 
-  // support both: [{..},...]  and { data: [{..}, ...] }
   const arr: any[] = Array.isArray(res) ? res : (res?.data ?? []);
 
   return arr.map((u: any) => ({
-    id: u.id,
+    orderId: u.id,
     tableId: u.tableId,
     orderNumber: u.orderNumber,
     orderType: u.orderType,
-    status: u.status,
+    orderStatus: u.orderStatus,
     paymentStatus: u.paymentStatus,
     subtotal: u.subtotal,
     taxAmount: u.taxAmount,
