@@ -142,7 +142,7 @@ export default function CustomerDashboard() {
   );
 
   const handleAdd = (item: any) => {
-    if (!item.subMenuItemId || item.subMenuItemId.length === 0) {
+    if (!item.subMenuItems || item.subMenuItems.length === 0){
       addToCart(item.id);
       return;
     }
@@ -562,7 +562,7 @@ export default function CustomerDashboard() {
               </DialogHeader>
 
               <div className="px-6 py-2">
-                {selectedItem.subMenuItemId?.map((extra: any) => {
+                {selectedItem.subMenuItems?.map((extra: any) => {
                   const checked = selectedExtras.some((e) => e.id === extra.id);
 
                   return (
