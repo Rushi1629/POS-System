@@ -208,28 +208,30 @@ function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => voi
                             {i.subMenuItem.name} ({fmt(i.subMenuItem.price)})
                           </p>
                         )}
-                        {i.notes && (
-                          <p className="mt-1 inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-700">
-                            <StickyNote className="h-3 w-3" /> {i.notes}
-                          </p>
-                        )}
-                        {i.orderItemStatus && (
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              "mt-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold",
-                              STATUS_META[i.orderItemStatus]?.cls,
-                            )}
-                          >
-                            <span
+                        <div className="mt-1 flex items-center gap-2">
+                          {i.notes && (
+                            <Badge className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-700">
+                              <StickyNote className="h-3 w-3" /> {i.notes}
+                            </Badge>
+                          )}
+                          {i.orderItemStatus && (
+                            <Badge
+                              variant="outline"
                               className={cn(
-                                "h-1.5 w-1.5 rounded-full",
-                                STATUS_META[i.orderItemStatus]?.dot,
+                                "mt-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold",
+                                STATUS_META[i.orderItemStatus]?.cls,
                               )}
-                            />
-                            {STATUS_META[i.orderItemStatus]?.label || i.orderItemStatus}
-                          </Badge>
-                        )}
+                            >
+                              <span
+                                className={cn(
+                                  "h-1.5 w-1.5 rounded-full",
+                                  STATUS_META[i.orderItemStatus]?.dot,
+                                )}
+                              />
+                              {STATUS_META[i.orderItemStatus]?.label || i.orderItemStatus}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                       <p className="shrink-0 text-sm font-bold tabular-nums">
                         {fmt(i.totalPrice)}
