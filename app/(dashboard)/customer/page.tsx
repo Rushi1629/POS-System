@@ -50,6 +50,9 @@ export default function CustomerDashboard() {
   const searchParams = useSearchParams();
   const tableToken = searchParams?.get("tableToken");
 
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [selectedExtras, setSelectedExtras] = useState<any[]>([]);
+
   const {
     data: tableData,
     isLoading: isLoadingTable,
@@ -100,7 +103,7 @@ export default function CustomerDashboard() {
 
   const { data: menuItems = [], isLoading } = useFetchMenusCustomer();
 
-  // console.log(menuItems, "menuItems");
+  console.log(menuItems, "menuItems");
 
   useEffect(() => {
     console.log("✅ categories updated:", allCategory);
@@ -115,6 +118,8 @@ export default function CustomerDashboard() {
     return Object.fromEntries(menuItems.map((i) => [i.id, i]));
   }, [menuItems]);
 
+  console.log(menuMap, "menuMap");
+
   const addToCart = useCallback(
     (itemId: number) => {
       const item = menuMap[itemId];
@@ -125,7 +130,7 @@ export default function CustomerDashboard() {
           id: item.id,
           name: item.name,
           price: item.price,
-          quantity: 1, // reducer will override if needed
+          quantity: 1,
           menuType: item.menuType,
           // isBest: item.isBest,
           imageUrl: item.imageUrl,
@@ -135,6 +140,43 @@ export default function CustomerDashboard() {
     },
     [dispatch, menuMap],
   );
+
+  const handleAdd = (item: any) => {
+    if (!item.subMenuItems || item.subMenuItems.length === 0) {
+      addToCart(item.id);
+      return;
+    }
+
+    setSelectedExtras([]);
+    setSelectedItem(item);
+  };
+
+  const handleConfirmAdd = () => {
+    if (!selectedItem) return;
+
+    // OPTIONAL: you can pass extras to redux later
+    addToCart(selectedItem.id);
+
+    setSelectedItem(null);
+  };
+
+  const extrasTotal = useMemo(() => {
+    return selectedExtras.reduce(
+      (total, item) => total + Number(item.price),
+      0,
+    );
+  }, [selectedExtras]);
+
+  const toggleExtra = (extra: any) => {
+    setSelectedExtras((prev) => {
+      const exists = prev.find((e) => e.id === extra.id);
+      if (exists) {
+        return prev.filter((e) => e.id !== extra.id);
+      } else {
+        return [...prev, extra];
+      }
+    });
+  };
 
   const removeFromCart = useCallback(
     (id: number) => {
@@ -261,9 +303,13 @@ export default function CustomerDashboard() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-orange-700">Rate Per Minute / Guest</p>
+                      <p className="text-xs text-orange-700">
+                        Rate Per Minute / Guest
+                      </p>
                       <p className="text-xs font-semibold text-orange-900">
-                        {table.ratePerMinute ? `₹ ${table.ratePerMinute.toFixed(2)}` : "N/A"}
+                        {table.ratePerMinute
+                          ? `₹ ${table.ratePerMinute.toFixed(2)}`
+                          : "N/A"}
                       </p>
                     </div>
                   </div>
@@ -424,7 +470,8 @@ export default function CustomerDashboard() {
                         key={item.id}
                         item={item}
                         quantity={cart[item.id]?.quantity || 0}
-                        onAdd={() => addToCart(item.id)}
+                        // onAdd={() => addToCart(item.id)}
+                        onAdd={() => handleAdd(item)}
                         onRemove={() => removeFromCart(item.id)}
                       />
                     ))}
@@ -478,106 +525,69 @@ export default function CustomerDashboard() {
       </>
       {/* )} */}
 
-      {/* {tableData && (
-        <Dialog open={guestCountDialog}>
-          <DialogContent className="sm:max-w-sm max-w-lg max-h-[90vh] flex flex-col">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Welcome to {table.name}
-              </DialogTitle>
-              <DialogDescription>
-                Please enter the number of guests at your table.
-              </DialogDescription>
-            </DialogHeader>
+      <Dialog
+        open={selectedItem !== null}
+        onOpenChange={(open) => !open && setSelectedItem(null)}
+      >
+        <DialogContent className="max-h-[90vh] overflow-y-auto rounded-3xl p-0 sm:max-w-xl">
+          {selectedItem && (
+            <>
+              <DialogHeader className="border-b px-6 py-5 text-left">
+                <DialogTitle className="text-lg font-semibold">
+                  Customize {selectedItem.name}
+                </DialogTitle>
+                <DialogDescription>
+                  Select any extras you would like with your {selectedItem.name}
+                </DialogDescription>
+              </DialogHeader>
 
-            <div className="space-y-4 py-4 overflow-y-auto px-2 no-scrollbar">
-              <div className="bg-linear-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg p-4">
-                <p className="text-sm font-semibold text-orange-900 mb-2">
-                  Table Information
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <p className="text-xs text-orange-700">Table Name</p>
-                    <p className="text-xs font-semibold text-orange-900">
-                      {table.name}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-orange-700">Capacity</p>
-                    <p className="text-xs font-semibold text-orange-900">
-                      {table.capacity}{" "}
-                      {table.capacity === 1 ? "Guest" : "Guests"}
-                    </p>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="text-xs text-orange-700">Type</p>
-                    <p className="text-xs font-semibold text-orange-900">
-                      {table.type}
-                    </p>
-                  </div>
-                </div>
+              <div className="px-6 py-2">
+                {selectedItem.subMenuItems?.map((extra: any) => {
+                  const checked = selectedExtras.some((e) => e.id === extra.id);
+
+                  return (
+                    <label
+                      key={extra.id}
+                      className="flex items-center gap-4 py-4 border-b"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() =>
+                          setSelectedExtras((prev) => {
+                            const exists = prev.find((e) => e.id === extra.id);
+
+                            if (exists) {
+                              return prev.filter((e) => e.id !== extra.id);
+                            } else {
+                              return [...prev, extra]; // ✅ store full object
+                            }
+                          })
+                        }
+                      />
+
+                      <span className="flex-1">
+                        <p className="font-semibold">{extra.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {extra.description}
+                        </p>
+                      </span>
+
+                      <span>₹ {extra.price}</span>
+                    </label>
+                  );
+                })}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="guest-count" className="">
-                  Number of Guests (Max: {table.capacity})
-                </Label>
-
-                <div className="relative">
-                  <UserCheck2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="guest-count"
-                    type="number"
-                    min={1}
-                    inputMode="numeric"
-                    max={table.capacity}
-                    value={guestInput}
-                    onChange={(e) => setGuestInput(e.target.value)}
-                    placeholder={`Enter 1 to ${table.capacity} guests`}
-                    className="pl-9"
-                    autoFocus
-                  />
-                </div>
-              </div>
-
-              {guestInput && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <p className="text-sm text-green-900">
-                    <span className="font-semibold">Seated Guests:</span>{" "}
-                    <span className="text-lg font-bold">{guestInput}</span> /{" "}
-                    {table.capacity}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setGuestCountDialog(false);
-                  setGuestInput("");
-                }}
-              >
-                Close
-              </Button>
-              <Button
-                onClick={handleGuestCountConfirm}
-                className="bg-[#e25f28] hover:bg-[#d14f1f]"
-                disabled={
-                  isUpdatingSession ||
-                  !guestInput ||
-                  parseInt(guestInput) < 1 ||
-                  parseInt(guestInput) > (table?.capacity ?? 0)
-                }
-              >
-                {isUpdatingSession ? "Updating..." : "Confirm"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )} */}
+              <DialogFooter className="p-5">
+                <Button onClick={handleConfirmAdd} className="w-full">
+                  Add to Cart · ₹ {Number(selectedItem.price) + extrasTotal}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
