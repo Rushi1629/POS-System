@@ -151,14 +151,34 @@ export default function CustomerDashboard() {
     setSelectedItem(item);
   };
 
-  const handleConfirmAdd = () => {
+  const handleConfirmAdd = useCallback(() => {
     if (!selectedItem) return;
 
-    // OPTIONAL: you can pass extras to redux later
-    addToCart(selectedItem.id);
+    const extrasTotal = selectedExtras.reduce(
+      (sum, e) => sum + Number(e.price),
+      0,
+    );
+
+    const finalPrice = Number(selectedItem.price) + extrasTotal;
+
+    const uniqueId = selectedItem.id;
+
+    dispatch(
+      addItemAction({
+        id: uniqueId, // ✅ FIXED
+        name: selectedItem.name,
+        price: finalPrice,
+        quantity: 1,
+        menuType: selectedItem.menuType,
+        imageUrl: selectedItem.imageUrl,
+        description: selectedItem.description,
+        extras: selectedExtras,
+      }),
+    );
 
     setSelectedItem(null);
-  };
+    setSelectedExtras([]);
+  }, [dispatch, selectedItem, selectedExtras]);
 
   const extrasTotal = useMemo(() => {
     return selectedExtras.reduce(
