@@ -8,7 +8,7 @@ export type CartItem = {
   isBest?: boolean;
   imageUrl: string;
   notes?: string;
-  subMenuItems?: any[];
+  subMenuItem?: any[];
 };
 
 export type CartState = {
