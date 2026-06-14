@@ -141,6 +141,7 @@ export default function CustomerDashboard() {
   );
 
   const handleAdd = (item: any) => {
+    debugger;
     if (!item.subMenuItems || item.subMenuItems.length === 0) {
       addToCart(item.id);
       return;
@@ -150,45 +151,40 @@ export default function CustomerDashboard() {
     setSelectedItem(item);
   };
 
-  const handleConfirmAdd = useCallback(
-    (item: any) => {
-      if (!selectedItem) return;
+  const handleConfirmAdd = useCallback(() => {
+    if (!selectedItem) return;
 
-      const extrasTotal = selectedExtras.reduce(
-        (sum, e) => sum + Number(e.price),
-        0,
-      );
+    const extrasTotal = selectedExtras.reduce(
+      (sum, e) => sum + Number(e.price),
+      0,
+    );
 
-      const finalPrice = Number(selectedItem.price) + extrasTotal;
+    const extrasKey = selectedExtras
+      .map((e) => e.id)
+      .sort()
+      .join("_");
 
-      const extrasKey = selectedExtras
-        .map((e) => e.id)
-        .sort()
-        .join("_");
+    const uniqueId =
+      selectedExtras.length > 0
+        ? `${selectedItem.id}`
+        : `${selectedItem.id}`;
 
-      const uniqueId =
-        selectedExtras.length > 0
-          ? `${selectedItem.id}-${extrasKey}`
-          : `${selectedItem.id}`;
+    dispatch(
+      addItemAction({
+        id: selectedItem.id, // ✅ FIXED (IMPORTANT)
+        name: selectedItem.name,
+        price: Number(selectedItem.price),
+        quantity: 1,
+        menuType: selectedItem.menuType,
+        imageUrl: selectedItem.imageUrl,
+        description: selectedItem.description,
+        extras: selectedExtras,
+      }),
+    );
 
-      dispatch(
-        addItemAction({
-          id: item.id, // ✅ FIXED
-          name: selectedItem.name,
-          price: Number(selectedItem.price),
-          quantity: 1,
-          menuType: selectedItem.menuType,
-          imageUrl: selectedItem.imageUrl,
-          description: selectedItem.description,
-          extras: selectedExtras,
-        }),
-      );
-
-      setSelectedItem(null);
-      setSelectedExtras([]);
-    },
-    [dispatch, selectedItem, selectedExtras],
-  );
+    setSelectedItem(null);
+    setSelectedExtras([]);
+  }, [dispatch, selectedItem, selectedExtras]);
 
   const extrasTotal = useMemo(() => {
     return selectedExtras.reduce(

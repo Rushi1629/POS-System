@@ -39,10 +39,16 @@ const CartView = () => {
 
   const cart = useSelector((state: RootState) => state.cart?.items ?? {});
 
+  console.log(cart,"cart");
+  
+
   // ✅ Convert cart → UI items (optimized)
   const items = useMemo(() => {
     return Object.values(cart);
   }, [cart]);
+
+  console.log(items,"items");
+  
 
   const [orderError, setOrderError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState("");

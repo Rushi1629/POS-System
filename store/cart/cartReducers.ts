@@ -6,6 +6,7 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
   const item = action.payload;
 
   if (state.items[item.id]) {
+    
     state.items[item.id].quantity += 1;
   } else {
     state.items[item.id] = { ...item, quantity: 1 };

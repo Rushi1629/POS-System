@@ -16,6 +16,16 @@ export type CartItem = {
   }[];
 };
 
+export type OrderItemPayload = {
+  menuItemId: number;
+  quantity: number;
+  notes?: string;
+  subMenuItemId: {
+    subMenuItemId: number;
+    quantity: number;
+  }[];
+};
+
 export type CartState = {
   items: Record<string, CartItem>;
 };
