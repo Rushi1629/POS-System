@@ -16,10 +16,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchTableByTokenCustomer } from "@/client/hooks/useCustomer";
 import { useCreateOrder } from "@/client/hooks/useOrder";
 import { clearCartDB, loadCartFromDB, saveCartToDB } from "@/lib/db";
-import {
-  setCartAction,
-  updateItemNoteAction,
-} from "@/store/cart/cartSlice";
+import { setCartAction, updateItemNoteAction } from "@/store/cart/cartSlice";
 import ApiLoader from "@/components/ApiLoader";
 
 const CartView = () => {
@@ -77,6 +74,10 @@ const CartView = () => {
           menuItemId: item.id,
           quantity: item.quantity,
           notes: item.notes || undefined,
+          extras: item.extras?.map((e: any) => ({
+            id: e.id,
+            price: e.price,
+          })),
         })),
       });
       // dispatch(clearCartAction());
