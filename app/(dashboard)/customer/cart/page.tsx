@@ -74,10 +74,11 @@ const CartView = () => {
           menuItemId: Number(item.id),
           quantity: item.quantity,
           notes: item.notes || undefined,
-          subMenuItemId: item.subMenuItemId?.map((e: any) => ({
-            id: e.id,
-            price: e.price,
-          })),
+          subMenuItemId:
+            item.extras?.map((e) => ({
+              subMenuItemId: e.id,
+              quantity: e.quantity,
+            })) || [],
         })),
       });
       // dispatch(clearCartAction());

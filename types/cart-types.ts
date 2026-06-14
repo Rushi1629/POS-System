@@ -12,11 +12,7 @@ export type CartItem = {
     id: number;
     name: string;
     price: number;
-  }[];
-  subMenuItemId?: {
-    id: number;
-    price: number;
-    name: string;
+    quantity: number;
   }[];
 };
 

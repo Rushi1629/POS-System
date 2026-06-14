@@ -21,7 +21,12 @@ const CartItemCard = ({
   onRemove,
   onNoteChange,
 }: CartItemCardProps) => {
-  const total = item.price * item.quantity;
+  // const total = item.price * item.quantity;
+
+  const extrasTotal =
+    item.extras?.reduce((sum, e) => sum + e.price * e.quantity, 0) || 0;
+
+  const total = (item.price + extrasTotal) * item.quantity;
 
   return (
     <div className="group relative rounded-xl border border-border bg-card p-5 transition-all hover:shadow-md hover:border-primary/20">
@@ -80,9 +85,9 @@ const CartItemCard = ({
 
               <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
                 {item.description}
-                {item.subMenuItemId && item.subMenuItemId.length > 0 && (
+                {item.extras && item.extras.length > 0 && (
                   <div className="mt-2 space-y-1">
-                    {item.subMenuItemId.map((extra: any) => (
+                    {item.extras.map((extra: any) => (
                       <div
                         key={extra.id}
                         className="flex justify-between text-sm text-muted-foreground"
@@ -110,7 +115,8 @@ const CartItemCard = ({
             {/* PRICE */}
             <div className="text-right shrink-0">
               <p className="text-lg font-bold tabular-nums text-primary">
-                ₹{item.price * item.quantity}
+                {/* ₹{item.price * item.quantity} */}
+                ₹{total}
               </p>
               {item.quantity > 1 && (
                 <p className="text-xs text-muted-foreground">
