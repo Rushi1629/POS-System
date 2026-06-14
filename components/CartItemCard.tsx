@@ -80,9 +80,9 @@ const CartItemCard = ({
 
               <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
                 {item.description}
-                {item.subMenuItem && item.subMenuItem.length > 0 && (
+                {item.subMenuItemId && item.subMenuItemId.length > 0 && (
                   <div className="mt-2 space-y-1">
-                    {item.subMenuItem.map((extra: any) => (
+                    {item.subMenuItemId.map((extra: any) => (
                       <div
                         key={extra.id}
                         className="flex justify-between text-sm text-muted-foreground"
