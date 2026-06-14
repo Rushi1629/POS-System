@@ -172,7 +172,7 @@ export default function CustomerDashboard() {
         menuType: selectedItem.menuType,
         imageUrl: selectedItem.imageUrl,
         description: selectedItem.description,
-        extras: selectedExtras,
+        subMenuItems: selectedExtras,
       }),
     );
 
