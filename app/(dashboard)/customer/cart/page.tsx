@@ -71,7 +71,7 @@ const CartView = () => {
         tableId,
         notes: orderNotes || undefined,
         orderItems: items.map((item) => ({
-          menuItemId: item.id,
+          menuItemId: Number(item.id),
           quantity: item.quantity,
           notes: item.notes || undefined,
           subMenuItemId: item.subMenuItemId?.map((e: any) => ({
@@ -141,10 +141,10 @@ const CartView = () => {
             key={item.id}
             item={item}
             onIncrement={() => dispatch(addItemAction(item))}
-            onDecrement={() => dispatch(removeItemAction(item.id))}
-            onRemove={() => dispatch(removeItemAction(item.id))}
+            onDecrement={() => dispatch(removeItemAction(Number(item.id)))}
+            onRemove={() => dispatch(removeItemAction(Number(item.id)))}
             onNoteChange={(notes) =>
-              dispatch(updateItemNoteAction({ id: item.id, notes }))
+              dispatch(updateItemNoteAction({ id: Number(item.id), notes }))
             }
           />
         ))}

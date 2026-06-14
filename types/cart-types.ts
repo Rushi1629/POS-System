@@ -1,5 +1,5 @@
 export type CartItem = {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   price: number;
@@ -8,7 +8,16 @@ export type CartItem = {
   isBest?: boolean;
   imageUrl: string;
   notes?: string;
-  subMenuItemId?: any[];
+  extras?: {
+    id: number;
+    name: string;
+    price: number;
+  }[];
+  subMenuItemId?: {
+    id: number;
+    price: number;
+    name: string;
+  }[];
 };
 
 export type CartState = {

@@ -127,12 +127,11 @@ export default function CustomerDashboard() {
 
       dispatch(
         addItemAction({
-          id: item.id,
+          id: String(item.id),
           name: item.name,
           price: item.price,
           quantity: 1,
           menuType: item.menuType,
-          // isBest: item.isBest,
           imageUrl: item.imageUrl,
           description: item.description,
         }),
@@ -142,7 +141,7 @@ export default function CustomerDashboard() {
   );
 
   const handleAdd = (item: any) => {
-    if (!item.subMenuItems || item.subMenuItems.length === 0){
+    if (!item.subMenuItems || item.subMenuItems.length === 0) {
       addToCart(item.id);
       return;
     }
@@ -161,7 +160,15 @@ export default function CustomerDashboard() {
 
     const finalPrice = Number(selectedItem.price) + extrasTotal;
 
-    const uniqueId = selectedItem.id;
+    const extrasKey = selectedExtras
+      .map((e) => e.id)
+      .sort()
+      .join("_");
+
+    const uniqueId =
+      selectedExtras.length > 0
+        ? `${selectedItem.id}-${extrasKey}`
+        : `${selectedItem.id}`;
 
     dispatch(
       addItemAction({
@@ -172,7 +179,7 @@ export default function CustomerDashboard() {
         menuType: selectedItem.menuType,
         imageUrl: selectedItem.imageUrl,
         description: selectedItem.description,
-        subMenuItemId: selectedExtras,
+        extras: selectedExtras,
       }),
     );
 
@@ -489,7 +496,12 @@ export default function CustomerDashboard() {
                       <MenuItemCard
                         key={item.id}
                         item={item}
-                        quantity={cart[item.id]?.quantity || 0}
+                        // quantity={cart[item.id]?.quantity || 0}
+                        quantity={Object.values(cart)
+                          .filter((c) =>
+                            c.id.toString().startsWith(item.id.toString()),
+                          )
+                          .reduce((sum, c) => sum + c.quantity, 0)}
                         // onAdd={() => addToCart(item.id)}
                         onAdd={() => handleAdd(item)}
                         onRemove={() => removeFromCart(item.id)}
