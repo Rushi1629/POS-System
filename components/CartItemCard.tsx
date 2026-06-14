@@ -80,6 +80,19 @@ const CartItemCard = ({
 
               <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
                 {item.description}
+                {item.extras && item.extras.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {item.extras.map((extra: any) => (
+                      <div
+                        key={extra.id}
+                        className="flex justify-between text-sm text-muted-foreground"
+                      >
+                        <span>+ {extra.name}</span>
+                        <span>₹{extra.price}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </p>
               <div className="mt-3">
                 <label className="block text-sm font-medium text-muted-foreground">
