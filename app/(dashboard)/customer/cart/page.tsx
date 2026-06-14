@@ -18,6 +18,7 @@ import { useCreateOrder } from "@/client/hooks/useOrder";
 import { clearCartDB, loadCartFromDB, saveCartToDB } from "@/lib/db";
 import { setCartAction, updateItemNoteAction } from "@/store/cart/cartSlice";
 import ApiLoader from "@/components/ApiLoader";
+import { CartItem } from "@/types/cart-types";
 
 const CartView = () => {
   const dispatch = useDispatch();
@@ -91,6 +92,14 @@ const CartView = () => {
     }
   }, [items, placeOrder, tableId, router]);
 
+  const generateCartKey = (item: CartItem) => {
+    return `${item.id}-${
+      item.extras?.map((e) => e.id).join(",") || "noextra"
+    }-${
+      item.extras?.map((s) => s.id).join(",") || "nosub"
+    }-${item.notes || "nonote"}`;
+  };
+
   console.log(items, "items");
 
   // ✅ Derived values (memoized)
@@ -139,11 +148,12 @@ const CartView = () => {
       <div className="flex-1 space-y-4">
         {items.map((item) => (
           <CartItemCard
-            key={item.id}
+            // key={item.id}
+            key={generateCartKey(item)}
             item={item}
             onIncrement={() => dispatch(addItemAction(item))}
-            onDecrement={() => dispatch(removeItemAction(Number(item.id)))}
-            onRemove={() => dispatch(removeItemAction(Number(item.id)))}
+            onDecrement={() => dispatch(removeItemAction(item.id))}
+            onRemove={() => dispatch(removeItemAction(item.id))}
             onNoteChange={(notes) =>
               dispatch(updateItemNoteAction({ id: Number(item.id), notes }))
             }

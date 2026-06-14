@@ -127,7 +127,7 @@ export default function CustomerDashboard() {
 
       dispatch(
         addItemAction({
-          id: String(item.id),
+          id: item.id,
           name: item.name,
           price: item.price,
           quantity: 1,
@@ -150,42 +150,45 @@ export default function CustomerDashboard() {
     setSelectedItem(item);
   };
 
-  const handleConfirmAdd = useCallback(() => {
-    if (!selectedItem) return;
+  const handleConfirmAdd = useCallback(
+    (item: any) => {
+      if (!selectedItem) return;
 
-    const extrasTotal = selectedExtras.reduce(
-      (sum, e) => sum + Number(e.price),
-      0,
-    );
+      const extrasTotal = selectedExtras.reduce(
+        (sum, e) => sum + Number(e.price),
+        0,
+      );
 
-    const finalPrice = Number(selectedItem.price) + extrasTotal;
+      const finalPrice = Number(selectedItem.price) + extrasTotal;
 
-    const extrasKey = selectedExtras
-      .map((e) => e.id)
-      .sort()
-      .join("_");
+      const extrasKey = selectedExtras
+        .map((e) => e.id)
+        .sort()
+        .join("_");
 
-    const uniqueId =
-      selectedExtras.length > 0
-        ? `${selectedItem.id}-${extrasKey}`
-        : `${selectedItem.id}`;
+      const uniqueId =
+        selectedExtras.length > 0
+          ? `${selectedItem.id}-${extrasKey}`
+          : `${selectedItem.id}`;
 
-    dispatch(
-      addItemAction({
-        id: uniqueId, // ✅ FIXED
-        name: selectedItem.name,
-        price: finalPrice,
-        quantity: 1,
-        menuType: selectedItem.menuType,
-        imageUrl: selectedItem.imageUrl,
-        description: selectedItem.description,
-        extras: selectedExtras,
-      }),
-    );
+      dispatch(
+        addItemAction({
+          id: item.id, // ✅ FIXED
+          name: selectedItem.name,
+          price: Number(selectedItem.price),
+          quantity: 1,
+          menuType: selectedItem.menuType,
+          imageUrl: selectedItem.imageUrl,
+          description: selectedItem.description,
+          extras: selectedExtras,
+        }),
+      );
 
-    setSelectedItem(null);
-    setSelectedExtras([]);
-  }, [dispatch, selectedItem, selectedExtras]);
+      setSelectedItem(null);
+      setSelectedExtras([]);
+    },
+    [dispatch, selectedItem, selectedExtras],
+  );
 
   const extrasTotal = useMemo(() => {
     return selectedExtras.reduce(
@@ -193,17 +196,6 @@ export default function CustomerDashboard() {
       0,
     );
   }, [selectedExtras]);
-
-  const toggleExtra = (extra: any) => {
-    setSelectedExtras((prev) => {
-      const exists = prev.find((e) => e.id === extra.id);
-      if (exists) {
-        return prev.filter((e) => e.id !== extra.id);
-      } else {
-        return [...prev, extra];
-      }
-    });
-  };
 
   const removeFromCart = useCallback(
     (id: number) => {
@@ -218,7 +210,11 @@ export default function CustomerDashboard() {
 
   const totalCartPrice = useMemo(() => {
     return Object.values(cart).reduce(
-      (sum, item) => sum + item.price * item.quantity,
+      (sum, item) =>
+        sum +
+        ((Number(item.price) || 0) +
+          (item.extras?.reduce((s, e) => s + (Number(e.price) || 0), 0) || 0)) *
+          (Number(item.quantity) || 0),
       0,
     );
   }, [cart]);
@@ -496,12 +492,12 @@ export default function CustomerDashboard() {
                       <MenuItemCard
                         key={item.id}
                         item={item}
-                        // quantity={cart[item.id]?.quantity || 0}
-                        quantity={Object.values(cart)
-                          .filter((c) =>
-                            c.id.toString().startsWith(item.id.toString()),
-                          )
-                          .reduce((sum, c) => sum + c.quantity, 0)}
+                        quantity={cart[item.id]?.quantity || 0}
+                        // quantity={Object.values(cart)
+                        //   .filter((c) =>
+                        //     c.id.toString().startsWith(item.id.toString()),
+                        //   )
+                        //   .reduce((sum, c) => sum + c.quantity, 0)}
                         // onAdd={() => addToCart(item.id)}
                         onAdd={() => handleAdd(item)}
                         onRemove={() => removeFromCart(item.id)}
