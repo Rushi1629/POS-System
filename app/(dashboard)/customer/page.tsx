@@ -578,7 +578,7 @@ export default function CustomerDashboard() {
         open={selectedItem !== null}
         onOpenChange={(open) => !open && setSelectedItem(null)}
       >
-        <DialogContent className="max-h-[90vh] overflow-y-auto rounded-3xl p-0 sm:max-w-xl">
+        <DialogContent className="max-h-[90vh] rounded-3xl p-0 sm:max-w-xl flex flex-col">
           {selectedItem && (
             <>
               <DialogHeader className="border-b px-6 py-5 text-left">
@@ -590,7 +590,7 @@ export default function CustomerDashboard() {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="px-6 py-2">
+              <div className="px-6 py-2 overflow-y-auto px-2 no-scrollbar">
                 {selectedItem.subMenuItems?.map((extra: any) => {
                   const checked = selectedExtras.some((e) => e.id === extra.id);
 
