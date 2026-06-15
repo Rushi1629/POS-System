@@ -59,7 +59,7 @@ export default function AuthInitializer({ children }: Props) {
     dispatch(setUser(user));
 
     // ✅ Redirect logged-in user away from login page
-    if (pathname === "/login") {
+    if (user && pathname === "/login") {
       router.replace("/user-management");
       return;
     }

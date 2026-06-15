@@ -6,6 +6,7 @@ export type CartItem = {
   quantity: number;
   menuType?: "Veg" | "NonVeg";
   isBest?: boolean;
+  isUpdated?: boolean;
   imageUrl: string;
   notes?: string;
   extras?: {

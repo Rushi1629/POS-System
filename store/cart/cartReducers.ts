@@ -3,24 +3,71 @@ import { CartItem, CartState } from "@/types/cart-types";
 import { current, PayloadAction } from "@reduxjs/toolkit";
 
 export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
+  debugger;
   const item = action.payload;
 
-  if (state.items[item.id]) {
-    
-    state.items[item.id].quantity += 1;
+  const existingItem = state.items[item.id];
+
+  console.log(existingItem, "itemsexist");
+
+  if (existingItem) {
+    // ✅ Increase main item quantity
+    existingItem.quantity += 1;
+    existingItem.isUpdated = true;
+
+    // ✅ Handle extras
+    if (item.extras?.length) {
+      if (!existingItem.extras) existingItem.extras = [];
+
+      item.extras.forEach((newExtra) => {
+        const existingExtra = existingItem.extras?.find(
+          (e) => e.id === newExtra.id,
+        );
+
+        if (existingExtra) {
+          existingExtra.quantity =
+            (existingExtra.quantity || 0) + (newExtra.quantity || 1);
+            existingItem.isUpdated = true;
+        } else {
+          existingItem.extras?.push({
+            ...newExtra,
+            quantity: newExtra.quantity || 1,
+          });
+        }
+      });
+    }
   } else {
-    state.items[item.id] = { ...item, quantity: 1 };
+    // ✅ First time item
+    state.items[item.id] = {
+      ...item,
+      quantity: 1,
+      isUpdated: false,
+      extras:
+        item.extras?.map((e) => ({
+          ...e,
+          quantity: e.quantity || 1,
+          isUpdated: false,
+        })) || [],
+    };
   }
 };
 
 export const removeItem = (state: CartState, action: PayloadAction<number>) => {
   const id = action.payload;
 
-  if (!state.items[id]) return;
+  const existingItem = state.items[id];
+  if (!existingItem) return;
 
-  if (state.items[id].quantity > 1) {
-    state.items[id].quantity -= 1;
+  if (existingItem.quantity > 1) {
+    existingItem.quantity -= 1;
+
+    // ✅ MARK UPDATED
+    existingItem.isUpdated = true;
+
   } else {
+    // ❗ Before deleting, mark updated if needed (optional logic)
+    existingItem.isUpdated = true;
+
     delete state.items[id];
   }
 };

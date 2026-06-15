@@ -134,6 +134,7 @@ export default function CustomerDashboard() {
           menuType: item.menuType,
           imageUrl: item.imageUrl,
           description: item.description,
+          extras: [],
         }),
       );
     },
@@ -165,9 +166,7 @@ export default function CustomerDashboard() {
       .join("_");
 
     const uniqueId =
-      selectedExtras.length > 0
-        ? `${selectedItem.id}`
-        : `${selectedItem.id}`;
+      selectedExtras.length > 0 ? `${selectedItem.id}` : `${selectedItem.id}`;
 
     dispatch(
       addItemAction({
@@ -259,6 +258,32 @@ export default function CustomerDashboard() {
         console.error("Failed to update guest count:", error);
       }
     }
+  };
+
+  const handleExtraClick = (extra: any) => {
+    debugger;
+    setSelectedExtras((prev) => {
+      const existing = prev.find((e) => e.id === extra.id);
+
+      if (existing) {
+        return prev.map((e) =>
+          e.id === extra.id
+            ? {
+                ...e,
+                quantity: (e.quantity ?? 1) + 1,
+              }
+            : e,
+        );
+      }
+
+      return [
+        ...prev,
+        {
+          ...extra,
+          quantity: 1,
+        },
+      ];
+    });
   };
 
   if (!isAdmin && (isLoadingTable || !table)) {
@@ -577,17 +602,7 @@ export default function CustomerDashboard() {
                       <input
                         type="checkbox"
                         checked={checked}
-                        onChange={() =>
-                          setSelectedExtras((prev) => {
-                            const exists = prev.find((e) => e.id === extra.id);
-
-                            if (exists) {
-                              return prev.filter((e) => e.id !== extra.id);
-                            } else {
-                              return [...prev, extra]; // ✅ store full object
-                            }
-                          })
-                        }
+                        onChange={() => handleExtraClick(extra)}
                       />
 
                       <span className="flex-1">

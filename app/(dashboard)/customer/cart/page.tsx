@@ -39,16 +39,14 @@ const CartView = () => {
 
   const cart = useSelector((state: RootState) => state.cart?.items ?? {});
 
-  console.log(cart,"cart");
-  
+  console.log(cart, "cart");
 
   // ✅ Convert cart → UI items (optimized)
   const items = useMemo(() => {
     return Object.values(cart);
   }, [cart]);
 
-  console.log(items,"items");
-  
+  console.log(items, "items");
 
   const [orderError, setOrderError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState("");
@@ -77,16 +75,23 @@ const CartView = () => {
       await placeOrder({
         tableId,
         notes: orderNotes || undefined,
-        orderItems: items.map((item) => ({
-          menuItemId: Number(item.id),
-          quantity: item.quantity,
-          notes: item.notes || undefined,
-          subMenuItemId:
-            item.extras?.map((e) => ({
-              subMenuItemId: e.id,
-              quantity: e.quantity,
-            })) || [],
-        })),
+        orderItems: items.map((item) => {
+
+          return {
+            menuItemId: Number(item.id),
+            quantity: item.quantity,
+            notes: item.notes || undefined,
+
+            // ...(item.isUpdated && { isUpdated: true }),
+            isUpdated: item.isUpdated ?? false,
+
+            orderSubMenuItems:
+              item.extras?.map((e) => ({
+                subMenuItemId: e.id,
+                quantity: e.quantity || 1,
+              })) || [],
+          };
+        }),
       });
       // dispatch(clearCartAction());
       // await clearCartDB(tableToken ?? undefined);

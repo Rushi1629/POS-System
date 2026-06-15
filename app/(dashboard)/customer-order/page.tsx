@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useFetchOrders } from "@/client/hooks/useOrder";
 
 // ───────── Types ─────────
 type MenuItem = { id: number; name: string; price: string; menuType: string };
@@ -45,7 +46,13 @@ type Order = {
   tableId: number;
   orderNumber: string;
   orderType: "DINE_IN" | "TAKEAWAY" | "DELIVERY";
-  status: "PENDING" | "PREPARING" | "READY" | "SERVED" | "COMPLETED" | "CANCELLED";
+  status:
+    | "PENDING"
+    | "PREPARING"
+    | "READY"
+    | "SERVED"
+    | "COMPLETED"
+    | "CANCELLED";
   paymentStatus: "UNPAID" | "PAID" | "REFUNDED";
   subtotal: string;
   taxAmount: string;
@@ -79,15 +86,33 @@ const SAMPLE: Order[] = [
     etaMinutes: 12,
     items: [
       {
-        id: 1, quantity: 2, unitPrice: "129.25", totalPrice: "258.5",
-        notes: "Low Sugar", isCancelled: false,
-        menuItem: { id: 30001, name: "Veg Cheese Burger", price: "129.25", menuType: "Veg" },
+        id: 1,
+        quantity: 2,
+        unitPrice: "129.25",
+        totalPrice: "258.5",
+        notes: "Low Sugar",
+        isCancelled: false,
+        menuItem: {
+          id: 30001,
+          name: "Veg Cheese Burger",
+          price: "129.25",
+          menuType: "Veg",
+        },
         subMenuItem: null,
       },
       {
-        id: 2, quantity: 1, unitPrice: "129.25", totalPrice: "129.25",
-        notes: null, isCancelled: false,
-        menuItem: { id: 60001, name: "Non Veg Cheese Burger", price: "129.25", menuType: "Non Veg" },
+        id: 2,
+        quantity: 1,
+        unitPrice: "129.25",
+        totalPrice: "129.25",
+        notes: null,
+        isCancelled: false,
+        menuItem: {
+          id: 60001,
+          name: "Non Veg Cheese Burger",
+          price: "129.25",
+          menuType: "Non Veg",
+        },
         subMenuItem: null,
       },
     ],
@@ -99,21 +124,48 @@ const SAMPLE: Order[] = [
     orderType: "TAKEAWAY",
     status: "READY",
     paymentStatus: "PAID",
-    subtotal: "540.00", taxAmount: "27.00", discountAmount: "0",
-    serviceCharge: "0", timeChargeAmount: null, totalAmount: "567.00",
+    subtotal: "540.00",
+    taxAmount: "27.00",
+    discountAmount: "0",
+    serviceCharge: "0",
+    timeChargeAmount: null,
+    totalAmount: "567.00",
     notes: null,
     placedAt: "18 min ago",
     items: [
       {
-        id: 3, quantity: 2, unitPrice: "180.00", totalPrice: "360.00",
-        notes: "Extra cheese", isCancelled: false,
-        menuItem: { id: 40001, name: "Margherita Pizza", price: "180.00", menuType: "Veg" },
-        subMenuItem: { id: 1, name: "Extra Cheese", price: "10.50", menuType: "Veg" },
+        id: 3,
+        quantity: 2,
+        unitPrice: "180.00",
+        totalPrice: "360.00",
+        notes: "Extra cheese",
+        isCancelled: false,
+        menuItem: {
+          id: 40001,
+          name: "Margherita Pizza",
+          price: "180.00",
+          menuType: "Veg",
+        },
+        subMenuItem: {
+          id: 1,
+          name: "Extra Cheese",
+          price: "10.50",
+          menuType: "Veg",
+        },
       },
       {
-        id: 4, quantity: 3, unitPrice: "60.00", totalPrice: "180.00",
-        notes: null, isCancelled: false,
-        menuItem: { id: 70001, name: "Cold Coffee", price: "60.00", menuType: "Veg" },
+        id: 4,
+        quantity: 3,
+        unitPrice: "60.00",
+        totalPrice: "180.00",
+        notes: null,
+        isCancelled: false,
+        menuItem: {
+          id: 70001,
+          name: "Cold Coffee",
+          price: "60.00",
+          menuType: "Veg",
+        },
         subMenuItem: null,
       },
     ],
@@ -125,21 +177,43 @@ const SAMPLE: Order[] = [
     orderType: "DINE_IN",
     status: "COMPLETED",
     paymentStatus: "PAID",
-    subtotal: "950.00", taxAmount: "47.50", discountAmount: "50",
-    serviceCharge: "20", timeChargeAmount: "15.00", totalAmount: "982.50",
+    subtotal: "950.00",
+    taxAmount: "47.50",
+    discountAmount: "50",
+    serviceCharge: "20",
+    timeChargeAmount: "15.00",
+    totalAmount: "982.50",
     notes: "Birthday celebration",
     placedAt: "Yesterday · 8:42 PM",
     items: [
       {
-        id: 5, quantity: 1, unitPrice: "450.00", totalPrice: "450.00",
-        notes: null, isCancelled: false,
-        menuItem: { id: 80001, name: "Paneer Tikka Platter", price: "450.00", menuType: "Veg" },
+        id: 5,
+        quantity: 1,
+        unitPrice: "450.00",
+        totalPrice: "450.00",
+        notes: null,
+        isCancelled: false,
+        menuItem: {
+          id: 80001,
+          name: "Paneer Tikka Platter",
+          price: "450.00",
+          menuType: "Veg",
+        },
         subMenuItem: null,
       },
       {
-        id: 6, quantity: 2, unitPrice: "250.00", totalPrice: "500.00",
-        notes: "Spicy", isCancelled: false,
-        menuItem: { id: 90001, name: "Chicken Biryani", price: "250.00", menuType: "Non Veg" },
+        id: 6,
+        quantity: 2,
+        unitPrice: "250.00",
+        totalPrice: "500.00",
+        notes: "Spicy",
+        isCancelled: false,
+        menuItem: {
+          id: 90001,
+          name: "Chicken Biryani",
+          price: "250.00",
+          menuType: "Non Veg",
+        },
         subMenuItem: null,
       },
     ],
@@ -151,15 +225,28 @@ const SAMPLE: Order[] = [
     orderType: "DELIVERY",
     status: "CANCELLED",
     paymentStatus: "REFUNDED",
-    subtotal: "220.00", taxAmount: "11.00", discountAmount: "0",
-    serviceCharge: "0", timeChargeAmount: null, totalAmount: "231.00",
+    subtotal: "220.00",
+    taxAmount: "11.00",
+    discountAmount: "0",
+    serviceCharge: "0",
+    timeChargeAmount: null,
+    totalAmount: "231.00",
     notes: null,
     placedAt: "3 days ago",
     items: [
       {
-        id: 7, quantity: 1, unitPrice: "220.00", totalPrice: "220.00",
-        notes: null, isCancelled: true,
-        menuItem: { id: 30001, name: "Veg Cheese Burger Combo", price: "220.00", menuType: "Veg" },
+        id: 7,
+        quantity: 1,
+        unitPrice: "220.00",
+        totalPrice: "220.00",
+        notes: null,
+        isCancelled: true,
+        menuItem: {
+          id: 30001,
+          name: "Veg Cheese Burger Combo",
+          price: "220.00",
+          menuType: "Veg",
+        },
         subMenuItem: null,
       },
     ],
@@ -167,7 +254,11 @@ const SAMPLE: Order[] = [
 ];
 
 // ───────── Tracker steps ─────────
-const STEPS: Array<{ key: Order["status"]; label: string; icon: React.ElementType }> = [
+const STEPS: Array<{
+  key: Order["status"];
+  label: string;
+  icon: React.ElementType;
+}> = [
   { key: "PENDING", label: "Placed", icon: Receipt },
   { key: "PREPARING", label: "Preparing", icon: ChefHat },
   { key: "READY", label: "Ready", icon: Sparkles },
@@ -175,7 +266,10 @@ const STEPS: Array<{ key: Order["status"]; label: string; icon: React.ElementTyp
   { key: "COMPLETED", label: "Completed", icon: CheckCheck },
 ];
 
-const TYPE_META: Record<Order["orderType"], { label: string; icon: React.ElementType }> = {
+const TYPE_META: Record<
+  Order["orderType"],
+  { label: string; icon: React.ElementType }
+> = {
   DINE_IN: { label: "Dine-In", icon: Utensils },
   TAKEAWAY: { label: "Takeaway", icon: ShoppingBag },
   DELIVERY: { label: "Delivery", icon: Truck },
@@ -197,13 +291,22 @@ export default function CustomerOrdersPage() {
   const past = useMemo(() => SAMPLE.filter((o) => !isActive(o.status)), []);
   const list = tab === "active" ? active : past;
 
-  const totalSpent = SAMPLE
-    .filter((o) => o.status === "COMPLETED")
-    .reduce((s, o) => s + parseFloat(o.totalAmount), 0);
+  const totalSpent = SAMPLE.filter((o) => o.status === "COMPLETED").reduce(
+    (s, o) => s + parseFloat(o.totalAmount),
+    0,
+  );
+
+  const {
+    data: AllOrders,
+    isLoading: isTableWiseLoading,
+    isError: isTableWiseError,
+  } = useFetchOrders();
+
+  console.log(AllOrders,"orders");
+  
 
   return (
     <div className="flex min-h-screen bg-background">
-
       <main className="flex-1">
         {/* Header */}
         <div className="border-b border-border bg-card/40 px-8 py-5">
@@ -248,7 +351,9 @@ export default function CustomerOrdersPage() {
             <SummaryCard
               icon={<CheckCheck className="h-4 w-4" />}
               label="Completed"
-              value={String(SAMPLE.filter((o) => o.status === "COMPLETED").length)}
+              value={String(
+                SAMPLE.filter((o) => o.status === "COMPLETED").length,
+              )}
               tint="bg-emerald-500/10 text-emerald-600"
             />
             <SummaryCard
@@ -280,7 +385,9 @@ export default function CustomerOrdersPage() {
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                {t === "active" ? `Active (${active.length})` : `History (${past.length})`}
+                {t === "active"
+                  ? `Active (${active.length})`
+                  : `History (${past.length})`}
               </button>
             ))}
           </div>
@@ -302,12 +409,25 @@ export default function CustomerOrdersPage() {
 // ───────── Components ─────────
 
 function SummaryCard({
-  icon, label, value, tint,
-}: { icon: React.ReactNode; label: string; value: string; tint: string }) {
+  icon,
+  label,
+  value,
+  tint,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  tint: string;
+}) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4">
       <div className="flex items-center gap-2">
-        <span className={cn("flex h-7 w-7 items-center justify-center rounded-lg", tint)}>
+        <span
+          className={cn(
+            "flex h-7 w-7 items-center justify-center rounded-lg",
+            tint,
+          )}
+        >
           {icon}
         </span>
         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -550,15 +670,25 @@ function Tracker({ status }: { status: Order["status"] }) {
                   done && "border-primary bg-primary text-primary-foreground",
                   current &&
                     "border-primary bg-background text-primary ring-4 ring-primary/20 animate-pulse",
-                  !done && !current && "border-border bg-background text-muted-foreground",
+                  !done &&
+                    !current &&
+                    "border-border bg-background text-muted-foreground",
                 )}
               >
-                {done ? <CheckCheck className="h-4 w-4" /> : <Icon className="h-3.5 w-3.5" />}
+                {done ? (
+                  <CheckCheck className="h-4 w-4" />
+                ) : (
+                  <Icon className="h-3.5 w-3.5" />
+                )}
               </div>
               <p
                 className={cn(
                   "text-[10px] font-semibold uppercase tracking-wider",
-                  current ? "text-primary" : done ? "text-foreground" : "text-muted-foreground",
+                  current
+                    ? "text-primary"
+                    : done
+                      ? "text-foreground"
+                      : "text-muted-foreground",
                 )}
               >
                 {step.label}
