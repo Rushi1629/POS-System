@@ -1,21 +1,22 @@
 import { clearCartDB, saveCartToDB } from "@/lib/db";
-import { CartItem, CartState } from "@/types/cart-types";
+import {
+  CartItem,
+  CartState,
+  getCartKey,
+  normalizeCartItems,
+} from "@/types/cart-types";
 import { current, PayloadAction } from "@reduxjs/toolkit";
 
 export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
-  debugger;
   const item = action.payload;
+  const cartKey =
+    item.cartKey ?? getCartKey(item.id, item.extras, item.menuType);
 
-  const existingItem = state.items[item.id];
-
-  console.log(existingItem, "itemsexist");
+  const existingItem = state.items[cartKey];
 
   if (existingItem) {
-    // ✅ Increase main item quantity
     existingItem.quantity += 1;
-    existingItem.isUpdated = true;
 
-    // ✅ Handle extras
     if (item.extras?.length) {
       if (!existingItem.extras) existingItem.extras = [];
 
@@ -27,7 +28,6 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
         if (existingExtra) {
           existingExtra.quantity =
             (existingExtra.quantity || 0) + (newExtra.quantity || 1);
-            existingItem.isUpdated = true;
         } else {
           existingItem.extras?.push({
             ...newExtra,
@@ -37,48 +37,40 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
       });
     }
   } else {
-    // ✅ First time item
-    state.items[item.id] = {
+    state.items[cartKey] = {
       ...item,
+      cartKey,
       quantity: 1,
-      isUpdated: false,
+      originalQuantity: item.originalQuantity ?? 1,
       extras:
         item.extras?.map((e) => ({
           ...e,
           quantity: e.quantity || 1,
-          isUpdated: false,
         })) || [],
     };
   }
 };
 
-export const removeItem = (state: CartState, action: PayloadAction<number>) => {
-  const id = action.payload;
+export const removeItem = (state: CartState, action: PayloadAction<string>) => {
+  const cartKey = action.payload;
 
-  const existingItem = state.items[id];
+  const existingItem = state.items[cartKey];
   if (!existingItem) return;
 
   if (existingItem.quantity > 1) {
     existingItem.quantity -= 1;
-
-    // ✅ MARK UPDATED
-    existingItem.isUpdated = true;
-
   } else {
-    // ❗ Before deleting, mark updated if needed (optional logic)
-    existingItem.isUpdated = true;
-
-    delete state.items[id];
+    delete state.items[cartKey];
   }
 };
 
 export const updateItemNote = (
   state: CartState,
-  action: PayloadAction<{ id: number; notes?: string }>,
+  action: PayloadAction<{ cartKey: string; notes?: string }>,
 ) => {
-  const { id, notes } = action.payload;
-  if (!state.items[id]) return;
-  state.items[id].notes = notes;
+  const { cartKey, notes } = action.payload;
+  if (!state.items[cartKey]) return;
+  state.items[cartKey].notes = notes;
 };
 
 export const clearCart = (state: CartState) => {
@@ -89,5 +81,5 @@ export const setCart = (
   state: CartState,
   action: PayloadAction<Record<string, CartItem>>,
 ) => {
-  state.items = action.payload;
+  state.items = normalizeCartItems(action.payload);
 };

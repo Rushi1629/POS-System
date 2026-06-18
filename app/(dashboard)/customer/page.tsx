@@ -38,6 +38,7 @@ import {
 import { Label } from "@/components/ui/label";
 import ApiLoader from "@/components/ApiLoader";
 import { useProfile } from "@/client/hooks/useAuth";
+import { getCartKey } from "@/types/cart-types";
 
 export default function CustomerDashboard() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
@@ -128,6 +129,7 @@ export default function CustomerDashboard() {
       dispatch(
         addItemAction({
           id: item.id,
+          cartKey: getCartKey(item.id, [], item.menuType),
           name: item.name,
           price: item.price,
           quantity: 1,
@@ -170,7 +172,12 @@ export default function CustomerDashboard() {
 
     dispatch(
       addItemAction({
-        id: selectedItem.id, // ✅ FIXED (IMPORTANT)
+        id: selectedItem.id,
+        cartKey: getCartKey(
+          selectedItem.id,
+          selectedExtras,
+          selectedItem.menuType,
+        ),
         name: selectedItem.name,
         price: Number(selectedItem.price),
         quantity: 1,
@@ -183,7 +190,7 @@ export default function CustomerDashboard() {
 
     setSelectedItem(null);
     setSelectedExtras([]);
-  }, [dispatch, selectedItem, selectedExtras]);
+  }, [selectedItem, selectedExtras]);
 
   const extrasTotal = useMemo(() => {
     return selectedExtras.reduce(
@@ -193,10 +200,17 @@ export default function CustomerDashboard() {
   }, [selectedExtras]);
 
   const removeFromCart = useCallback(
-    (id: number) => {
-      dispatch(removeItemAction(id));
+    (id: number, menuType?: string) => {
+      const cartKey = [...Object.values(cart)]
+        .reverse()
+        .find(
+          (item) => item.id === id && item.menuType === menuType,
+        )?.cartKey;
+      if (cartKey) {
+        dispatch(removeItemAction(cartKey));
+      }
     },
-    [dispatch],
+    [cart],
   );
 
   const totalCartItems = useMemo(() => {
@@ -513,15 +527,15 @@ export default function CustomerDashboard() {
                       <MenuItemCard
                         key={item.id}
                         item={item}
-                        quantity={cart[item.id]?.quantity || 0}
-                        // quantity={Object.values(cart)
-                        //   .filter((c) =>
-                        //     c.id.toString().startsWith(item.id.toString()),
-                        //   )
-                        //   .reduce((sum, c) => sum + c.quantity, 0)}
-                        // onAdd={() => addToCart(item.id)}
+                        quantity={Object.values(cart)
+                          .filter(
+                            (cartItem) =>
+                              cartItem.id === item.id &&
+                              cartItem.menuType === item.menuType,
+                          )
+                          .reduce((sum, cartItem) => sum + cartItem.quantity, 0)}
                         onAdd={() => handleAdd(item)}
-                        onRemove={() => removeFromCart(item.id)}
+                        onRemove={() => removeFromCart(item.id, item.menuType)}
                       />
                     ))}
 

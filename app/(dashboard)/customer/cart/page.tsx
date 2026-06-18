@@ -76,15 +76,15 @@ const CartView = () => {
         tableId,
         notes: orderNotes || undefined,
         orderItems: items.map((item) => {
+          const isUpdated =
+            item.originalQuantity !== undefined &&
+            item.quantity !== item.originalQuantity;
 
           return {
             menuItemId: Number(item.id),
             quantity: item.quantity,
             notes: item.notes || undefined,
-
-            // ...(item.isUpdated && { isUpdated: true }),
-            isUpdated: item.isUpdated ?? false,
-
+            isUpdated,
             orderSubMenuItems:
               item.extras?.map((e) => ({
                 subMenuItemId: e.id,
@@ -159,14 +159,13 @@ const CartView = () => {
       <div className="flex-1 space-y-4">
         {items.map((item) => (
           <CartItemCard
-            // key={item.id}
-            key={generateCartKey(item)}
+            key={item.cartKey}
             item={item}
             onIncrement={() => dispatch(addItemAction(item))}
-            onDecrement={() => dispatch(removeItemAction(item.id))}
-            onRemove={() => dispatch(removeItemAction(item.id))}
+            onDecrement={() => dispatch(removeItemAction(item.cartKey))}
+            onRemove={() => dispatch(removeItemAction(item.cartKey))}
             onNoteChange={(notes) =>
-              dispatch(updateItemNoteAction({ id: Number(item.id), notes }))
+              dispatch(updateItemNoteAction({ cartKey: item.cartKey, notes }))
             }
           />
         ))}
