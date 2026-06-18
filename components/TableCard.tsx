@@ -307,7 +307,12 @@ export function TableCard({
 
       {/* 🧾 Seat Guests Dialog */}
       <Dialog open={seatDialog} onOpenChange={setSeatDialog}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent
+          className="sm:max-w-sm"
+          onInteractOutside={(e) => {
+            e.preventDefault();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Seat Guests at {table.name}</DialogTitle>
             <DialogDescription>

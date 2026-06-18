@@ -227,7 +227,12 @@ function MenuDialog({
         if (!loading) onOpenChange(o); // ✅ block close while saving
       }}
     >
-      <DialogContent className="sm:max-w-[640px] max-h-[90vh] flex flex-col">
+      <DialogContent
+        className="sm:max-w-[640px] max-h-[90vh] flex flex-col"
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-xl">
             {initial ? "Edit menu item" : "Create new menu item"}

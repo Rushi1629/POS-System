@@ -203,9 +203,7 @@ export default function CustomerDashboard() {
     (id: number, menuType?: string) => {
       const cartKey = [...Object.values(cart)]
         .reverse()
-        .find(
-          (item) => item.id === id && item.menuType === menuType,
-        )?.cartKey;
+        .find((item) => item.id === id && item.menuType === menuType)?.cartKey;
       if (cartKey) {
         dispatch(removeItemAction(cartKey));
       }
@@ -324,7 +322,12 @@ export default function CustomerDashboard() {
 
         {table && (
           <Dialog open={guestCountDialog}>
-            <DialogContent className="sm:max-w-sm max-w-lg max-h-[90vh] flex flex-col">
+            <DialogContent
+              className="sm:max-w-sm max-w-lg max-h-[90vh] flex flex-col"
+              onInteractOutside={(e) => {
+                e.preventDefault();
+              }}
+            >
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
@@ -533,7 +536,10 @@ export default function CustomerDashboard() {
                               cartItem.id === item.id &&
                               cartItem.menuType === item.menuType,
                           )
-                          .reduce((sum, cartItem) => sum + cartItem.quantity, 0)}
+                          .reduce(
+                            (sum, cartItem) => sum + cartItem.quantity,
+                            0,
+                          )}
                         onAdd={() => handleAdd(item)}
                         onRemove={() => removeFromCart(item.id, item.menuType)}
                       />

@@ -35,10 +35,10 @@ const baseSchema = {
     .max(30)
     .regex(/^[a-zA-Z0-9_]+$/, "Letters, numbers, underscores only"),
   email: z.string().trim().email("Invalid email").max(255),
- phoneNumber: z
-  .string()
-  .trim()
-  .regex(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"),
+  phoneNumber: z
+    .string()
+    .trim()
+    .regex(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"),
   role: z.enum(["Super Admin", "Admin", "Chef", "Waiter", "Customer"]),
   isActive: z.boolean(),
 };
@@ -118,7 +118,12 @@ export function UserFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[560px] p-0 overflow-hidden max-h-[85vh] flex flex-col">
+      <DialogContent
+        className="sm:max-w-[560px] p-0 overflow-hidden max-h-[85vh] flex flex-col"
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
+      >
         <DialogHeader className="border-b bg-muted/30 px-6 py-5">
           <DialogTitle className="text-lg">
             {mode === "create" ? "Create New User" : "Edit User"}

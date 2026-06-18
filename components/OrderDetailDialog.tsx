@@ -23,7 +23,12 @@ const OrderDetailDialog = ({
   const status = STATUS_META[order.orderStatus];
   return (
     <Dialog open={!!order} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-160 max-h-[90vh] flex flex-col">
+      <DialogContent
+        className="sm:max-w-160 max-h-[90vh] flex flex-col"
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Receipt className="h-5 w-5 text-primary" />

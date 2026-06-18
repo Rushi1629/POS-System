@@ -125,7 +125,12 @@ function CategoryDialog({
         if (!loading) onOpenChange(o); // ✅ block close while saving
       }}
     >
-      <DialogContent className="sm:max-w-[540px] max-h-[85vh] flex flex-col">
+      <DialogContent
+        className="sm:max-w-[540px] max-h-[85vh] flex flex-col"
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
+      >
         <DialogHeader className="shrink-0">
           <DialogTitle className="text-xl">
             {initial ? "Edit category" : "Create new category"}

@@ -106,7 +106,12 @@ function TableDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] flex flex-col">
+      <DialogContent
+        className="max-w-lg max-h-[90vh] flex flex-col"
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
+      >
         <DialogHeader>
           <DialogTitle>{initial ? "Edit Table" : "New Table"}</DialogTitle>
           <DialogDescription>
