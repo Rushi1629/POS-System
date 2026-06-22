@@ -16,9 +16,9 @@ export const useCreateOrder = () => {
   });
 };
 
-export const useFetchOrders = () => {
+export const useFetchActiveOrders = () => {
   return useQuery({
-    queryKey: ["orders"],
+    queryKey: ["active-orders"],
     queryFn: fetchAllOrders,
     refetchOnWindowFocus: false,
     retry: false,

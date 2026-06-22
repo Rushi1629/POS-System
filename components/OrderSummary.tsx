@@ -59,7 +59,7 @@ const OrderSummary = (props: OrderSummaryProps) => {
   const {
     itemCount,
     subtotal,
-    gstRate = 5,
+    gstRate = 0,
     orderNotes = "",
     onOrderNotesChange,
     isPlacingOrder = false,

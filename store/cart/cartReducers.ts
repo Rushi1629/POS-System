@@ -15,33 +15,25 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
   const existingItem = state.items[cartKey];
 
   if (existingItem) {
-    existingItem.quantity += 1;
+    const incrementBy = item.quantity ?? 1;
+    const newQuantity = existingItem.quantity + incrementBy;
 
-    if (item.extras?.length) {
-      if (!existingItem.extras) existingItem.extras = [];
+    existingItem.quantity = newQuantity;
 
-      item.extras.forEach((newExtra) => {
-        const existingExtra = existingItem.extras?.find(
-          (e) => e.id === newExtra.id,
-        );
-
-        if (existingExtra) {
-          existingExtra.quantity =
-            (existingExtra.quantity || 0) + (newExtra.quantity || 1);
-        } else {
-          existingItem.extras?.push({
-            ...newExtra,
-            quantity: newExtra.quantity || 1,
-          });
-        }
-      });
+    // ✅ FIX: do NOT rely blindly, ensure originalQuantity exists
+    if (existingItem.originalQuantity === undefined) {
+      existingItem.originalQuantity = existingItem.quantity - incrementBy;
     }
+
+    existingItem.isUpdated =
+      existingItem.quantity !== existingItem.originalQuantity;
   } else {
     state.items[cartKey] = {
       ...item,
       cartKey,
-      quantity: 1,
-      originalQuantity: item.originalQuantity ?? 1,
+      quantity: item.quantity || 1,
+      // originalQuantity: item.originalQuantity ?? (item.quantity || 1),
+      originalQuantity: item.quantity || 1,
       extras:
         item.extras?.map((e) => ({
           ...e,
@@ -53,15 +45,23 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
 
 export const removeItem = (state: CartState, action: PayloadAction<string>) => {
   const cartKey = action.payload;
-
   const existingItem = state.items[cartKey];
+
   if (!existingItem) return;
 
-  if (existingItem.quantity > 1) {
-    existingItem.quantity -= 1;
-  } else {
-    delete state.items[cartKey];
+  const newQuantity = existingItem.quantity - 1;
+
+  // ✅ DO NOT DELETE — keep item for cancellation tracking
+  existingItem.quantity = Math.max(newQuantity, 0);
+
+  // ✅ Ensure originalQuantity exists
+  if (existingItem.originalQuantity === undefined) {
+    existingItem.originalQuantity = existingItem.quantity + 1;
   }
+
+  // ✅ Mark updated
+  existingItem.isUpdated =
+    existingItem.quantity !== existingItem.originalQuantity;
 };
 
 export const updateItemNote = (
@@ -69,8 +69,12 @@ export const updateItemNote = (
   action: PayloadAction<{ cartKey: string; notes?: string }>,
 ) => {
   const { cartKey, notes } = action.payload;
-  if (!state.items[cartKey]) return;
-  state.items[cartKey].notes = notes;
+  const item = state.items[cartKey];
+
+  if (!item) return;
+
+  item.notes = notes;
+  item.isUpdated = true;
 };
 
 export const clearCart = (state: CartState) => {
@@ -81,5 +85,16 @@ export const setCart = (
   state: CartState,
   action: PayloadAction<Record<string, CartItem>>,
 ) => {
-  state.items = normalizeCartItems(action.payload);
+  const normalized = normalizeCartItems(action.payload);
+
+  Object.values(normalized).forEach((item) => {
+    if (item.originalQuantity === undefined) {
+      item.originalQuantity = item.quantity;
+    }
+
+    // ✅ IMPORTANT FIX
+    item.isUpdated = false;
+  });
+
+  state.items = normalized;
 };

@@ -14,11 +14,58 @@ import {
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchTableByTokenCustomer } from "@/client/hooks/useCustomer";
-import { useCreateOrder } from "@/client/hooks/useOrder";
+import { useCreateOrder, useFetchActiveOrders } from "@/client/hooks/useOrder";
 import { clearCartDB, loadCartFromDB, saveCartToDB } from "@/lib/db";
 import { setCartAction, updateItemNoteAction } from "@/store/cart/cartSlice";
 import ApiLoader from "@/components/ApiLoader";
-import { CartItem } from "@/types/cart-types";
+import { CartItem, getCartKey } from "@/types/cart-types";
+import { toast } from "sonner";
+
+// 🔽 ADD HERE (top of file, before CartView component)
+
+const mapOrdersToCart = (orders: any): Record<string, CartItem> => {
+  const cartItems: Record<string, CartItem> = {};
+  const ordersArray = Array.isArray(orders) ? orders : [orders];
+
+  ordersArray.forEach((order: any) => {
+    order.items
+      ?.filter((item: any) => !item.isCancelled)
+      .forEach((item: any) => {
+        const extras =
+          item.orderSubMenuItems
+            ?.filter((e: any) => !e.isCancelled)
+            .map((e: any) => ({
+              id: e.subMenuItem.id || e.subMenuItem.subMenuItemId,
+              name: e.subMenuItem.name,
+              price: Number(e.unitPrice), // ✅ FIXED
+              quantity: e.quantity,
+            })) || [];
+
+        const cartKey = getCartKey(
+          item.menuItem.id,
+          extras,
+          item.menuItem.menuType,
+        );
+
+        cartItems[cartKey] = {
+          id: item.menuItem.id,
+          name: item.menuItem.name,
+          description: "",
+          price: Number(item.unitPrice), // ✅ FIXED
+          quantity: item.quantity,
+          originalQuantity: item.quantity,
+          orderItemId: item.orderItemId,
+          extras,
+          notes: item.notes || undefined,
+          cartKey,
+          menuType: item.menuItem.menuType,
+          imageUrl: "",
+        };
+      });
+  });
+
+  return cartItems;
+};
 
 const CartView = () => {
   const dispatch = useDispatch();
@@ -33,6 +80,19 @@ const CartView = () => {
   }, []);
 
   const { data: tableData } = useFetchTableByTokenCustomer(tableToken);
+  const { data: ActiveOrders, refetch: refetchActiveOrders } =
+    useFetchActiveOrders();
+
+  useEffect(() => {
+    if (!ActiveOrders) return;
+
+    const mappedCart = mapOrdersToCart(ActiveOrders);
+
+    dispatch(setCartAction(mappedCart));
+  }, [ActiveOrders]);
+
+  console.log(ActiveOrders, "ActiveOrders");
+
   const tableId = tableData?.id;
 
   console.log(tableId, "datatable");
@@ -76,27 +136,36 @@ const CartView = () => {
         tableId,
         notes: orderNotes || undefined,
         orderItems: items.map((item) => {
-          const isUpdated =
-            item.originalQuantity !== undefined &&
-            item.quantity !== item.originalQuantity;
+          const isCancelled = item.quantity === 0;
 
           return {
             menuItemId: Number(item.id),
-            quantity: item.quantity,
+
+            // ✅ IMPORTANT FIX
+            quantity: isCancelled
+              ? item.originalQuantity || 1 // send old qty OR 1
+              : item.quantity,
+
+            ...(item.orderItemId && { orderItemId: item.orderItemId }),
+
+            ...(isCancelled && { isCancelled: true }),
+
             notes: item.notes || undefined,
-            isUpdated,
+
             orderSubMenuItems:
               item.extras?.map((e) => ({
                 subMenuItemId: e.id,
-                quantity: e.quantity || 1,
+                quantity: (e.quantity || 1) * item.quantity,
               })) || [],
           };
         }),
       });
       // dispatch(clearCartAction());
-      // await clearCartDB(tableToken ?? undefined);
-      setOrderSuccess("Order placed successfully.");
-      router.push(`/customer?tableToken=${tableToken}`);
+
+      await clearCartDB(tableToken ?? undefined);
+      await refetchActiveOrders();
+      toast.success("Order placed successfully.");
+      // router.push(`/customer?tableToken=${tableToken}`);
     } catch (err: any) {
       setOrderError(err?.message ?? "Failed to place order. Please try again.");
       setOrderSuccess("");
@@ -115,15 +184,27 @@ const CartView = () => {
 
   // ✅ Derived values (memoized)
   const { subtotal, totalQty } = useMemo(() => {
+    debugger;
     return items.reduce(
       (acc, item) => {
-        acc.subtotal += item.price * item.quantity;
+        const baseTotal = Number(item.price) * item.quantity;
+
+        const extrasPerItem =
+          (item.extras?.reduce((sum, e) => sum + e.price * e.quantity, 0) ||
+            0) / item.quantity;
+
+        // ✅ NO MULTIPLY HERE
+        const itemTotal = (item.price + extrasPerItem) * item.quantity;
+
+        acc.subtotal += itemTotal;
         acc.totalQty += item.quantity;
+
         return acc;
       },
       { subtotal: 0, totalQty: 0 },
     );
   }, [items]);
+
   // Load cart for this tableToken from IndexedDB on mount / when token changes
   useEffect(() => {
     if (!hasMounted) return;
@@ -161,7 +242,14 @@ const CartView = () => {
           <CartItemCard
             key={item.cartKey}
             item={item}
-            onIncrement={() => dispatch(addItemAction(item))}
+            onIncrement={() =>
+              dispatch(
+                addItemAction({
+                  ...item,
+                  quantity: 1, // ✅ ONLY increment by 1
+                }),
+              )
+            }
             onDecrement={() => dispatch(removeItemAction(item.cartKey))}
             onRemove={() => dispatch(removeItemAction(item.cartKey))}
             onNoteChange={(notes) =>

@@ -4,12 +4,15 @@ export type CartItem = {
   name: string;
   description?: string;
   price: number;
+  isUpdated?: boolean;
   quantity: number;
   originalQuantity?: number; // Track the starting quantity for update detection
   menuType?: "Veg" | "NonVeg";
   isBest?: boolean;
   imageUrl: string;
+  isCancelled?: boolean;
   notes?: string;
+  orderItemId?: number; // ⚠️ not in original type, but needed for mapping orders to cart 
   extras?: {
     id: number;
     name: string;
@@ -22,16 +25,9 @@ export const getCartKey = (
   extras?: { id: number }[],
   menuType?: "Veg" | "NonVeg",
 ) => {
-  const extrasKey = extras?.length
-    ? extras
-        .map((e) => e.id)
-        .sort((a, b) => a - b)
-        .join(",")
-    : "noextra";
-
+  // ✅ Don't include extras in key - merge all variants of same item
   const typeKey = menuType || "notype";
-
-  return `${id}-${typeKey}-${extrasKey}`;
+  return `${id}-${typeKey}`;
 };
 
 export const normalizeCartItems = (

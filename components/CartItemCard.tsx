@@ -21,16 +21,10 @@ const CartItemCard = ({
   onRemove,
   onNoteChange,
 }: CartItemCardProps) => {
-  
+const basePrice = Number(item.price) || 0;
+const quantity = Number(item.quantity) || 0;
 
-  const extrasTotal =
-    item.extras?.reduce((sum, e) => sum + (Number(e.price) || 0), 0) || 0;
-
-  const basePrice = Number(item.price) || 0;
-  const quantity = Number(item.quantity) || 0;
-
-  const singleItemTotal = basePrice + extrasTotal;
-  const total = singleItemTotal * quantity;
+const total = basePrice * quantity;
 
   return (
     <div className="group relative rounded-xl border border-border bg-card p-5 transition-all hover:shadow-md hover:border-primary/20">
@@ -110,11 +104,11 @@ const CartItemCard = ({
               <p className="text-lg font-bold tabular-nums text-primary">
                 ₹{total || 0}
               </p>
-              {item.quantity > 1 && (
+              {/* {item.quantity > 1 && (
                 <p className="text-xs text-muted-foreground">
                   ₹{singleItemTotal} × {item.quantity}
                 </p>
-              )}
+              )} */}
             </div>
           </div>
 

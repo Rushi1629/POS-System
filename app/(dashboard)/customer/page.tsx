@@ -53,6 +53,7 @@ export default function CustomerDashboard() {
 
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<any[]>([]);
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   const {
     data: tableData,
@@ -157,19 +158,6 @@ export default function CustomerDashboard() {
   const handleConfirmAdd = useCallback(() => {
     if (!selectedItem) return;
 
-    const extrasTotal = selectedExtras.reduce(
-      (sum, e) => sum + Number(e.price),
-      0,
-    );
-
-    const extrasKey = selectedExtras
-      .map((e) => e.id)
-      .sort()
-      .join("_");
-
-    const uniqueId =
-      selectedExtras.length > 0 ? `${selectedItem.id}` : `${selectedItem.id}`;
-
     dispatch(
       addItemAction({
         id: selectedItem.id,
@@ -180,7 +168,7 @@ export default function CustomerDashboard() {
         ),
         name: selectedItem.name,
         price: Number(selectedItem.price),
-        quantity: 1,
+        quantity: selectedQuantity,
         menuType: selectedItem.menuType,
         imageUrl: selectedItem.imageUrl,
         description: selectedItem.description,
@@ -190,11 +178,12 @@ export default function CustomerDashboard() {
 
     setSelectedItem(null);
     setSelectedExtras([]);
-  }, [selectedItem, selectedExtras]);
+    setSelectedQuantity(1);
+  }, [selectedItem, selectedExtras, selectedQuantity]);
 
   const extrasTotal = useMemo(() => {
     return selectedExtras.reduce(
-      (total, item) => total + Number(item.price),
+      (total, item) => total + Number(item.price) * (item.quantity ?? 1),
       0,
     );
   }, [selectedExtras]);
@@ -295,6 +284,37 @@ export default function CustomerDashboard() {
           quantity: 1,
         },
       ];
+    });
+  };
+
+  const handleExtraIncrement = (extra: any) => {
+    setSelectedExtras((prev) => {
+      const existing = prev.find((e) => e.id === extra.id);
+
+      if (existing) {
+        return prev.map((e) =>
+          e.id === extra.id ? { ...e, quantity: (e.quantity ?? 1) + 1 } : e,
+        );
+      }
+
+      return [...prev, { ...extra, quantity: 1 }];
+    });
+  };
+
+  const handleExtraDecrement = (extra: any) => {
+    setSelectedExtras((prev) => {
+      const existing = prev.find((e) => e.id === extra.id);
+
+      if (!existing) return prev;
+
+      if (existing.quantity === 1) {
+        // remove completely
+        return prev.filter((e) => e.id !== extra.id);
+      }
+
+      return prev.map((e) =>
+        e.id === extra.id ? { ...e, quantity: e.quantity - 1 } : e,
+      );
     });
   };
 
@@ -619,11 +639,26 @@ export default function CustomerDashboard() {
                       key={extra.id}
                       className="flex items-center gap-4 py-4 border-b"
                     >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => handleExtraClick(extra)}
-                      />
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => handleExtraDecrement(extra)}
+                          className="w-8 h-8 rounded-full border flex items-center justify-center"
+                        >
+                          -
+                        </button>
+
+                        <span className="w-5 text-center">
+                          {selectedExtras.find((e) => e.id === extra.id)
+                            ?.quantity || 0}
+                        </span>
+
+                        <button
+                          onClick={() => handleExtraIncrement(extra)}
+                          className="w-8 h-8 rounded-full border flex items-center justify-center"
+                        >
+                          +
+                        </button>
+                      </div>
 
                       <span className="flex-1">
                         <p className="font-semibold">{extra.name}</p>
