@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useFetchOrders } from "@/client/hooks/useOrder";
+import { useFetchActiveOrders } from "@/client/hooks/useOrder";
 
 // ───────── Types ─────────
 type MenuItem = { id: number; name: string; price: string; menuType: string };
@@ -300,7 +300,7 @@ export default function CustomerOrdersPage() {
     data: AllOrders,
     isLoading: isTableWiseLoading,
     isError: isTableWiseError,
-  } = useFetchOrders();
+  } = useFetchActiveOrders();
 
   console.log(AllOrders,"orders");
   
