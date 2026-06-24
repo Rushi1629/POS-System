@@ -21,10 +21,20 @@ const CartItemCard = ({
   onRemove,
   onNoteChange,
 }: CartItemCardProps) => {
-const basePrice = Number(item.price) || 0;
-const quantity = Number(item.quantity) || 0;
+  const basePrice = Number(item.price) || 0;
+  const quantity = Number(item.quantity) || 0;
 
-const total = basePrice * quantity;
+  const extrasTotal =
+    item.extras?.reduce(
+      (sum, e) => sum + Number(e.price) * (e.quantity || 1),
+      0,
+    ) || 0;
+
+  const total = basePrice * quantity + extrasTotal;
+
+  console.log(item, "item");
+  console.log(extrasTotal, "extrasTotal");
+  console.log(total, "total");
 
   return (
     <div className="group relative rounded-xl border border-border bg-card p-5 transition-all hover:shadow-md hover:border-primary/20">
@@ -79,8 +89,12 @@ const total = basePrice * quantity;
                         key={extra.id}
                         className="flex justify-between text-sm text-muted-foreground"
                       >
-                        <span>+ {extra.name}</span>
-                        <span>₹{extra.price}</span>
+                        <span>
+                          + {extra.name} × {extra.quantity}
+                        </span>
+                        <span>
+                          ₹{(extra.price * (extra.quantity || 1)).toFixed(2)}
+                        </span>
                       </div>
                     ))}
                   </div>

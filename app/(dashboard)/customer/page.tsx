@@ -156,6 +156,7 @@ export default function CustomerDashboard() {
   };
 
   const handleConfirmAdd = useCallback(() => {
+    debugger;
     if (!selectedItem) return;
 
     dispatch(
@@ -172,7 +173,10 @@ export default function CustomerDashboard() {
         menuType: selectedItem.menuType,
         imageUrl: selectedItem.imageUrl,
         description: selectedItem.description,
-        extras: selectedExtras,
+        extras: [...selectedExtras].map((e) => ({
+          ...e,
+          quantity: e.quantity || 1,
+        })),
       }),
     );
 
@@ -300,6 +304,8 @@ export default function CustomerDashboard() {
       return [...prev, { ...extra, quantity: 1 }];
     });
   };
+
+  console.log(selectedExtras, "SELECTED EXTRAS BEFORE ADD");
 
   const handleExtraDecrement = (extra: any) => {
     setSelectedExtras((prev) => {

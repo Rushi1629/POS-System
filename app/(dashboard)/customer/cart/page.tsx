@@ -37,7 +37,12 @@ const mapOrdersToCart = (orders: any): Record<string, CartItem> => {
             .map((e: any) => ({
               id: e.subMenuItem.id || e.subMenuItem.subMenuItemId,
               name: e.subMenuItem.name,
-              price: Number(e.unitPrice), // ✅ FIXED
+              // price: Number(e.unitPrice), // ✅ FIXED
+              price: Number(
+                e.unitPrice && Number(e.unitPrice) > 0
+                  ? e.unitPrice
+                  : e.subMenuItem?.price,
+              ),
               quantity: e.quantity,
             })) || [];
 
@@ -51,7 +56,9 @@ const mapOrdersToCart = (orders: any): Record<string, CartItem> => {
           id: item.menuItem.id,
           name: item.menuItem.name,
           description: "",
-          price: Number(item.unitPrice), // ✅ FIXED
+          price: Number(
+            item.unitPrice ?? item.menuItem?.price ?? 0, // ✅ FIX
+          ), // ✅ FIXED
           quantity: item.quantity,
           originalQuantity: item.quantity,
           orderItemId: item.orderItemId,
@@ -152,11 +159,12 @@ const CartView = () => {
 
             notes: item.notes || undefined,
 
-            orderSubMenuItems:
-              item.extras?.map((e) => ({
-                subMenuItemId: e.id,
-                quantity: (e.quantity || 1) * item.quantity,
-              })) || [],
+            orderSubMenuItems: Array.isArray(item.extras)
+              ? item.extras.map((e) => ({
+                  subMenuItemId: e.id,
+                  quantity: e.quantity || 1,
+                }))
+              : [],
           };
         }),
       });
@@ -170,15 +178,7 @@ const CartView = () => {
       setOrderError(err?.message ?? "Failed to place order. Please try again.");
       setOrderSuccess("");
     }
-  }, [items, placeOrder, tableId, router]);
-
-  const generateCartKey = (item: CartItem) => {
-    return `${item.id}-${
-      item.extras?.map((e) => e.id).join(",") || "noextra"
-    }-${
-      item.extras?.map((s) => s.id).join(",") || "nosub"
-    }-${item.notes || "nonote"}`;
-  };
+  }, [items, placeOrder, tableId, router, orderNotes]);
 
   console.log(items, "items");
 
