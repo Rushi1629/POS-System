@@ -33,9 +33,6 @@ import EmptyEmptyState from "@/components/EmptyState";
 import SummaryCard from "@/components/SummaryCard";
 import OrderCardCustomer from "@/components/OrderCardCustomer";
 
-export function statusIndex(s: Order["orderStatus"]) {
-  return STEPS.findIndex((x) => x.key === s);
-}
 
 function isActive(s: Order["orderStatus"]) {
   return s !== "COMPLETED" && s !== "CANCELLED";

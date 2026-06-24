@@ -1,6 +1,6 @@
-import { statusIndex } from "@/app/(dashboard)/customer-order/page";
 import { cn } from "@/lib/utils";
 import { Order, STEPS } from "@/types/customer-order-types";
+import { statusIndex } from "@/utils/utils";
 import { CheckCheck, CircleDot } from "lucide-react";
 import React from "react";
 

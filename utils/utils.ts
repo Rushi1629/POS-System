@@ -1,3 +1,5 @@
+import { Order, STEPS } from "@/types/customer-order-types";
+
 // 🧠 Timer formatter
 function formatDuration(startTime: string) {
   const start = new Date(startTime).getTime();
@@ -44,4 +46,9 @@ function formatMinutes(minutes: number): string {
 const fmt = (n: number | string) =>
   `₹${Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-export { formatDuration, getPageNumbers, delay, formatMinutes, fmt };
+function statusIndex(s: Order["orderStatus"]) {
+  return STEPS.findIndex((x) => x.key === s);
+}
+
+
+export { formatDuration, getPageNumbers, delay, formatMinutes, fmt, statusIndex };
