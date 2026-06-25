@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -39,7 +39,17 @@ export default function Sidebar() {
   const logoutMutation = useLogout();
   // const user = useAppSelector((state) => state.auth.user);
   const queryClient = useQueryClient();
-  const { data: user, isLoading, isError } = useProfile({ enabled: pathname !== "/customer" });
+  const {
+    data: user,
+    isLoading,    
+    isError,
+  } = useProfile({ enabled: !pathname.startsWith("/customer"), });
+
+  useEffect(() => {
+    if (user) {
+      router.push("/user-management");
+    }
+  }, [user, router]);
 
   const handleLogout = async () => {
     try {

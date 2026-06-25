@@ -24,14 +24,14 @@ export default function DashboardLayout({
 
   const searchParams = useSearchParams();
   const tableToken = searchParams?.get("tableToken");
-  
+
   const {
     data: tableData,
     isLoading: isLoadingTable,
     isError: isTableError,
   } = useFetchTableByTokenCustomer(tableToken);
 
-  const table = tableData;  
+  const table = tableData;
 
   useEffect(() => {
     const load = async () => {

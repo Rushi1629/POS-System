@@ -16,17 +16,30 @@ export default function AuthInitializer({ children }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useAppDispatch();
-  
+
   // Disable profile fetch for public customer routes (QR-based sessions)
   // Profile is only needed for authenticated staff routes
-  const isPublicCustomerRoute = pathname === "/customer" || pathname.startsWith("/customer/");
-  
-  const { data: user, isLoading, isError, refetch } = useProfile({ enabled: !isPublicCustomerRoute });
+  const isPublicCustomerRoute = pathname.startsWith("/customer");
+
+  const {
+    data: user,
+    isLoading,
+    isError,
+    refetch,
+  } = useProfile({ enabled: !isPublicCustomerRoute });
+
+  useEffect(() => {
+    if (user) {
+      router.push("/user-management");
+    }
+  }, [user, router]);
 
   useEffect(() => {
     // Public routes that should NOT trigger profile fetch or redirects
     const publicPaths = ["/customer", "/login", "/register"];
-    if (publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+    if (
+      publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))
+    ) {
       return;
     }
 

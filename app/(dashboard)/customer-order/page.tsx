@@ -32,7 +32,9 @@ import { Order, STEPS } from "@/types/customer-order-types";
 import EmptyEmptyState from "@/components/EmptyState";
 import SummaryCard from "@/components/SummaryCard";
 import OrderCardCustomer from "@/components/OrderCardCustomer";
-
+import { useProfile } from "@/client/hooks/useAuth";
+import { useFetchTableByTokenCustomer } from "@/client/hooks/useCustomer";
+import { useSearchParams } from "next/navigation";
 
 function isActive(s: Order["orderStatus"]) {
   return s !== "COMPLETED" && s !== "CANCELLED";
@@ -43,6 +45,17 @@ export default function CustomerOrdersPage() {
     isLoading: isTableWiseLoading,
     isError: isTableWiseError,
   } = useFetchActiveOrders();
+  const searchParams = useSearchParams();
+
+  const tableToken = searchParams?.get("tableToken");
+
+  const {
+    data: tableData,
+    isLoading: isLoadingTable,
+    refetch: refetchTable,
+  } = useFetchTableByTokenCustomer(tableToken);
+
+  const { data: profile } = useProfile({ enabled: !tableToken });
 
   console.log(ActiveOrders, "orders");
 
