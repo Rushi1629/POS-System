@@ -20,26 +20,26 @@ import {
   useUpdateOrderStatus,
 } from "@/client/hooks/useOrder";
 
-const transformOrders = (data: TableOrder[]): KOrder[] => {
-  return data.flatMap((table) =>
-    table.orders.map((order) => ({
-      id: order.orderId,
-      table: table.tableName,
-      orderNumber: order.orderNumber,
-      placedAt: new Date().toISOString(), // or use API time if available
-      status: order.orderStatus,
+function transformOrders(data: any[]): KOrder[] {
+  return data.map((table) => ({
+    id: table.tableId,
+    table: table.tableName,
+    orderNumber: table.orders?.[0]?.orderNumber || "",
+    placedAt: table.orders?.[0]?.createdAt || "",
+    status: table.orders?.[0]?.orderStatus || "PENDING",
 
-      items: order.items.map((item) => ({
+    items: table.orders.flatMap((order: any) =>
+      order.items.map((item: any) => ({
         id: item.orderItemId,
-        name: item.menuItem.name,
+        name: item.menuItem?.name || "Item",
         qty: item.quantity,
-        note: item.notes ?? "",
+        note: item.notes || "",
         status: item.orderItemStatus,
         isCancelled: item.isCancelled ?? false,
       })),
-    })),
-  );
-};
+    ),
+  }));
+}
 
 export default function page() {
   const {
