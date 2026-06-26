@@ -29,12 +29,6 @@ export default function AuthInitializer({ children }: Props) {
   } = useProfile({ enabled: !isPublicCustomerRoute });
 
   useEffect(() => {
-    if (user) {
-      router.push("/user-management");
-    }
-  }, [user, router]);
-
-  useEffect(() => {
     // Public routes that should NOT trigger profile fetch or redirects
     const publicPaths = ["/customer", "/login", "/register"];
     if (
@@ -49,12 +43,12 @@ export default function AuthInitializer({ children }: Props) {
     // 🚫 Wait until loading finishes
     if (isLoading) return;
 
-    // ❌ If error → logout (only redirect when not already on login/register)
-    if (isError) {
+    // 🧠 Wait until we know user OR confirmed error
+    if (!user && !isError) return;
+
+    if (isError && !user) {
       dispatch(clearUser());
-      if (pathname !== "/login" && pathname !== "/register") {
-        router.replace("/login");
-      }
+      router.replace("/login");
       return;
     }
 
@@ -69,7 +63,9 @@ export default function AuthInitializer({ children }: Props) {
     // }
 
     // ✅ Set user in store
-    dispatch(setUser(user));
+    if (user) {
+      dispatch(setUser(user));
+    }
 
     // ✅ Redirect logged-in user away from login page
     if (user && pathname === "/login") {

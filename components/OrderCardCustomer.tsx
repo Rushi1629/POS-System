@@ -15,7 +15,11 @@ import {
 } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
-import { Order, TYPE_META } from "@/types/customer-order-types";
+import {
+  Order,
+  ORDER_ITEM_STATUS_META,
+  TYPE_META,
+} from "@/types/customer-order-types";
 import Tracker from "./Tracker";
 
 const OrderCardCustomer = ({ order }: { order: Order }) => {
@@ -113,6 +117,8 @@ const OrderCardCustomer = ({ order }: { order: Order }) => {
       <div className="divide-y divide-border px-5">
         {order.items.map((it) => {
           const veg = it.menuItem.menuType === "Veg";
+          const statusMeta = ORDER_ITEM_STATUS_META[it.orderItemStatus];
+
           return (
             <div key={it.id} className="flex items-start gap-3 py-3">
               <span
@@ -132,7 +138,7 @@ const OrderCardCustomer = ({ order }: { order: Order }) => {
                 <div className="flex items-baseline justify-between gap-3">
                   <p
                     className={cn(
-                      "truncate text-sm font-semibold",
+                      "truncate text-sm font-semibold flex gap-2",
                       it.isCancelled && "line-through text-muted-foreground",
                     )}
                   >
@@ -140,6 +146,20 @@ const OrderCardCustomer = ({ order }: { order: Order }) => {
                       {it.quantity}×
                     </span>
                     {it.menuItem.name}
+                    {it.isCancelled ? (
+                      <Badge className="bg-destructive/10 text-destructive text-[10px]">
+                        Cancelled
+                      </Badge>
+                    ) : (
+                      <Badge
+                        className={cn(
+                          "rounded-full border-0 text-[10px]",
+                          statusMeta.className,
+                        )}
+                      >
+                        {statusMeta.label}
+                      </Badge>
+                    )}
                   </p>
                   <p className="shrink-0 text-sm font-semibold tabular-nums">
                     ₹{parseFloat(it.totalPrice).toFixed(2)}

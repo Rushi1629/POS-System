@@ -1,11 +1,87 @@
-export type ItemStatus = "PENDING" | "ACCEPTED" | "PREPARING" | "READY" | "SERVED";
-export type OrderStatus = "PENDING" | "ACCEPTED" | "PREPARING" | "READY" | "SERVED";
+import { Role, UserRole } from "./types";
+
+export type ItemStatus =
+  | "PENDING"
+  | "ACCEPTED"
+  | "PREPARING"
+  | "READY"
+  | "SERVED"
+  | "COMPLETED"
+  | "CANCELLED";
+export type OrderStatus =
+  | "PENDING"
+  | "ACCEPTED"
+  | "PREPARING"
+  | "READY"
+  | "SERVED"
+  | "COMPLETED"
+  | "CANCELLED";
+
+export type TableOrder = {
+  tableId: number;
+  tableName: string;
+  orders: Order[];
+};
+
+export type Order = {
+  orderId: number;
+  orderStatus: OrderStatus;
+  tableId: number;
+  orderNumber: string;
+  orderType: string;
+  paymentStatus: string;
+  subtotal: string;
+  taxAmount: string;
+  discountAmount: string;
+  serviceCharge: string;
+  timeChargeAmount: string | null;
+  totalAmount: string;
+  notes: string | null;
+  items: OrderItem[];
+};
+
+export type OrderItem = {
+  orderItemId: number;
+  orderItemStatus: ItemStatus;
+  orderId: number;
+  quantity: number;
+  unitPrice: string;
+  totalPrice: string;
+  notes: string | null;
+  isCancelled: boolean;
+  menuItem: MenuItem;
+  orderSubMenuItems: SubMenuItem[];
+};
+
+export type MenuItem = {
+  menuItemId: number;
+  id: number;
+  name: string;
+  price: string;
+  menuType: string;
+};
+
+export type SubMenuItem = {
+  orderSubMenuItemId: number;
+  quantity: number;
+  unitPrice: string;
+  totalPrice: string;
+  notes: string | null;
+  isCancelled: boolean;
+  subMenuItem: {
+    subMenuItemId: number;
+    id: number;
+    name: string;
+    price: string;
+  };
+};
 
 export type KItem = {
   id: number;
   name: string;
   qty: number;
   note?: string;
+  isCancelled: boolean;
   status: ItemStatus;
 };
 
@@ -23,7 +99,9 @@ export const NEXT: Record<ItemStatus, ItemStatus | null> = {
   ACCEPTED: "PREPARING",
   PREPARING: "READY",
   READY: "SERVED",
-  SERVED: null,
+  CANCELLED: "CANCELLED",
+  COMPLETED: "COMPLETED",
+  SERVED: "SERVED",
 };
 
 export const STATUS_STYLES: Record<
@@ -60,4 +138,55 @@ export const STATUS_STYLES: Record<
     dot: "bg-muted-foreground/50",
     accent: "from-muted-foreground/30 to-transparent",
   },
+  COMPLETED: {
+    label: "Completed",
+    chip: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30",
+    dot: "bg-emerald-500",
+    accent: "from-emerald-500/60 to-emerald-500/0",
+  },
+  CANCELLED: {
+    label: "Cancelled",
+    chip: "bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30",
+    dot: "bg-rose-500",
+    accent: "from-rose-500/60 to-rose-500/0",
+  },
 };
+
+type StatusTransition = {
+  from: OrderStatus | "ANY";
+  to: OrderStatus;
+  roles: UserRole[];
+};
+
+export const STATUS_TRANSITIONS: StatusTransition[] = [
+  {
+    from: "PENDING",
+    to: "ACCEPTED",
+    roles: ["Admin", "Super Admin"],
+  },
+  {
+    from: "ACCEPTED",
+    to: "PREPARING",
+    roles: ["Chef"],
+  },
+  {
+    from: "PREPARING",
+    to: "READY",
+    roles: ["Chef"],
+  },
+  {
+    from: "READY",
+    to: "SERVED",
+    roles: ["Waiter"],
+  },
+  {
+    from: "SERVED",
+    to: "COMPLETED",
+    roles: ["Admin", "Super Admin"],
+  },
+  {
+    from: "ANY",
+    to: "CANCELLED",
+    roles: ["Admin", "Waiter"],
+  },
+];

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createOrder, fetchAllOrders, fetchAllOrdersTableWise } from "../services/order.service";
+import { createOrder, fetchAllOrders, fetchAllOrdersTableWise, updateOrderStatus } from "../services/order.service";
 
 export const useCreateOrder = () => {
   const queryClient = useQueryClient();
@@ -33,5 +33,22 @@ export const useFetchOrdersTableWise = () => {
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,
+  });
+};
+
+export const useUpdateOrderStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateOrderStatus,
+
+    onSuccess: () => {
+      // 🔥 Refetch orders after update
+      queryClient.invalidateQueries({ queryKey: ["orders-table-wise"] });
+    },
+
+    onError: (error) => {
+      console.error("Update failed", error);
+    },
   });
 };

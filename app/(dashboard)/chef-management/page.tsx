@@ -1,19 +1,7 @@
 "use client";
-import { useMemo, useState } from "react";
-import {
-  ChefHat,
-  Clock,
-  Check,
-  StickyNote,
-  ArrowRight,
-  Flame,
-  Timer,
-  CheckCheck,
-  Search,
-} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ChefHat, Flame, Timer, CheckCheck, Search } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import StatCard from "@/components/StatCard";
@@ -23,58 +11,52 @@ import {
   NEXT,
   OrderStatus,
   STATUS_STYLES,
+  TableOrder,
 } from "@/types/chef-types";
 import ChefCard from "@/components/ChefCard";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  useFetchOrdersTableWise,
+  useUpdateOrderStatus,
+} from "@/client/hooks/useOrder";
 
-const SEED: KOrder[] = [
-  {
-    id: 1,
-    table: "Table 2",
-    orderNumber: "ORD-1024",
-    placedAt: "10:35 AM",
-    status: "PREPARING",
-    items: [
-      { id: 1, name: "Butter Chicken", qty: 1, status: "PREPARING" },
-      {
-        id: 2,
-        name: "Garlic Naan",
-        qty: 3,
-        note: "Extra crispy",
-        status: "READY",
-      },
-      { id: 3, name: "Mango Lassi", qty: 2, status: "SERVED" },
-    ],
-  },
-  {
-    id: 2,
-    table: "Table 6",
-    orderNumber: "ORD-1025",
-    placedAt: "11:10 AM",
-    status: "ACCEPTED",
-    items: [
-      { id: 4, name: "Biryani", qty: 2, status: "PENDING" },
-      { id: 5, name: "Paneer Tikka", qty: 1, status: "ACCEPTED" },
-      { id: 6, name: "Masala Chai", qty: 4, status: "READY" },
-    ],
-  },
-  {
-    id: 3,
-    table: "Table 9",
-    orderNumber: "ORD-1026",
-    placedAt: "09:50 AM",
-    status: "PREPARING",
-    items: [
-      { id: 7, name: "Dal Makhani", qty: 2, status: "PREPARING" },
-      { id: 8, name: "Palak Paneer", qty: 1, status: "PREPARING" },
-      { id: 9, name: "Garlic Naan", qty: 6, status: "PENDING" },
-      { id: 10, name: "Gulab Jamun", qty: 3, status: "PENDING" },
-    ],
-  },
-];
+const transformOrders = (data: TableOrder[]): KOrder[] => {
+  return data.flatMap((table) =>
+    table.orders.map((order) => ({
+      id: order.orderId,
+      table: table.tableName,
+      orderNumber: order.orderNumber,
+      placedAt: new Date().toISOString(), // or use API time if available
+      status: order.orderStatus,
+
+      items: order.items.map((item) => ({
+        id: item.orderItemId,
+        name: item.menuItem.name,
+        qty: item.quantity,
+        note: item.notes ?? "",
+        status: item.orderItemStatus,
+        isCancelled: item.isCancelled ?? false,
+      })),
+    })),
+  );
+};
 
 export default function page() {
-  const [orders, setOrders] = useState<KOrder[]>(SEED);
+  const {
+    data: TableWiseOrders,
+    isLoading: isTableWiseLoading,
+    isError: isTableWiseError,
+  } = useFetchOrdersTableWise();
+  const { mutate: updateStatus, isPending } = useUpdateOrderStatus();
+
+  const [orders, setOrders] = useState<KOrder[]>([]);
+
+  useEffect(() => {
+    if (TableWiseOrders) {
+      const formatted = transformOrders(TableWiseOrders.data);
+      setOrders(formatted);
+    }
+  }, [TableWiseOrders]);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | OrderStatus>("all");
 
@@ -105,11 +87,25 @@ export default function page() {
     setOrders((prev) =>
       prev.map((o) => {
         if (o.id !== orderId) return o;
+
         const items = o.items.map((i) => {
           if (i.id !== itemId) return i;
+
           const next = NEXT[i.status];
-          return next ? { ...i, status: next } : i;
+
+          if (next) {
+            // 🔥 API CALL HERE
+            updateStatus({
+              orderItemId: i.id,
+              status: next,
+            });
+
+            return { ...i, status: next }; // optimistic UI
+          }
+
+          return i;
         });
+
         return { ...o, items };
       }),
     );
@@ -119,10 +115,23 @@ export default function page() {
     setOrders((prev) =>
       prev.map((o) => {
         if (o.id !== orderId) return o;
+
         const items = o.items.map((i) => {
           const next = NEXT[i.status];
-          return next ? { ...i, status: next } : i;
+
+          if (next) {
+            // 🔥 API CALL FOR EACH ITEM
+            updateStatus({
+              orderItemId: i.id,
+              status: next,
+            });
+
+            return { ...i, status: next };
+          }
+
+          return i;
         });
+
         return { ...o, items };
       }),
     );

@@ -35,7 +35,6 @@ export const fetchAllOrders = async (): Promise<CustomerOrder[]> => {
   }));
 };
 
-
 export const fetchAllOrdersTableWise =
   async (): Promise<GetOrdersResponseAdminChef> => {
     const res = await fetcher("/order/table-orders");
@@ -43,3 +42,21 @@ export const fetchAllOrdersTableWise =
 
     return res;
   };
+
+export const updateOrderStatus = async ({
+  orderItemId,
+  status,
+}: {
+  orderItemId: number;
+  status: string;
+}) => {
+  const res = await fetcher(`/order/order-item`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      orderItemId,
+      status,
+    }),
+  });
+
+  return res;
+};

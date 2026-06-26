@@ -196,8 +196,14 @@ export default function CustomerOrdersPage() {
               icon={<CheckCheck className="h-4 w-4" />}
               label="Completed"
               value={String(
-                ActiveOrders?.filter((o) => o.orderStatus === "COMPLETED")
-                  .length ?? 0,
+                ActiveOrders?.reduce((count, order) => {
+                  return (
+                    count +
+                    order.items.filter(
+                      (item: any) => item.orderItemStatus === "COMPLETED",
+                    ).length
+                  );
+                }, 0) ?? 0,
               )}
               tint="bg-emerald-500/10 text-emerald-600"
             />

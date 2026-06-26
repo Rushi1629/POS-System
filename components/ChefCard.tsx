@@ -51,6 +51,7 @@ const ChefCard = ({
         {order.items.map((item) => {
           const s = STATUS_STYLES[item.status];
           const next = NEXT[item.status];
+          const isCancelled = item.isCancelled;
           return (
             <div
               key={item.id}
@@ -63,6 +64,11 @@ const ChefCard = ({
                   <span className="text-xs font-medium text-muted-foreground">
                     ×{item.qty}
                   </span>
+                  {isCancelled && (
+                    <span className="text-[10px] font-semibold text-red-500">
+                      Cancelled
+                    </span>
+                  )}
                 </div>
                 {item.note && (
                   <p className="mt-0.5 flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-300">
@@ -74,18 +80,17 @@ const ChefCard = ({
               <Badge variant="outline" className={cn("border", s.chip)}>
                 {s.label}
               </Badge>
-              {next ? (
+              {!isCancelled && next ? (
                 <Button
                   size="icon"
                   variant="ghost"
                   className="h-7 w-7 rounded-full hover:bg-primary/10 hover:text-primary"
                   onClick={() => onAdvance(item.id)}
-                  title={`Move to ${STATUS_STYLES[next].label}`}
                 >
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               ) : (
-                <div className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground">
+                <div className="flex h-7 w-7 items-center justify-center text-muted-foreground">
                   <Check className="h-4 w-4" />
                 </div>
               )}

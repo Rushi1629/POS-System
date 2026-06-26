@@ -39,7 +39,7 @@ export const useProfile = (options?: any) => {
     queryFn: fetchUserProfile,
     refetchOnWindowFocus: false,
     retry: false,
-    staleTime: 0, // 🔥 IMPORTANT (always fresh)
+    staleTime: 5 * 60 * 1000,
     ...(options || {}),
   });
 };

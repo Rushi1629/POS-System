@@ -45,12 +45,6 @@ export default function Sidebar() {
     isError,
   } = useProfile({ enabled: !pathname.startsWith("/customer"), });
 
-  useEffect(() => {
-    if (user) {
-      router.push("/user-management");
-    }
-  }, [user, router]);
-
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();

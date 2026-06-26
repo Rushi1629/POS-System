@@ -14,6 +14,7 @@ export type OrderItem = {
   notes: string | null;
   orderItemStatus:
     | "PENDING"
+    | "ACCEPTED"
     | "PREPARING"
     | "READY"
     | "SERVED"
@@ -32,6 +33,7 @@ export type Order = {
   tableId: number;
   orderStatus:
     | "PENDING"
+    | "ACCEPTED"
     | "PREPARING"
     | "READY"
     | "SERVED"
@@ -59,11 +61,47 @@ export const STEPS: Array<{
   icon: React.ElementType;
 }> = [
   { key: "PENDING", label: "Placed", icon: Receipt },
+  { key: "ACCEPTED", label: "Accepted", icon: CheckCheck },
   { key: "PREPARING", label: "Preparing", icon: ChefHat },
   { key: "READY", label: "Ready", icon: Sparkles },
   { key: "SERVED", label: "Served", icon: Utensils },
   { key: "COMPLETED", label: "Completed", icon: CheckCheck },
 ];
+export type OrderItemStatus = OrderItem["orderItemStatus"];
+
+export const ORDER_ITEM_STATUS_META: Record<
+  OrderItemStatus,
+  { label: string; className: string }
+> = {
+  PENDING: {
+    label: "Placed",
+    className: "bg-gray-100 text-gray-600",
+  },
+  ACCEPTED: {
+    label: "Accepted",
+    className: "bg-emerald-100 text-emerald-700",
+  },
+  PREPARING: {
+    label: "Preparing",
+    className: "bg-amber-100 text-amber-700",
+  },
+  READY: {
+    label: "Ready",
+    className: "bg-blue-100 text-blue-700",
+  },
+  SERVED: {
+    label: "Served",
+    className: "bg-purple-100 text-purple-700",
+  },
+  COMPLETED: {
+    label: "Completed",
+    className: "bg-emerald-100 text-emerald-700",
+  },
+  CANCELLED: {
+    label: "Cancelled",
+    className: "bg-destructive/10 text-destructive",
+  },
+};
 
 export const TYPE_META: Record<
   Order["orderType"],
