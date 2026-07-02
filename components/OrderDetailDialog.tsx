@@ -40,7 +40,7 @@ const OrderDetailDialog = ({
               {status.label}
             </Badge>
           </DialogTitle>
-          <DialogDescription className="font-mono text-xs">
+          <DialogDescription className="text-xs">
             {order.orderNumber}
           </DialogDescription>
         </DialogHeader>

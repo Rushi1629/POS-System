@@ -53,7 +53,7 @@ export default function UsersPage() {
 
   const { mutateAsync: createUserMutation } = useCreateUser();
 
-  const { data: users = [], isLoading, error } = useFetchUsers();
+  const { data: users = [], isLoading: isFetchingUsers, error } = useFetchUsers();
 
   const { data: roles = [] } = useFetchRoles();
 
@@ -62,7 +62,7 @@ export default function UsersPage() {
   const { mutateAsync: editUser } = useEditUser();
 
   const stats = useMemo(() => {
-    const admins = users.filter((u) => u.role === "Admin").length;
+    const admins = users.filter((u) => u.role === "Super Admin").length;
 
     const recent = users.filter(
       (u) =>
@@ -91,7 +91,7 @@ export default function UsersPage() {
     setLoadingForm(false);
   };
 
-  if (isLoading) {
+  if (isFetchingUsers) {
     return <ApiLoader message="Loading users..." />;
   }
 

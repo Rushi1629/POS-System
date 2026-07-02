@@ -43,17 +43,34 @@ export const fetchAllOrdersTableWise =
     return res;
   };
 
-export const updateOrderStatus = async ({
+export const updateOrderItemStatus = async ({
   orderItemId,
   status,
 }: {
   orderItemId: number;
   status: string;
 }) => {
-  const res = await fetcher(`/order/order-item`, {
+  const res = await fetcher(`/order/order-item-status`, {
     method: "PATCH",
     body: JSON.stringify({
       orderItemId,
+      status,
+    }),
+  });
+
+  return res;
+};
+export const updateOrderStatus = async ({
+  orderId,
+  status,
+}: {
+  orderId: number;
+  status: string;
+}) => {
+  const res = await fetcher(`/order/order-status`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      orderId,
       status,
     }),
   });

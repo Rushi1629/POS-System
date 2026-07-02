@@ -234,6 +234,10 @@ const CartView = () => {
     return <ApiLoader message="Loading your Cart items..." />;
   }
 
+  if (isPlacingOrder) {
+    return <ApiLoader message="Placing your order..." />;
+  }
+
   return (
     <div className="flex flex-col xl:flex-row gap-8">
       {/* 🧾 Items */}

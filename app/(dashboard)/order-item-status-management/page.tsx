@@ -17,8 +17,13 @@ import ChefCard from "@/components/ChefCard";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   useFetchOrdersTableWise,
-  useUpdateOrderStatus,
+  useUpdateItemOrderStatus,
 } from "@/client/hooks/useOrder";
+import { getNextStatus } from "@/utils/utils";
+import { useProfile } from "@/client/hooks/useAuth";
+import { useSearchParams } from "next/navigation";
+import { UserRole } from "@/types/types";
+import { toast } from "sonner";
 
 function transformOrders(data: any[]): KOrder[] {
   return data.map((table) => ({
@@ -47,9 +52,23 @@ export default function page() {
     isLoading: isTableWiseLoading,
     isError: isTableWiseError,
   } = useFetchOrdersTableWise();
-  const { mutate: updateStatus, isPending } = useUpdateOrderStatus();
+  const { mutate: updateStatus, isPending } = useUpdateItemOrderStatus();
+  const searchParams = useSearchParams();
+
+  const tableToken = searchParams?.get("tableToken");
+
+  const { data: profile } = useProfile({ enabled: !tableToken });
 
   const [orders, setOrders] = useState<KOrder[]>([]);
+
+  const role = profile?.role?.name as UserRole | undefined;
+
+  if (!role) {
+    console.warn("Role not loaded yet");
+    return;
+  }
+
+  console.log(role, "role");
 
   useEffect(() => {
     if (TableWiseOrders) {
@@ -84,6 +103,13 @@ export default function page() {
   }, [orders]);
 
   const advanceItem = (orderId: number, itemId: number) => {
+    if (!role) {
+      toast.error("Role not loaded yet");
+      return;
+    }
+
+    let errorShown = false;
+
     setOrders((prev) =>
       prev.map((o) => {
         if (o.id !== orderId) return o;
@@ -91,19 +117,44 @@ export default function page() {
         const items = o.items.map((i) => {
           if (i.id !== itemId) return i;
 
-          const next = NEXT[i.status];
-
-          if (next) {
-            // 🔥 API CALL HERE
-            updateStatus({
-              orderItemId: i.id,
-              status: next,
-            });
-
-            return { ...i, status: next }; // optimistic UI
+          // 🚫 Cancelled check
+          if (i.isCancelled) {
+            if (!errorShown) {
+              toast.error(`${i.name} is cancelled`);
+              errorShown = true;
+            }
+            return i;
           }
 
-          return i;
+          const next = getNextStatus(i.status, role);
+
+          if (!next) {
+            // ✅ show only once
+            if (!errorShown) {
+              toast.error(
+                `Not allowed: ${role} cannot move ${i.name} from ${i.status}`,
+              );
+              errorShown = true;
+            }
+            return i;
+          }
+
+          updateStatus(
+            {
+              orderItemId: i.id,
+              status: next,
+            },
+            {
+              onSuccess: () => {
+                toast.success(`${i.name} moved to ${next}`);
+              },
+              onError: () => {
+                toast.error("Failed to update status");
+              },
+            },
+          );
+
+          return { ...i, status: next };
         });
 
         return { ...o, items };
@@ -117,19 +168,33 @@ export default function page() {
         if (o.id !== orderId) return o;
 
         const items = o.items.map((i) => {
-          const next = NEXT[i.status];
-
-          if (next) {
-            // 🔥 API CALL FOR EACH ITEM
-            updateStatus({
-              orderItemId: i.id,
-              status: next,
-            });
-
-            return { ...i, status: next };
+          // 🚫 CORRECT CHECK (use isCancelled)
+          if (i.isCancelled) {
+            return i;
           }
 
-          return i;
+          const next = getNextStatus(i.status, role);
+
+          if (!next) {
+            return i;
+          }
+
+          updateStatus(
+            {
+              orderItemId: i.id,
+              status: next,
+            },
+            {
+              onSuccess: () => {
+                toast.success(`${i.name} moved to ${next}`);
+              },
+              onError: () => {
+                toast.error(`Failed to update ${i.name}`);
+              },
+            },
+          );
+
+          return { ...i, status: next };
         });
 
         return { ...o, items };
@@ -142,7 +207,7 @@ export default function page() {
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Chef Station
+            Order Item Status Management
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Track tickets in real-time and bump items as they progress.
@@ -231,13 +296,24 @@ export default function page() {
 
       {filtered.length === 0 && (
         <div className="flex mt-6 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 p-16 text-center">
-          <ChefHat className="h-10 w-10 text-muted-foreground" />
-          <p className="mt-3 text-sm font-medium">
-            No tickets match your filter
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Try clearing the search or filter.
-          </p>
+          {isTableWiseLoading ? (
+            <>
+              <div className="h-14 w-14 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+              <h3 className="mt-4 text-lg font-semibold">
+                Loading order items...
+              </h3>
+            </>
+          ) : (
+            <>
+              <ChefHat className="h-10 w-10 text-muted-foreground" />
+              <p className="mt-3 text-sm font-medium">
+                No tickets match your filter
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Try clearing the search or filter.
+              </p>
+            </>
+          )}
         </div>
       )}
     </div>

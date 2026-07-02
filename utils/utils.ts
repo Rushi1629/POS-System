@@ -1,4 +1,6 @@
+import { ItemStatus, STATUS_TRANSITIONS } from "@/types/chef-types";
 import { Order, STEPS } from "@/types/customer-order-types";
+import { UserRole } from "@/types/types";
 
 // 🧠 Timer formatter
 function formatDuration(startTime: string) {
@@ -13,7 +15,10 @@ function formatDuration(startTime: string) {
   return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m ${secs}s`;
 }
 
-function getPageNumbers(current: number, total: number): Array<number | "ellipsis"> {
+function getPageNumbers(
+  current: number,
+  total: number,
+): Array<number | "ellipsis"> {
   const pages: Array<number | "ellipsis"> = [];
   if (total <= 7) {
     for (let i = 1; i <= total; i++) pages.push(i);
@@ -50,5 +55,26 @@ function statusIndex(s: Order["orderStatus"]) {
   return STEPS.findIndex((x) => x.key === s);
 }
 
+function getNextStatus(
+  current: ItemStatus,
+  role: UserRole,
+  isCancelled?: boolean,
+): ItemStatus | null {
+  if (isCancelled) return null;
 
-export { formatDuration, getPageNumbers, delay, formatMinutes, fmt, statusIndex };
+  const transition = STATUS_TRANSITIONS.find(
+    (t) => (t.from === current || t.from === "ANY") && t.roles.includes(role),
+  );
+
+  return transition ? (transition.to as ItemStatus) : null;
+}
+
+export {
+  formatDuration,
+  getPageNumbers,
+  delay,
+  formatMinutes,
+  fmt,
+  statusIndex,
+  getNextStatus,
+};

@@ -85,7 +85,7 @@ import { isEqual } from "lodash-es";
 import TableStatusCustom from "@/components/TableStatus";
 
 function Tables() {
-  const { data: tables = [] } = useFetchTables();
+  const { data: tables = [], isLoading: isTableLoading } = useFetchTables();
   console.log(tables, "tables");
 
   const { mutateAsync: createTable, isPending: isCreating } = useCreateTable();
@@ -452,16 +452,27 @@ function Tables() {
       {filtered.length === 0 ? (
         <Card className="mt-6 border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Table2 className="h-6 w-6" />
-            </div>
-            <h3 className="mt-4 text-lg font-semibold">No tables found</h3>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Try adjusting your filters, or create your first table.
-            </p>
-            <Button onClick={openCreate} className="mt-5 gap-2">
-              <Plus className="h-4 w-4" /> New Table
-            </Button>
+            {isTableLoading ? (
+              <>
+                <div className="h-14 w-14 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+                <h3 className="mt-4 text-lg font-semibold">
+                  Loading table items...
+                </h3>
+              </>
+            ) : (
+              <>
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <Table2 className="h-6 w-6" />
+                </div>
+                <h3 className="mt-4 text-lg font-semibold">No tables found</h3>
+                <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                  Try adjusting your filters, or create your first table.
+                </p>
+                <Button onClick={openCreate} className="mt-5 gap-2">
+                  <Plus className="h-4 w-4" /> New Table
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
       ) : (

@@ -35,6 +35,7 @@ import OrderCardCustomer from "@/components/OrderCardCustomer";
 import { useProfile } from "@/client/hooks/useAuth";
 import { useFetchTableByTokenCustomer } from "@/client/hooks/useCustomer";
 import { useSearchParams } from "next/navigation";
+import ApiLoader from "@/components/ApiLoader";
 
 function isActive(s: Order["orderStatus"]) {
   return s !== "COMPLETED" && s !== "CANCELLED";
@@ -148,6 +149,10 @@ export default function CustomerOrdersPage() {
       0,
     );
   }, [mappedOrders]);
+
+  if (isTableWiseLoading) {
+    return <ApiLoader message="Loading your orders..." />;
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
