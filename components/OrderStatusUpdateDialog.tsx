@@ -5,7 +5,13 @@ import {
   OrderStatus,
 } from "@/types/order-status-types";
 import React from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
 import OrderStausStatusBadge from "./OrderStausStatusBadge";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -32,32 +38,38 @@ const OrderStatusUpdateDialog = ({
   onClose: () => void;
   onConfirm: () => void;
 }) => {
-  const item = target?.item;
-  const allowed = item ? getAllowedTransitions(item.orderItemStatus, role) : [];
+  const allowed = target ? getAllowedTransitions(target.orderStatus, role) : [];
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent
+        className={cn(
+          "w-[95vw] sm:max-w-[560px]", // mobile full width
+          "max-h-[90vh] flex flex-col overflow-hidden",
+          "p-0",
+        )}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
+        <DialogHeader className="border-b bg-muted/30 px-4 sm:px-6 py-4">
           <DialogTitle>Update order status</DialogTitle>
           <DialogDescription>
-            {item ? (
+            {target && (
               <>
                 <span className="font-medium text-foreground">
-                  {item.menuItem.name}
+                  Order #{target.orderNumber ?? target.orderId}
                 </span>{" "}
-                · {target?.tableName} · order #{item.orderId}
+                · {target.tableName}
               </>
-            ) : null}
+            )}
           </DialogDescription>
         </DialogHeader>
 
-        {item && (
-          <div className="space-y-4">
+        {target && (
+          <div className="flex-1 overflow-y-auto no-scrollbar px-4 sm:px-6 py-4 space-y-4">
             <div className="flex items-center justify-between rounded-xl border border-border bg-muted/50 px-4 py-3">
               <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                Current
+                Current order status
               </div>
-              <OrderStausStatusBadge status={item.orderItemStatus} />
+              <OrderStausStatusBadge status={target.orderStatus} />
             </div>
 
             <div>
@@ -95,22 +107,32 @@ const OrderStatusUpdateDialog = ({
                 })}
                 {allowed.length === 0 && (
                   <p className="col-span-2 rounded-xl border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
-                    No transitions available for the “{role}” role from{" "}
-                    <strong>{item.orderItemStatus}</strong>.
+                    No order transitions are available for the “{role}” role
+                    from <strong>{target.orderStatus}</strong>.
                   </p>
                 )}
               </div>
             </div>
 
-            <OrderStatusWorkflow current={item.orderItemStatus} next={pending} />
+            <OrderStatusWorkflow current={target.orderStatus} next={pending} />
           </div>
         )}
 
-        <div className="mt-2 flex justify-end gap-2">
-          <Button variant="ghost" onClick={onClose} disabled={submitting}>
+        <div className="border-t px-4 sm:px-6 py-3 flex flex-col sm:flex-row gap-2 sm:justify-end">
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            disabled={submitting}
+            className="w-full sm:w-auto"
+          >
             Cancel
           </Button>
-          <Button onClick={onConfirm} disabled={!pending || submitting}>
+
+          <Button
+            onClick={onConfirm}
+            disabled={!pending || submitting}
+            className="w-full sm:w-auto"
+          >
             {submitting ? "Updating…" : "Confirm update"}
           </Button>
         </div>

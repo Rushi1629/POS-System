@@ -15,7 +15,7 @@ const OrderStatusWorkflow = ({
       <p className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">
         Workflow
       </p>
-      <div className="flex items-center gap-1 overflow-x-auto">
+      <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
         {STATUS_ORDER.map((s, i) => {
           const isCurrent = s === current;
           const isNext = s === next;

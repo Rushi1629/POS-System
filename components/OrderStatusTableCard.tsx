@@ -1,8 +1,8 @@
-import { OrderItem, OrderStatus, TableOrders } from "@/types/order-status-types";
+import { Order, OrderItem, OrderStatus, TableOrders } from "@/types/order-status-types";
 import { UserRole } from "@/types/types";
 import React from "react";
-import OrderStatusItemRow from "./OrderStatusItemRow";
 import OrderStausStatusBadge from "./OrderStausStatusBadge";
+import { cn } from "@/lib/utils";
 
 const OrderStatusTableCard = ({
   table,
@@ -11,7 +11,7 @@ const OrderStatusTableCard = ({
 }: {
   table: TableOrders;
   role: UserRole;
-  onPick: (item: OrderItem, status: OrderStatus) => void;
+  onPick: (order: Order) => void;
 }) => {
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
@@ -39,21 +39,67 @@ const OrderStatusTableCard = ({
                 </span>
                 <OrderStausStatusBadge status={order.orderStatus} />
               </div>
-              <div className="text-sm">
-                <span className="text-muted-foreground">Total </span>
-                <span className="font-semibold">₹{order.totalAmount}</span>
+              <div className="flex items-center gap-4">
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Total </span>
+                  <span className="font-semibold">₹{order.totalAmount}</span>
+                </div>
+                <button
+                  onClick={() => onPick(order)}
+                  className="inline-flex items-center gap-2 rounded-lg border border-primary bg-primary/10 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/20 transition-colors"
+                >
+                  Update Order Status
+                </button>
               </div>
             </div>
 
-            <div className="space-y-2">
-              {order.items.map((item) => (
-                <OrderStatusItemRow
-                  key={item.orderItemId}
-                  item={item}
-                  role={role}
-                  onPick={onPick}
-                />
-              ))}
+            <div className="space-y-2 opacity-75">
+              {order.items.map((item) => {
+                const cancelled =
+                  item.isCancelled || item.orderItemStatus === "CANCELLED";
+                return (
+                  <div
+                    key={item.orderItemId}
+                    className={cn(
+                      "flex flex-wrap items-center gap-4 rounded-xl border border-transparent bg-background/30 px-4 py-3",
+                      cancelled && "opacity-60",
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "flex h-8 w-8 items-center justify-center rounded-lg text-sm",
+                        item.menuItem.menuType === "Veg"
+                          ? "bg-emerald-500/20 text-emerald-600"
+                          : "bg-rose-500/20 text-rose-600",
+                      )}
+                    >
+                      {item.menuItem.menuType === "Veg" ? "🥬" : "🔥"}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p
+                          className={cn(
+                            "truncate font-medium text-sm",
+                            cancelled && "line-through",
+                          )}
+                        >
+                          {item.menuItem.name}
+                        </p>
+                        <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                          ×{item.quantity}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-right text-xs">
+                      <p className="font-semibold">₹{item.totalPrice}</p>
+                    </div>
+
+                    <OrderStausStatusBadge status={item.orderItemStatus} />
+                  </div>
+                );
+              })}
             </div>
           </div>
         ))}

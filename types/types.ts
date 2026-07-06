@@ -365,7 +365,7 @@ export const navItems: NavItem[] = [
     icon: ChefHat,
     href: "/order-item-status-management",
     group: "Management",
-    roles: ["Super Admin"],
+    roles: ["Super Admin","Chef","Waiter"],
   },
   {
     id: "nav-order-status-management",
@@ -373,7 +373,7 @@ export const navItems: NavItem[] = [
     icon: ChefHat,
     href: "/order-status-management",
     group: "Management",
-    roles: ["Super Admin"],
+    roles: ["Super Admin","Chef","Waiter"],
   },
   {
     id: "nav-customer-management",

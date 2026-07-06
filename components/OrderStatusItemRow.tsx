@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import {
   getAllowedTransitions,
   labelFor,
+  Order,
   OrderItem,
   OrderStatus,
 } from "@/types/order-status-types";
@@ -13,12 +14,14 @@ import { UserRole } from "@/types/types";
 
 const OrderStatusItemRow = ({
   item,
+  order,
   role,
   onPick,
 }: {
   item: OrderItem;
+  order: Order;
   role: UserRole;
-  onPick: (item: OrderItem, status: OrderStatus) => void;
+  onPick: (order: Order, item: OrderItem, status: OrderStatus) => void;
 }) => {
   const allowed = item.isCancelled
     ? []
@@ -93,7 +96,7 @@ const OrderStatusItemRow = ({
                   next === "CANCELLED" &&
                     "border-status-cancelled-foreground/30 text-status-cancelled-foreground hover:bg-status-cancelled",
                 )}
-                onClick={() => onPick(item, next)}
+                onClick={() => onPick(order, item, next)}
               >
                 {next === "CANCELLED" ? (
                   <X className="size-3.5" />

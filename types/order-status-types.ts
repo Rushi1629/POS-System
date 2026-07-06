@@ -17,11 +17,11 @@ export interface StatusTransition {
 
 export const STATUS_TRANSITIONS: StatusTransition[] = [
   { from: "PENDING", to: "ACCEPTED", roles: ["Admin", "Super Admin"] },
-  { from: "ACCEPTED", to: "PREPARING", roles: ["Chef"] },
-  { from: "PREPARING", to: "READY", roles: ["Chef"] },
-  { from: "READY", to: "SERVED", roles: ["Waiter"] },
+  { from: "ACCEPTED", to: "PREPARING", roles: ["Chef", "Super Admin"] },
+  { from: "PREPARING", to: "READY", roles: ["Chef", "Super Admin"] },
+  { from: "READY", to: "SERVED", roles: ["Waiter", "Super Admin"] },
   { from: "SERVED", to: "COMPLETED", roles: ["Admin", "Super Admin"] },
-  { from: "ANY", to: "CANCELLED", roles: ["Admin", "Waiter"] },
+  { from: "ANY", to: "CANCELLED", roles: ["Admin", "Waiter", "Super Admin"] },
 ];
 
 export const ALL_ROLES: UserRole[] = ["Super Admin", "Admin", "Chef", "Waiter"];
@@ -63,8 +63,10 @@ export interface UpdateStatusPayload {
 }
 
 export interface ActiveTarget {
-  item: OrderItem;
+  orderId: number;
+  orderStatus: OrderStatus;
   tableName: string;
+  orderNumber?: string;
 }
 
 export interface SubMenuItem {

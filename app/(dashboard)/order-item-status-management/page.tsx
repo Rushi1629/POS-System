@@ -103,6 +103,7 @@ export default function page() {
   }, [orders]);
 
   const advanceItem = (orderId: number, itemId: number) => {
+    debugger;
     if (!role) {
       toast.error("Role not loaded yet");
       return;
@@ -162,45 +163,45 @@ export default function page() {
     );
   };
 
-  const bumpAll = (orderId: number) => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id !== orderId) return o;
+  // const bumpAll = (orderId: number) => {
+  //   setOrders((prev) =>
+  //     prev.map((o) => {
+  //       if (o.id !== orderId) return o;
 
-        const items = o.items.map((i) => {
-          // 🚫 CORRECT CHECK (use isCancelled)
-          if (i.isCancelled) {
-            return i;
-          }
+  //       const items = o.items.map((i) => {
+  //         // 🚫 CORRECT CHECK (use isCancelled)
+  //         if (i.isCancelled) {
+  //           return i;
+  //         }
 
-          const next = getNextStatus(i.status, role);
+  //         const next = getNextStatus(i.status, role);
 
-          if (!next) {
-            return i;
-          }
+  //         if (!next) {
+  //           return i;
+  //         }
 
-          updateStatus(
-            {
-              orderItemId: i.id,
-              status: next,
-            },
-            {
-              onSuccess: () => {
-                toast.success(`${i.name} moved to ${next}`);
-              },
-              onError: () => {
-                toast.error(`Failed to update ${i.name}`);
-              },
-            },
-          );
+  //         updateStatus(
+  //           {
+  //             orderItemId: i.id,
+  //             status: next,
+  //           },
+  //           {
+  //             onSuccess: () => {
+  //               toast.success(`${i.name} moved to ${next}`);
+  //             },
+  //             onError: () => {
+  //               toast.error(`Failed to update ${i.name}`);
+  //             },
+  //           },
+  //         );
 
-          return { ...i, status: next };
-        });
+  //         return { ...i, status: next };
+  //       });
 
-        return { ...o, items };
-      }),
-    );
-  };
+  //       return { ...o, items };
+  //     }),
+  //   );
+  // };
 
   return (
     <div className="">
@@ -289,7 +290,7 @@ export default function page() {
             key={o.id}
             order={o}
             onAdvance={(itemId) => advanceItem(o.id, itemId)}
-            onBumpAll={() => bumpAll(o.id)}
+            // onBumpAll={() => bumpAll(o.id)}
           />
         ))}
       </div>

@@ -9,11 +9,11 @@ import { Button } from "./ui/button";
 const ChefCard = ({
   order,
   onAdvance,
-  onBumpAll,
+  // onBumpAll,
 }: {
   order: KOrder;
   onAdvance: (itemId: number) => void;
-  onBumpAll: () => void;
+  // onBumpAll: () => void;
 }) => {
   const allServed = order.items.every((i) => i.status === "SERVED");
   const headerTone = STATUS_STYLES[order.status as ItemStatus];
@@ -104,7 +104,7 @@ const ChefCard = ({
         <p className="text-xs text-muted-foreground">
           {order.items.length} items
         </p>
-        <Button
+        {/* <Button
           size="sm"
           variant={allServed ? "outline" : "default"}
           disabled={allServed}
@@ -113,7 +113,7 @@ const ChefCard = ({
         >
           {allServed ? "Completed" : "Bump all"}
           {!allServed && <ArrowRight className="ml-1 h-3.5 w-3.5" />}
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

@@ -1,12 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import {
-  CircleDot,
-  Clock,
-  Receipt,
-  Soup,
-} from "lucide-react";
+import { CircleDot, Clock, Receipt, Soup } from "lucide-react";
 import {
   ActiveTarget,
   OrderItem,
@@ -22,10 +17,13 @@ import {
   useUpdateOrderStatus,
 } from "@/client/hooks/useOrder";
 import ApiLoader from "@/components/ApiLoader";
+import { useProfile } from "@/client/hooks/useAuth";
 
 export default function page() {
   const { mutate: updateOrderStatus, isPending: isUpdateOrderPending } =
     useUpdateOrderStatus();
+
+  const { data: profile } = useProfile();
 
   const {
     data: TableWiseOrders,
@@ -96,7 +94,7 @@ export default function page() {
     setTables(mapped);
   }, [TableWiseOrders]);
 
-  const [role, setRole] = useState<UserRole>("Super Admin");
+  const role = (profile?.role?.name as UserRole | undefined) ?? "Super Admin";
   const [tables, setTables] = useState<TableOrders[]>([]);
   const [target, setTarget] = useState<ActiveTarget | null>(null);
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null);
@@ -117,22 +115,13 @@ export default function page() {
     };
   }, [tables]);
 
-  function applyStatus(item: OrderItem, status: OrderStatus) {
+  function applyStatus(orderId: number, status: OrderStatus) {
     setTables((prev) =>
       prev.map((t) => ({
         ...t,
-        orders: t.orders.map((o) => ({
-          ...o,
-          items: o.items.map((i) =>
-            i.orderItemId === item.orderItemId
-              ? {
-                  ...i,
-                  orderItemStatus: status,
-                  isCancelled: status === "CANCELLED",
-                }
-              : i,
-          ),
-        })),
+        orders: t.orders.map((o) =>
+          o.orderId === orderId ? { ...o, orderStatus: status } : o,
+        ),
       })),
     );
   }
@@ -142,12 +131,12 @@ export default function page() {
     setSubmitting(true);
     try {
       await updateOrderStatus({
-        orderId: target.item.orderId, // ✅ correct
+        orderId: target.orderId,
         status: pendingStatus,
       });
-      applyStatus(target.item, pendingStatus);
-      toast.success(`Status updated to ${pendingStatus}`, {
-        description: `${target.item.menuItem.name} • ${target.tableName}`,
+      applyStatus(target.orderId, pendingStatus);
+      toast.success(`Order status updated to ${pendingStatus}`, {
+        description: `${target.orderNumber ?? `Order #${target.orderId}`} • ${target.tableName}`,
       });
       setTarget(null);
       setPendingStatus(null);
@@ -174,7 +163,7 @@ export default function page() {
             Order Status Management
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            Live kitchen & service queue — update item status by role.
+            Update order status across the entire order from one place.
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-xs text-muted-foreground">
@@ -216,9 +205,14 @@ export default function page() {
             key={table.tableId}
             table={table}
             role={role}
-            onPick={(item, status) => {
-              setTarget({ item, tableName: table.tableName });
-              setPendingStatus(status);
+            onPick={(order) => {
+              setTarget({
+                orderId: order.orderId,
+                orderStatus: order.orderStatus,
+                tableName: table.tableName,
+                orderNumber: order.orderNumber,
+              });
+              setPendingStatus(null);
             }}
           />
         ))}
