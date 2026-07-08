@@ -8,8 +8,8 @@ const Tracker = ({ status }: { status: Order["orderStatus"] }) => {
   const idx = Math.max(0, statusIndex(status));
 
   return (
-    <div className="border-t border-border bg-background px-5 py-5">
-      <div className="relative flex items-start justify-between">
+    <div className="border-t border-border bg-background px-2 py-5">
+      <div className="relative flex items-start justify-between flex-wrap">
         {/* progress line */}
         <div className="absolute left-5 right-5 top-4 h-0.5 bg-border" />
         <div

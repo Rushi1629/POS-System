@@ -89,10 +89,12 @@ input:-internal-autofill-selected {
   scrollbar-width: none; /* Firefox */
 }
 
-:where(.custom-space-y>:not(:last-child)) {
-    --tw-space-y-reverse: 0;
-    margin-block-start: calc(calc(.25rem * 6) * var(--tw-space-y-reverse));
-    margin-block-end: calc(calc(.25rem * 6) * calc(1 - var(--tw-space-y-reverse)));
+:where(.custom-space-y > :not(:last-child)) {
+  --tw-space-y-reverse: 0;
+  margin-block-start: calc(calc(0.25rem * 6) * var(--tw-space-y-reverse));
+  margin-block-end: calc(
+    calc(0.25rem * 6) * calc(1 - var(--tw-space-y-reverse))
+  );
 }
 
 /* ✅ FINAL CLEAN VERSION */
@@ -121,13 +123,13 @@ input:-internal-autofill-selected {
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+  /* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-input[type=number] {
-    -moz-appearance:textfield; /* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
 }
 
 @theme inline {
@@ -177,23 +179,23 @@ input[type=number] {
 :root {
   --radius: 0.75rem;
   /* Cafe POS theme: warm cream content, dark sidebar, amber/orange accent */
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.18 0.02 60);
+  --background: oklch(0.985 0.008 80);
+  --foreground: oklch(0.22 0.02 60);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 60);
+  --card-foreground: oklch(0.22 0.02 60);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 60);
+  --popover-foreground: oklch(0.22 0.02 60);
   --primary: oklch(0.72 0.18 55);
-  --primary-foreground: oklch(0.99 0.01 80);
+  --primary-foreground: oklch(1 0 0);
   --primary-glow: oklch(0.78 0.16 65);
-  --secondary: oklch(0.95 0.015 75);
-  --secondary-foreground: oklch(0.22 0.03 60);
-  --muted: oklch(0.95 0.012 80);
-  --muted-foreground: oklch(0.5 0.02 60);
-  --accent: oklch(0.93 0.04 75);
-  --accent-foreground: oklch(0.22 0.04 55);
-  --destructive: oklch(0.6 0.22 27);
-  --destructive-foreground: oklch(0.99 0.01 80);
+  --secondary: oklch(0.96 0.02 80);
+  --secondary-foreground: oklch(0.3 0.04 60);
+  --muted: oklch(0.96 0.015 80);
+  --muted-foreground: oklch(0.52 0.02 60);
+  --accent: oklch(0.95 0.04 70);
+  --accent-foreground: oklch(0.3 0.06 50);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.9 0.012 75);
   --input: oklch(0.9 0.012 75);
   --ring: oklch(0.72 0.18 55);
@@ -253,6 +255,11 @@ input[type=number] {
   --sidebar-accent-foreground: oklch(0.96 0.012 75);
   --sidebar-border: oklch(0.24 0.016 60);
   --sidebar-ring: oklch(0.75 0.17 58);
-  --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-glow));
-  --shadow-elegant: 0 10px 30px -10px color-mix(in oklab, var(--primary) 40%, transparent);
+  --gradient-primary: linear-gradient(
+    135deg,
+    var(--primary),
+    var(--primary-glow)
+  );
+  --shadow-elegant: 0 10px 30px -10px
+    color-mix(in oklab, var(--primary) 40%, transparent);
 }

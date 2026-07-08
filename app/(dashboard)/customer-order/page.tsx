@@ -155,10 +155,9 @@ export default function CustomerOrdersPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <main className="flex-1">
+    <div className="">
         {/* Header */}
-        <div className="border-b border-border bg-card/40 px-8 py-5">
+        <div className="border-b border-border bg-card/40">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Link
@@ -177,12 +176,12 @@ export default function CustomerOrdersPage() {
 
             <div className="flex items-center gap-2">
               <Button asChild variant="outline" className="rounded-full">
-                <Link href="/customer">
+                <Link href={`/customer?tableToken=${tableToken}`}>
                   <Utensils className="mr-1.5 h-4 w-4" /> Order More
                 </Link>
               </Button>
               <Button asChild className="rounded-full">
-                <Link href="/customer/cart">
+                <Link href={`/customer/cart?tableToken=${tableToken}`}>
                   <ShoppingBag className="mr-1.5 h-4 w-4" /> View Cart
                 </Link>
               </Button>
@@ -228,7 +227,7 @@ export default function CustomerOrdersPage() {
         </div>
 
         {/* Tabs */}
-        <div className="px-8 pt-6">
+        <div className="my-5">
           <div className="inline-flex rounded-full border border-border bg-card p-1">
             {(["active", "past"] as const).map((t) => (
               <button
@@ -250,14 +249,13 @@ export default function CustomerOrdersPage() {
         </div>
 
         {/* List */}
-        <div className="space-y-5 px-8 py-6">
+        <div className="space-y-5">
           {list.length === 0 ? (
             <EmptyEmptyState tab={tab} />
           ) : (
             list.map((o) => <OrderCardCustomer key={o.id} order={o} />)
           )}
         </div>
-      </main>
     </div>
   );
 }

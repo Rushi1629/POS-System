@@ -45,6 +45,13 @@ export default function Sidebar() {
     isError,
   } = useProfile({ enabled: !pathname.startsWith("/customer"), });
 
+  console.log(user,"user sidebar");
+
+  const profileIcon = user?.name[0]?.toUpperCase();
+
+  console.log("Sidebar user profile:", profileIcon);
+  
+
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
@@ -215,14 +222,14 @@ export default function Sidebar() {
             className={`flex items-center gap-2 px-2 py-2 mt-1 rounded-lg bg-stone-800 ${collapsed ? "justify-center" : ""}`}
           >
             <div className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center text-stone-900 text-xs font-bold shrink-0">
-              MA
+              {profileIcon}
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-stone-200 truncate">
                   {user?.username || "Manager Account"}
                 </p>
-                <p className="text-xs text-stone-500 truncate">Admin</p>
+                <p className="text-xs text-stone-500 truncate">{user?.role?.name}</p>
               </div>
             )}
             {!collapsed && (

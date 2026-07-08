@@ -1,6 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { ChefHat, Flame, Timer, CheckCheck, Search } from "lucide-react";
+import {
+  ChefHat,
+  Flame,
+  Timer,
+  CheckCheck,
+  Search,
+  RotateCcw,
+} from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -24,6 +31,7 @@ import { useProfile } from "@/client/hooks/useAuth";
 import { useSearchParams } from "next/navigation";
 import { UserRole } from "@/types/types";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 function transformOrders(data: any[]): KOrder[] {
   return data.map((table) => ({
@@ -51,8 +59,13 @@ export default function page() {
     data: TableWiseOrders,
     isLoading: isTableWiseLoading,
     isError: isTableWiseError,
+    refetch,
   } = useFetchOrdersTableWise();
-  const { mutate: updateStatus, isPending } = useUpdateItemOrderStatus();
+  const {
+    mutate: updateStatus,
+    isPending,
+    isError,
+  } = useUpdateItemOrderStatus();
   const searchParams = useSearchParams();
 
   const tableToken = searchParams?.get("tableToken");
@@ -140,6 +153,16 @@ export default function page() {
             return i;
           }
 
+          if (next === i.status) {
+            if (!errorShown) {
+              toast.error(
+                `Invalid transition: ${i.status} → ${next} for ${i.name}`,
+              );
+              errorShown = true;
+            }
+            return i;
+          }
+
           updateStatus(
             {
               orderItemId: i.id,
@@ -149,8 +172,10 @@ export default function page() {
               onSuccess: () => {
                 toast.success(`${i.name} moved to ${next}`);
               },
-              onError: () => {
-                toast.error("Failed to update status");
+              onError: (err: any) => {
+                const msg =
+                  err?.response?.data?.message || "Failed to update status";
+                toast.error(msg);
               },
             },
           );
@@ -279,10 +304,19 @@ export default function page() {
               </button>
             ))}
           </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => refetch()}
+            disabled={isTableWiseLoading}
+            className="rounded-full"
+          >
+            <RotateCcw
+              className={cn("h-4 w-4", isTableWiseLoading && "animate-spin")}
+            />
+          </Button>
         </CardContent>
       </Card>
-
-      <hr />
 
       <div className="grid mt-6 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {filtered.map((o) => (
