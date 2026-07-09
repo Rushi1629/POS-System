@@ -256,13 +256,6 @@ const CartView = () => {
                 addItemAction({
                   ...item,
                   quantity: 1, // ✅ ONLY increment by 1
-                  extras: item.extras?.map((e) => ({
-                    ...e,
-                    quantity: Math.max(
-                      Math.round((e.quantity ?? 1) / item.quantity),
-                      1,
-                    ),
-                  })),
                 }),
               )
             }

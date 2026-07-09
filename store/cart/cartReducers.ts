@@ -24,24 +24,6 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
     existingItem.orderItemId = existingItem.orderItemId ?? item.orderItemId;
     existingItem.notes = existingItem.notes ?? item.notes;
 
-    if (item.extras && item.extras.length > 0) {
-      const extrasMap = new Map(
-        (existingItem.extras || []).map((e) => [e.id, { ...e }]),
-      );
-
-      item.extras.forEach((extra) => {
-        const key = extra.id;
-        const qty = extra.quantity || 1;
-        if (extrasMap.has(key)) {
-          extrasMap.get(key).quantity += qty;
-        } else {
-          extrasMap.set(key, { ...extra, quantity: qty });
-        }
-      });
-
-      existingItem.extras = Array.from(extrasMap.values());
-    }
-
     if (existingItem.originalQuantity === undefined) {
       existingItem.originalQuantity = existingItem.quantity - incrementBy;
     }
@@ -72,21 +54,7 @@ export const removeItem = (state: CartState, action: PayloadAction<string>) => {
   const newQuantity = existingItem.quantity - 1;
 
   // ✅ DO NOT DELETE — keep item for cancellation tracking
-  const prevQuantity = existingItem.quantity;
   existingItem.quantity = Math.max(newQuantity, 0);
-
-  if (existingItem.extras?.length && prevQuantity > 0) {
-    existingItem.extras = existingItem.extras
-      .map((extra) => {
-        const perItemQty = Math.max(
-          Math.round((extra.quantity || 1) / prevQuantity),
-          1,
-        );
-        const nextQty = (extra.quantity || 1) - perItemQty;
-        return nextQty > 0 ? { ...extra, quantity: nextQty } : null;
-      })
-      .filter(Boolean) as typeof existingItem.extras;
-  }
 
   // ✅ Ensure originalQuantity exists
   if (existingItem.originalQuantity === undefined) {
