@@ -175,7 +175,7 @@ export default function CustomerDashboard() {
         description: selectedItem.description,
         extras: [...selectedExtras].map((e) => ({
           ...e,
-          quantity: e.quantity || 1,
+          quantity: (e.quantity || 1) * selectedQuantity,
         })),
       }),
     );
@@ -681,7 +681,11 @@ export default function CustomerDashboard() {
 
               <DialogFooter className="p-5">
                 <Button onClick={handleConfirmAdd} className="w-full">
-                  Add to Cart · ₹ {Number(selectedItem.price) + extrasTotal}
+                  Add to Cart · ₹{' '}
+                  {(
+                    Number(selectedItem.price) * selectedQuantity +
+                    extrasTotal * selectedQuantity
+                  ).toFixed(2)}
                 </Button>
               </DialogFooter>
             </>
