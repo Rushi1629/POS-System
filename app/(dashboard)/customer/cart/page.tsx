@@ -153,7 +153,12 @@ const CartView = () => {
               ? item.originalQuantity || 1 // send old qty OR 1
               : item.quantity,
 
-            ...(item.orderItemId && { orderItemId: item.orderItemId }),
+            ...(typeof item.orderItemId === "number" &&
+            ((typeof item.originalQuantity === "number" &&
+              item.quantity !== item.originalQuantity) ||
+              isCancelled)
+              ? { orderItemId: item.orderItemId }
+              : {}),
 
             ...(isCancelled && { isCancelled: true }),
 

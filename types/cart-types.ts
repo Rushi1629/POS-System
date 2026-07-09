@@ -61,6 +61,13 @@ export const normalizeCartItems = (
       // ✅ merge quantity
       existing.quantity += normalizedItem.quantity;
 
+      // preserve orderItemId / notes when duplicates merge
+      existing.orderItemId = existing.orderItemId ?? normalizedItem.orderItemId;
+      existing.notes = existing.notes ?? normalizedItem.notes;
+      existing.isCancelled = existing.isCancelled ?? normalizedItem.isCancelled;
+      existing.originalQuantity =
+        existing.originalQuantity ?? normalizedItem.originalQuantity ?? normalizedItem.quantity;
+
       // ✅ merge extras
       const extrasMap = new Map();
 
