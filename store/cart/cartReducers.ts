@@ -24,6 +24,22 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
     // existingItem.orderItemId = existingItem.orderItemId ?? item.orderItemId;
     // existingItem.notes = existingItem.notes ?? item.notes;
 
+    // merge extras
+    const extrasMap = new Map<number, any>();
+
+    [...(existingItem.extras || []), ...(item.extras || [])].forEach((extra) => {
+      if (extrasMap.has(extra.id)) {
+        extrasMap.get(extra.id).quantity += extra.quantity;
+      } else {
+        extrasMap.set(extra.id, {
+          ...extra,
+          quantity: extra.quantity ?? 1,
+        });
+      }
+    });
+
+    existingItem.extras = Array.from(extrasMap.values());
+
     if (existingItem.originalQuantity === undefined) {
       existingItem.originalQuantity = existingItem.quantity - incrementBy;
     }
