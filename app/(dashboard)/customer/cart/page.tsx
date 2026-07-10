@@ -48,8 +48,8 @@ const mapOrdersToCart = (orders: any): Record<string, CartItem> => {
 
         const cartKey = getCartKey(
           item.menuItem.id,
-          extras,
-          item.menuItem.menuType,
+          // extras,
+          // item.menuItem.menuType,
         );
 
         cartItems[cartKey] = {

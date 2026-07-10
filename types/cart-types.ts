@@ -22,18 +22,18 @@ export type CartItem = {
 };
 export const getCartKey = (
   id: number,
-  extras?: { id: number }[],
-  menuType?: "Veg" | "NonVeg",
+  // extras?: { id: number }[],
+  // menuType?: "Veg" | "NonVeg",
 ) => {
-  const typeKey = menuType || "notype";
+  // const typeKey = menuType || "notype";
 
-  const extrasKey =
-    extras
-      ?.map((e) => e.id) // ✅ ONLY ID, NOT quantity
-      .sort()
-      .join("|") || "noextra";
+  // const extrasKey =
+  //   extras
+  //     ?.map((e) => e.id) // ✅ ONLY ID, NOT quantity
+  //     .sort()
+  //     .join("|") || "noextra";
 
-  return `${id}-${typeKey}-${extrasKey}`;
+  return `${id}`;
 };
 
 export const normalizeCartItems = (
@@ -43,7 +43,7 @@ export const normalizeCartItems = (
 
   Object.values(items).forEach((item) => {
     const cartKey =
-      item.cartKey ?? getCartKey(item.id, item.extras, item.menuType);
+      item.cartKey ?? getCartKey(item.id);
     const normalizedItem: CartItem = {
       ...item,
       cartKey,

@@ -10,7 +10,7 @@ import { current, PayloadAction } from "@reduxjs/toolkit";
 export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
   const item = action.payload;
   const cartKey =
-    item.cartKey ?? getCartKey(item.id, item.extras, item.menuType);
+    item.cartKey ?? getCartKey(item.id);
 
   const existingItem = state.items[cartKey];
 
