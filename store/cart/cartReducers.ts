@@ -21,8 +21,8 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
     existingItem.quantity = newQuantity;
 
     // preserve item metadata from the existing cart line
-    existingItem.orderItemId = existingItem.orderItemId ?? item.orderItemId;
-    existingItem.notes = existingItem.notes ?? item.notes;
+    // existingItem.orderItemId = existingItem.orderItemId ?? item.orderItemId;
+    // existingItem.notes = existingItem.notes ?? item.notes;
 
     if (existingItem.originalQuantity === undefined) {
       existingItem.originalQuantity = existingItem.quantity - incrementBy;
@@ -35,7 +35,8 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
       ...item,
       cartKey,
       quantity: item.quantity || 1,
-      originalQuantity: item.quantity || 1,
+      originalQuantity: item.originalQuantity ?? (item.quantity || 1),
+      // originalQuantity: item.quantity || 1,
       extras:
         item.extras?.map((e) => ({
           ...e,
