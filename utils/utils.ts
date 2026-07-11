@@ -69,6 +69,20 @@ function getNextStatus(
   return transition ? (transition.to as ItemStatus) : null;
 }
 
+const inr = (v: string | number) =>
+  `₹${Number(v).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const fmtDate = (iso: string | null | undefined) =>
+  iso
+    ? new Date(iso).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "—";
+
 export {
   formatDuration,
   getPageNumbers,
@@ -77,4 +91,6 @@ export {
   fmt,
   statusIndex,
   getNextStatus,
+  inr,
+  fmtDate,
 };
