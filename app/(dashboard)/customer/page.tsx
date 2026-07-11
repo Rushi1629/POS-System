@@ -130,7 +130,7 @@ export default function CustomerDashboard() {
       dispatch(
         addItemAction({
           id: item.id,
-          cartKey: getCartKey(item.id, [], item.menuType),
+          cartKey: getCartKey(item.id),
           name: item.name,
           price: item.price,
           quantity: 1,
@@ -164,8 +164,8 @@ export default function CustomerDashboard() {
         id: selectedItem.id,
         cartKey: getCartKey(
           selectedItem.id,
-          selectedExtras,
-          selectedItem.menuType,
+          // selectedExtras,
+          // selectedItem.menuType,
         ),
         name: selectedItem.name,
         price: Number(selectedItem.price),
