@@ -1,13 +1,8 @@
 "use client";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useMemo, useState } from "react";
 import {
   Receipt,
   Search,
-  Wallet,
-  CreditCard,
-  Smartphone,
-  Banknote,
   IndianRupee,
   FileText,
   Users,
@@ -21,10 +16,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   Card,
   CardContent,
@@ -32,22 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -59,12 +36,8 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import {
-  apiGenerateBill,
-  apiPayBill,
   BillListItem,
-  MOCK_BILLS,
   PAYMENT_ICONS,
-  PaymentMethod,
   PaymentStatus,
   STATUS_STYLES,
 } from "@/types/billing-types";
@@ -73,15 +46,36 @@ import GenerateBillDialog from "@/components/biiling/GenerateBillDialog";
 import { fmtDate, inr } from "@/utils/utils";
 import PayBillDialog from "@/components/biiling/PayBillDialog";
 import ViewBillDialog from "@/components/biiling/ViewBillDialog";
+import { useFetchAllBills, usePayBill } from "@/client/hooks/useBilling";
 
 /* ---------- Page ---------- */
 export default function BillingPage() {
-  const [bills, setBills] = useState<BillListItem[]>(MOCK_BILLS);
+  const [bills, setBills] = useState<BillListItem[]>([]);
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<"ALL" | PaymentStatus>("ALL");
   const [openGenerate, setOpenGenerate] = useState(false);
   const [payTarget, setPayTarget] = useState<BillListItem | null>(null);
   const [viewTarget, setViewTarget] = useState<BillListItem | null>(null);
+
+  const {
+    data: allBills,
+    isLoading: isLoadingBills,
+    error,
+  } = useFetchAllBills();
+  const { mutateAsync: payBill, isPending: isPaying } = usePayBill();
+
+  useEffect(() => {
+    if (!Array.isArray(allBills)) return;
+    setBills((prev) => {
+      if (
+        prev.length === allBills.length &&
+        prev.every((p, i) => p?.id === allBills[i]?.id)
+      ) {
+        return prev;
+      }
+      return allBills;
+    });
+  }, [allBills]);
 
   const filtered = useMemo(() => {
     return bills.filter((b) => {
@@ -95,6 +89,25 @@ export default function BillingPage() {
       );
     });
   }, [bills, query, tab]);
+
+  const handlePayBill = async (bill: BillListItem, method: "CASH" | "CARD" | "UPI" | "WALLET" | "OTHER", notes: string) => {
+    try {
+      const updated = await payBill({
+        billingId: bill.id,
+        paymentMethod: method,
+        notes: notes || "na",
+      });
+
+      setBills((prev) =>
+        prev.map((item) =>
+          item.id === bill.id ? { ...item, ...updated, order: item.order } : item,
+        ),
+      );
+      setPayTarget(null);
+    } catch {
+      throw new Error("Payment failed");
+    }
+  };
 
   const stats = useMemo(() => {
     const paid = bills.filter((b) => b.paymentStatus === "PAID");
@@ -346,16 +359,8 @@ export default function BillingPage() {
           <PayBillDialog
             bill={payTarget}
             onClose={() => setPayTarget(null)}
-            onPaid={(updated) => {
-              setBills((prev) =>
-                prev.map((b) =>
-                  b.id === updated.id
-                    ? { ...b, ...updated, order: b.order }
-                    : b,
-                ),
-              );
-              setPayTarget(null);
-            }}
+            onPay={handlePayBill}
+            isPaying={isPaying}
           />
         )}
       </Dialog>

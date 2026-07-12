@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { CircleDot, Clock, Receipt, Soup } from "lucide-react";
 import {
   ActiveTarget,
+  getAllowedTransitions,
   OrderItem,
   OrderStatus,
   TableOrders,
@@ -20,7 +21,7 @@ import ApiLoader from "@/components/ApiLoader";
 import { useProfile } from "@/client/hooks/useAuth";
 
 export default function page() {
-  const { mutate: updateOrderStatus, isPending: isUpdateOrderPending } =
+  const { mutateAsync: updateOrderStatus, isPending: isUpdateOrderPending } =
     useUpdateOrderStatus();
 
   const { data: profile } = useProfile();
@@ -126,8 +127,21 @@ export default function page() {
     );
   }
 
+  console.log("ROLE:", role);
+  console.log("ALLOWED:", getAllowedTransitions(target?.orderStatus!, role));
+
   async function confirmUpdate() {
     if (!target || !pendingStatus) return;
+
+    const allowed = getAllowedTransitions(target.orderStatus, role);
+
+    if (!allowed.includes(pendingStatus)) {
+      toast.error(
+        `Not allowed: ${role} cannot move from ${target.orderStatus} to ${pendingStatus}`,
+      );
+      return;
+    }
+
     setSubmitting(true);
     try {
       await updateOrderStatus({
@@ -140,8 +154,11 @@ export default function page() {
       });
       setTarget(null);
       setPendingStatus(null);
-    } catch (e) {
-      toast.error("Failed to update status");
+    } catch (e: any) {
+      const message =
+        e?.response?.data?.message || e?.message || "Failed to update status";
+
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -231,6 +248,9 @@ export default function page() {
           setPendingStatus(null);
         }}
         onConfirm={confirmUpdate}
+        allowedStatuses={
+          target ? getAllowedTransitions(target.orderStatus, role) : []
+        }
       />
     </div>
   );

@@ -181,7 +181,7 @@ const CartView = () => {
       toast.success("Order placed successfully.");
       // router.push(`/customer?tableToken=${tableToken}`);
     } catch (err: any) {
-      setOrderError(err?.message ?? "Failed to place order. Please try again.");
+      toast.error(err?.message ?? "Failed to place order. Please try again.");
       setOrderSuccess("");
     }
   }, [items, placeOrder, tableId, router, orderNotes]);

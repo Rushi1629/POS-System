@@ -1,5 +1,4 @@
 import {
-  apiPayBill,
   BillListItem,
   PAYMENT_ICONS,
   PaymentMethod,
@@ -25,30 +24,27 @@ import { Button } from "../ui/button";
 const PayBillDialog = ({
   bill,
   onClose,
-  onPaid,
+  onPay,
+  isPaying,
 }: {
   bill: BillListItem;
   onClose: () => void;
-  onPaid: (b: BillListItem) => void;
+  onPay: (
+    bill: BillListItem,
+    method: PaymentMethod,
+    notes: string,
+  ) => Promise<void>;
+  isPaying: boolean;
 }) => {
   const [method, setMethod] = useState<PaymentMethod>("CASH");
   const [notes, setNotes] = useState(bill.notes ?? "");
-  const [loading, setLoading] = useState(false);
 
   const submit = async () => {
-    setLoading(true);
     try {
-      const data = await apiPayBill({
-        billingId: bill.id,
-        paymentMethod: method,
-        notes: notes || "na",
-      });
-      onPaid({ ...bill, ...data });
+      await onPay(bill, method, notes || "na");
       toast.success(`Payment recorded via ${method}`);
     } catch {
       toast.error("Payment failed");
-    } finally {
-      setLoading(false);
     }
   };
   return (
@@ -64,7 +60,7 @@ const PayBillDialog = ({
         </DialogDescription>
       </DialogHeader>
 
-      <div className="flex-1 overflow-y-auto pr-1 space-y-4 no-scrollbar">
+      <div className="flex-1 overflow-y-auto px-1 py-3 space-y-4 no-scrollbar">
         <div className="rounded-xl border border-border/60 bg-muted/40 p-4 space-y-2 text-sm">
           <Row
             label="Table"
@@ -128,9 +124,9 @@ const PayBillDialog = ({
         <Button variant="ghost" onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={submit} disabled={loading} className="gap-1">
+        <Button onClick={submit} disabled={isPaying} className="gap-1">
           <CheckCircle2 className="h-4 w-4" />
-          {loading ? "Processing…" : `Pay ${inr(bill.totalAmount)}`}
+          {isPaying ? "Processing…" : `Pay ${inr(bill.totalAmount)}`}
         </Button>
       </DialogFooter>
     </DialogContent>

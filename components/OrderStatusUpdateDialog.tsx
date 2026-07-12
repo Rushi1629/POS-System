@@ -28,6 +28,7 @@ const OrderStatusUpdateDialog = ({
   onPending,
   onClose,
   onConfirm,
+  allowedStatuses,
 }: {
   open: boolean;
   target: ActiveTarget | null;
@@ -37,8 +38,9 @@ const OrderStatusUpdateDialog = ({
   onPending: (s: OrderStatus) => void;
   onClose: () => void;
   onConfirm: () => void;
+  allowedStatuses: OrderStatus[];
 }) => {
-  const allowed = target ? getAllowedTransitions(target.orderStatus, role) : [];
+  const allowed = allowedStatuses;
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
@@ -130,7 +132,9 @@ const OrderStatusUpdateDialog = ({
 
           <Button
             onClick={onConfirm}
-            disabled={!pending || submitting}
+            disabled={
+              !pending || submitting || !allowedStatuses.includes(pending)
+            }
             className="w-full sm:w-auto"
           >
             {submitting ? "Updating…" : "Confirm update"}
