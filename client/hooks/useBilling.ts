@@ -1,6 +1,10 @@
 import { BillListItem } from "@/types/billing-types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchAllBills, payBill } from "../services/billing.service";
+import {
+  fetchAllBills,
+  generateBill,
+  payBill,
+} from "../services/billing.service";
 
 export const useFetchAllBills = () => {
   return useQuery<BillListItem[]>({
@@ -17,6 +21,20 @@ export const usePayBill = () => {
 
   return useMutation({
     mutationFn: payBill,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bills"] });
+    },
+    onError: (err) => {
+      console.log("❌ API ERROR", err);
+    },
+  });
+};
+
+export const useGenerateBill = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: generateBill,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bills"] });
     },

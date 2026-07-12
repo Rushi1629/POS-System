@@ -46,7 +46,13 @@ import GenerateBillDialog from "@/components/biiling/GenerateBillDialog";
 import { fmtDate, inr } from "@/utils/utils";
 import PayBillDialog from "@/components/biiling/PayBillDialog";
 import ViewBillDialog from "@/components/biiling/ViewBillDialog";
-import { useFetchAllBills, usePayBill } from "@/client/hooks/useBilling";
+import {
+  useFetchAllBills,
+  useGenerateBill,
+  usePayBill,
+} from "@/client/hooks/useBilling";
+import { useFetchOrdersTableWise } from "@/client/hooks/useOrder";
+import { OrderAdminChef } from "@/types/order-types";
 
 /* ---------- Page ---------- */
 export default function BillingPage() {
@@ -62,7 +68,24 @@ export default function BillingPage() {
     isLoading: isLoadingBills,
     error,
   } = useFetchAllBills();
+  const { data: tableWiseData } = useFetchOrdersTableWise();
   const { mutateAsync: payBill, isPending: isPaying } = usePayBill();
+  const { mutateAsync: generateBill, isPending: isGenerating } =
+    useGenerateBill();
+
+  const availableOrders = useMemo<OrderAdminChef[]>(() => {
+    if (!tableWiseData?.data) return [];
+
+    return tableWiseData.data.flatMap((table) =>
+      table.orders.map((order) => ({
+        ...order,
+        tableName: table.tableName,
+        tableId: table.tableId,
+      })),
+    );
+  }, [tableWiseData]);
+
+  console.log(availableOrders, "orders");
 
   useEffect(() => {
     if (!Array.isArray(allBills)) return;
@@ -90,7 +113,57 @@ export default function BillingPage() {
     });
   }, [bills, query, tab]);
 
-  const handlePayBill = async (bill: BillListItem, method: "CASH" | "CARD" | "UPI" | "WALLET" | "OTHER", notes: string) => {
+  const handleGenerateBill = async ({
+    tableId,
+    mobileNumber,
+    notes,
+  }: {
+    tableId: number;
+    mobileNumber: string;
+    notes: string;
+  }) => {
+    const selectedOrder = availableOrders.find((o) => o.tableId === tableId);
+    const GetTableId = selectedOrder?.tableId;
+
+    if (!GetTableId) {
+      throw new Error("Please choose a table with a valid table id.");
+    }
+
+    const data = await generateBill({
+      tableId: tableId!,
+      mobileNumber,
+      notes: notes || "n/a",
+    });
+
+    const bill: BillListItem = {
+      id: data.id,
+      billNumber: data.billNumber,
+      sessionId: data.sessionId,
+      orderId: data.orderId,
+      subtotal: data.subtotal,
+      taxAmount: data.taxAmount,
+      discountAmount: data.discountAmount,
+      serviceCharge: data.serviceCharge,
+      totalAmount: data.totalAmount,
+      paymentStatus: data.paymentStatus,
+      paymentMethod: data.paymentMethod,
+      paidAt: data.paidAt,
+      mobileNumber: data.mobileNumber,
+      notes: data.notes ?? null,
+      createdAt: data.createdAt,
+      session: data.session,
+      order: data.order ?? null,
+    };
+
+    setBills((prev) => [bill, ...prev]);
+    return bill;
+  };
+
+  const handlePayBill = async (
+    bill: BillListItem,
+    method: "CASH" | "CARD" | "UPI" | "WALLET" | "OTHER",
+    notes: string,
+  ) => {
     try {
       const updated = await payBill({
         billingId: bill.id,
@@ -100,7 +173,9 @@ export default function BillingPage() {
 
       setBills((prev) =>
         prev.map((item) =>
-          item.id === bill.id ? { ...item, ...updated, order: item.order } : item,
+          item.id === bill.id
+            ? { ...item, ...updated, order: item.order }
+            : item,
         ),
       );
       setPayTarget(null);
@@ -149,8 +224,10 @@ export default function BillingPage() {
               </Button>
             </DialogTrigger>
             <GenerateBillDialog
+              orders={availableOrders}
+              isGenerating={isGenerating}
               onClose={() => setOpenGenerate(false)}
-              onCreated={(b) => setBills((prev) => [b, ...prev])}
+              onSubmit={handleGenerateBill}
             />
           </Dialog>
         </div>

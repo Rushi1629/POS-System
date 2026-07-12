@@ -1,6 +1,11 @@
-import { apiGenerateBill, BillListItem } from "@/types/billing-types";
-import React, { useState } from "react";
+"use client";
+
+import { BillListItem, GenerateBillRequest } from "@/types/billing-types";
+import { OrderAdminChef } from "@/types/order-types";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+
 import {
   DialogContent,
   DialogDescription,
@@ -8,102 +13,181 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+
 import { Plus, Receipt } from "lucide-react";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { Input } from "../input";
 
-const GenerateBillDialog = ({
-  onClose,
-  onCreated,
-}: {
-  onClose: () => void;
-  onCreated: (b: BillListItem) => void;
-}) => {
-  const [orderId, setOrderId] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [notes, setNotes] = useState("");
-  const [loading, setLoading] = useState(false);
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
-  const submit = async () => {
-    if (!orderId || !mobile) {
-      toast.error("Order ID and mobile number are required");
+const GenerateBillDialog = ({
+  orders,
+  isGenerating,
+  onClose,
+  onSubmit,
+}: {
+  orders: OrderAdminChef[];
+  isGenerating: boolean;
+  onClose: () => void;
+  onSubmit: (payload: {
+    tableId: number;
+    mobileNumber: string;
+    notes: string;
+  }) => Promise<BillListItem>;
+}) => {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<GenerateBillRequest>({
+    defaultValues: {
+      tableId: 0,
+      mobileNumber: "",
+      notes: "",
+    },
+  });
+
+  const selectedTableId = watch("tableId");
+
+  // set default tableId
+  useEffect(() => {
+    if (orders.length > 0) {
+      setValue("tableId", Number(orders[0].tableId));
+    }
+  }, [orders, setValue]);
+
+  const submit = async (values: GenerateBillRequest) => {
+    if (!values.tableId) {
+      toast.error("Please select table id");
       return;
     }
-    setLoading(true);
+
     try {
-      const data = await apiGenerateBill({
-        orderId: Number(orderId),
-        mobileNumber: mobile,
-        notes: notes || "n/a",
+      const data = await onSubmit({
+        tableId: Number(values.tableId), // ✅ FIX
+        mobileNumber: values.mobileNumber.trim(),
+        notes: values.notes.trim() || "n/a",
       });
-      onCreated({
-        ...data,
-        notes: data.notes,
-        order: data.order,
-      });
+
       toast.success(`Bill ${data.billNumber} generated`);
       onClose();
-      setOrderId("");
-      setMobile("");
-      setNotes("");
-    } catch {
-      toast.error("Failed to generate bill");
-    } finally {
-      setLoading(false);
+
+      reset({
+        tableId: orders[0]?.tableId ?? 0,
+        mobileNumber: "",
+        notes: "",
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to generate bill",
+      );
     }
   };
+
   return (
     <DialogContent className="sm:max-w-lg flex flex-col max-h-[80vh]">
-      <DialogHeader className="sticky top-0 z-10 bg-background pb-2">
+      <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
-          <Receipt className="h-5 w-5 text-primary" /> Generate Bill
+          <Receipt className="h-5 w-5 text-primary" />
+          Generate Bill
         </DialogTitle>
         <DialogDescription>
-          Enter the order details to create a new billing record.
+          Enter the details to generate a bill.
         </DialogDescription>
       </DialogHeader>
-      <div className="space-y-4 py-2 max-h-[60vh] px-3 overflow-y-auto no-scrollbar">
+
+      <form
+        onSubmit={handleSubmit(submit)}
+        className="space-y-4 py-2 px-3 overflow-y-auto no-scrollbar"
+      >
+        {/* Table ID */}
         <div className="grid gap-2">
-          <Label htmlFor="orderId">Order ID</Label>
-          <Input
-            id="orderId"
-            type="number"
-            value={orderId}
-            onChange={(e) => setOrderId(e.target.value)}
-            placeholder="e.g. 6"
-          />
+          <Label>Table ID</Label>
+
+          {orders.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No tables available</p>
+          ) : (
+            <Select
+              value={selectedTableId?.toString()}
+              onValueChange={(value) => setValue("tableId", Number(value))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select table id" />
+              </SelectTrigger>
+
+              {/* <SelectContent>
+                {Array.from(new Set(orders.map((o) => String(o.tableId)))).map(
+                  (id) => (
+                    <SelectItem key={id} value={id}>
+                      {id}
+                    </SelectItem>
+                  ),
+                )}
+              </SelectContent> */}
+              <SelectContent>
+                {Array.from(
+                  new Map(
+                    orders.map((o) => [o.tableId, o.tableName]), // ✅ unique tableId + name
+                  ).entries(),
+                ).map(([tableId, tableName]) => (
+                  <SelectItem key={tableId} value={String(tableId)}>
+                    {tableName} {/* ✅ show name */}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
+
+        {/* Mobile */}
         <div className="grid gap-2">
-          <Label htmlFor="mobile">Mobile Number</Label>
+          <Label>Mobile Number</Label>
           <Input
-            id="mobile"
-            value={mobile}
-            onChange={(e) => setMobile(e.target.value)}
+            {...register("mobileNumber", {
+              required: "Mobile number is required",
+            })}
             placeholder="9167939647"
           />
+          {errors.mobileNumber && (
+            <p className="text-sm text-red-500">
+              {errors.mobileNumber.message}
+            </p>
+          )}
         </div>
+
+        {/* Notes */}
         <div className="grid gap-2">
-          <Label htmlFor="notes">Notes</Label>
-          <Textarea
-            id="notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Optional notes"
-            rows={3}
-          />
+          <Label>Notes</Label>
+          <Textarea {...register("notes")} placeholder="Optional notes" />
         </div>
-      </div>
-      <DialogFooter>
-        <Button variant="ghost" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button onClick={submit} disabled={loading} className="gap-1">
-          <Plus className="h-4 w-4" />
-          {loading ? "Generating…" : "Generate Bill"}
-        </Button>
-      </DialogFooter>
+
+        {/* Footer */}
+        <DialogFooter>
+          <Button type="button" variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+
+          <Button
+            type="submit"
+            disabled={isGenerating || orders.length === 0}
+            className="gap-1"
+          >
+            <Plus className="h-4 w-4" />
+            {isGenerating ? "Generating…" : "Generate Bill"}
+          </Button>
+        </DialogFooter>
+      </form>
     </DialogContent>
   );
 };

@@ -8,18 +8,16 @@ import { useFetchTableByTokenCustomer } from "@/client/hooks/useCustomer";
 export default function BottomNav() {
   const pathname = usePathname();
 
-  if (!pathname.startsWith("/customer")) return null;
   const searchParams = useSearchParams();
-
   const tableToken = searchParams?.get("tableToken");
-
-  console.log(tableToken, "token");
-
   const {
     data: tableData,
     isLoading: isLoadingTable,
     refetch: refetchTable,
   } = useFetchTableByTokenCustomer(tableToken);
+  if (!pathname.startsWith("/customer")) return null;
+
+  console.log(tableToken, "token");
 
   if (!tableToken) return null;
 

@@ -67,6 +67,7 @@ const PayBillDialog = ({
             value={`${bill.session.tableName} · ${bill.session.guestCount} guests`}
           />
           <Row label="Subtotal" value={inr(bill.subtotal)} />
+          <Row label="Time Charge Amount" value={inr(bill.timeChargeAmount)} />
           <Row label="Tax" value={inr(bill.taxAmount)} />
           <Row label="Discount" value={`- ${inr(bill.discountAmount)}`} />
           <Row label="Service" value={inr(bill.serviceCharge)} />
@@ -82,8 +83,8 @@ const PayBillDialog = ({
         <div className="space-y-4 pt-2">
           <div className="grid gap-2">
             <Label>Payment Method</Label>
-            <div className="grid grid-cols-4 gap-2">
-              {(["CASH", "CARD", "UPI", "WALLET"] as PaymentMethod[]).map(
+            <div className="grid grid-cols-3 gap-2">
+              {(["CASH", "CARD", "UPI", "ONLINE + CASH"] as PaymentMethod[]).map(
                 (m) => {
                   const Icon = PAYMENT_ICONS[m];
                   const active = method === m;
