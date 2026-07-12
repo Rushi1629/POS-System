@@ -144,6 +144,7 @@ export default function BillingPage() {
       taxAmount: data.taxAmount,
       discountAmount: data.discountAmount,
       serviceCharge: data.serviceCharge,
+      timeChargeAmount: data.timeChargeAmount,
       totalAmount: data.totalAmount,
       paymentStatus: data.paymentStatus,
       paymentMethod: data.paymentMethod,
@@ -161,7 +162,7 @@ export default function BillingPage() {
 
   const handlePayBill = async (
     bill: BillListItem,
-    method: "CASH" | "CARD" | "UPI" | "WALLET" | "OTHER",
+    method: "CASH" | "CARD" | "UPI" | "ONLINE + CASH" | "OTHER",
     notes: string,
   ) => {
     try {
