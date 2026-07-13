@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 const ViewBillDialog = ({ bill }: { bill: BillListItem }) => {
   return (
     <DialogContent className="sm:max-w-lg flex flex-col max-h-[80vh]">
-      <DialogHeader className="sticky top-0 z-10 pb-2">
+      <DialogHeader className="pb-2">
         <DialogTitle className="flex items-center gap-2">
           <Receipt className="h-5 w-5 text-primary" /> {bill.billNumber}
         </DialogTitle>
@@ -26,13 +26,13 @@ const ViewBillDialog = ({ bill }: { bill: BillListItem }) => {
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1 no-scrollbar">
+      <div className="flex-1 overflow-y-auto space-y-4 pr-1 no-scrollbar">
         <div className="grid grid-cols-2 gap-3 text-sm">
           <InfoTile
             label="Table"
-            value={`${bill.session.tableName} (${bill.session.tableType})`}
+            value={`${bill?.session?.tableName} (${bill?.session?.tableType})`}
           />
-          <InfoTile label="Guests" value={String(bill.session.guestCount)} />
+          <InfoTile label="Guests" value={String(bill.session?.guestCount)} />
           <InfoTile label="Mobile" value={bill.mobileNumber} />
           <InfoTile label="Created" value={fmtDate(bill.createdAt)} />
           <InfoTile label="Paid At" value={fmtDate(bill.paidAt)} />

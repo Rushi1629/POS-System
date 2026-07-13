@@ -38,6 +38,7 @@ import { cn } from "@/lib/utils";
 import {
   BillListItem,
   PAYMENT_ICONS,
+  PAYMENT_LABELS,
   PaymentStatus,
   STATUS_STYLES,
 } from "@/types/billing-types";
@@ -88,15 +89,19 @@ export default function BillingPage() {
   console.log(availableOrders, "orders");
 
   useEffect(() => {
-    if (!Array.isArray(allBills)) return;
+    if (!allBills || !Array.isArray(allBills)) return;
+
     setBills((prev) => {
+      const newBills = allBills;
+
       if (
-        prev.length === allBills.length &&
-        prev.every((p, i) => p?.id === allBills[i]?.id)
+        prev.length === newBills.length &&
+        prev.every((p, i) => p?.id === newBills[i]?.id)
       ) {
         return prev;
       }
-      return allBills;
+
+      return newBills;
     });
   }, [allBills]);
 
@@ -122,6 +127,7 @@ export default function BillingPage() {
     mobileNumber: string;
     notes: string;
   }) => {
+    debugger;
     const selectedOrder = availableOrders.find((o) => o.tableId === tableId);
     const GetTableId = selectedOrder?.tableId;
 
@@ -162,15 +168,23 @@ export default function BillingPage() {
 
   const handlePayBill = async (
     bill: BillListItem,
-    method: "CASH" | "CARD" | "UPI" | "ONLINE + CASH" | "OTHER",
+    method: "CASH" | "CARD" | "UPI" | "CASH_ONLINE" | "OTHER",
     notes: string,
+    splitPaymentData?: { cashAmount: number; onlineAmount: number },
   ) => {
     try {
-      const updated = await payBill({
+      const paymentRequest: any = {
         billingId: bill.id,
-        paymentMethod: method,
+        paymentMethod: method === "CASH_ONLINE" ? "CASH_ONLINE" : method,
         notes: notes || "na",
-      });
+      };
+
+      if (splitPaymentData) {
+        paymentRequest.cashAmount = splitPaymentData.cashAmount;
+        paymentRequest.onlineAmount = splitPaymentData.onlineAmount;
+      }
+
+      const updated = await payBill(paymentRequest);
 
       setBills((prev) =>
         prev.map((item) =>
@@ -367,11 +381,11 @@ export default function BillingPage() {
                         </TableCell>
                         <TableCell>
                           <div className="font-medium">
-                            {b.session.tableName}
+                            {b.session?.tableName}
                           </div>
                           <div className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Users className="h-3 w-3" /> {b.session.guestCount}{" "}
-                            · {b.session.tableType}
+                            <Users className="h-3 w-3" />{" "}
+                            {b.session?.guestCount} · {b.session?.tableType}
                           </div>
                         </TableCell>
                         <TableCell className="text-sm">
@@ -392,7 +406,8 @@ export default function BillingPage() {
                             </Badge>
                             {b.paymentMethod && (
                               <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <PMIcon className="h-3 w-3" /> {b.paymentMethod}
+                                <PMIcon className="h-3 w-3" />
+                                 {PAYMENT_LABELS[b.paymentMethod]}
                               </span>
                             )}
                           </div>

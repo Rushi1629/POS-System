@@ -1,9 +1,11 @@
 import {
   BillListItem,
   PAYMENT_ICONS,
+  PAYMENT_LABELS,
   PaymentMethod,
 } from "@/types/billing-types";
-import React, { useState } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
   DialogContent,
@@ -20,6 +22,14 @@ import { Label } from "../ui/label";
 import { cn } from "@/lib/utils";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
+import { Input } from "../input";
+
+interface PayBillFormData {
+  method: PaymentMethod;
+  notes: string;
+  cashAmount: string;
+  onlineAmount: string;
+}
 
 const PayBillDialog = ({
   bill,
@@ -33,23 +43,63 @@ const PayBillDialog = ({
     bill: BillListItem,
     method: PaymentMethod,
     notes: string,
+    splitPaymentData?: { cashAmount: number; onlineAmount: number },
   ) => Promise<void>;
   isPaying: boolean;
 }) => {
-  const [method, setMethod] = useState<PaymentMethod>("CASH");
-  const [notes, setNotes] = useState(bill.notes ?? "");
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { isValid },
+  } = useForm<PayBillFormData>({
+    mode: "onChange",
+    defaultValues: {
+      method: "CASH",
+      notes: bill.notes ?? "",
+      cashAmount: "",
+      onlineAmount: "",
+    },
+  });
 
-  const submit = async () => {
+  const method = watch("method");
+  const notes = watch("notes");
+  const cashAmount = watch("cashAmount");
+  const onlineAmount = watch("onlineAmount");
+
+  const totalAmount = parseFloat(bill.totalAmount);
+  const cashAmt = parseFloat(cashAmount) || 0;
+  const onlineAmt = parseFloat(onlineAmount) || 0;
+  const isSplitPayment = method === "CASH_ONLINE";
+  const isValidSplitPayment =
+    isSplitPayment && Math.abs(cashAmt + onlineAmt - totalAmount) < 0.01;
+  const isValidPayment = !isSplitPayment || isValidSplitPayment;
+
+  const submit = async (data: PayBillFormData) => {
     try {
-      await onPay(bill, method, notes || "na");
-      toast.success(`Payment recorded via ${method}`);
+      if (isSplitPayment) {
+        if (!isValidSplitPayment) {
+          toast.error(
+            `Split amounts must total ${totalAmount.toFixed(2)} (Cash: ${data.cashAmount}, Online: ${data.onlineAmount})`,
+          );
+          return;
+        }
+        await onPay(bill, data.method, data.notes || "na", {
+          cashAmount: cashAmt,
+          onlineAmount: onlineAmt,
+        });
+      } else {
+        await onPay(bill, data.method, data.notes || "na");
+      }
+      toast.success(`Payment recorded via ${data.method}`);
     } catch {
       toast.error("Payment failed");
     }
   };
   return (
     <DialogContent className="sm:max-w-lg flex flex-col max-h-[80vh]">
-      <DialogHeader className="sticky top-0 z-10 pb-2">
+      <DialogHeader className="pb-2">
         <DialogTitle className="flex items-center gap-2">
           <IndianRupee className="h-5 w-5 text-primary" /> Settle Bill
         </DialogTitle>
@@ -60,11 +110,12 @@ const PayBillDialog = ({
         </DialogDescription>
       </DialogHeader>
 
-      <div className="flex-1 overflow-y-auto px-1 py-3 space-y-4 no-scrollbar">
+      <form onSubmit={handleSubmit(submit)} className="flex-1 overflow-y-auto px-1 py-3 space-y-4 no-scrollbar">
+        <div className="">
         <div className="rounded-xl border border-border/60 bg-muted/40 p-4 space-y-2 text-sm">
           <Row
             label="Table"
-            value={`${bill.session.tableName} · ${bill.session.guestCount} guests`}
+            value={`${bill.session?.tableName} · ${bill.session?.guestCount} guests`}
           />
           <Row label="Subtotal" value={inr(bill.subtotal)} />
           <Row label="Time Charge Amount" value={inr(bill.timeChargeAmount)} />
@@ -84,7 +135,7 @@ const PayBillDialog = ({
           <div className="grid gap-2">
             <Label>Payment Method</Label>
             <div className="grid grid-cols-3 gap-2">
-              {(["CASH", "CARD", "UPI", "ONLINE + CASH"] as PaymentMethod[]).map(
+              {(["CASH", "CARD", "UPI", "CASH_ONLINE"] as PaymentMethod[]).map(
                 (m) => {
                   const Icon = PAYMENT_ICONS[m];
                   const active = method === m;
@@ -92,7 +143,13 @@ const PayBillDialog = ({
                     <button
                       key={m}
                       type="button"
-                      onClick={() => setMethod(m)}
+                      onClick={() => {
+                        setValue("method", m);
+                        if (m !== "CASH_ONLINE") {
+                          setValue("cashAmount", "");
+                          setValue("onlineAmount", "");
+                        }
+                      }}
                       className={cn(
                         "flex flex-col items-center gap-1 rounded-xl border p-3 text-xs font-medium transition",
                         active
@@ -101,20 +158,73 @@ const PayBillDialog = ({
                       )}
                     >
                       <Icon className="h-5 w-5" />
-                      {m}
+                      {PAYMENT_LABELS[m]}
                     </button>
                   );
                 },
               )}
             </div>
           </div>
+
+          {method === "CASH_ONLINE" && (
+            <div className="grid gap-4 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950">
+              <div className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                Enter split payment amounts (Total: {inr(totalAmount)})
+              </div>
+              <div className="grid gap-3">
+                <div className="grid gap-2">
+                  <Label htmlFor="cash-amount">Cash Amount</Label>
+                  <div className="flex items-center gap-2">
+                    <IndianRupee className="h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="cash-amount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max={totalAmount}
+                      {...register("cashAmount")}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="online-amount">Online Amount</Label>
+                  <div className="flex items-center gap-2">
+                    <IndianRupee className="h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="online-amount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max={totalAmount}
+                      {...register("onlineAmount")}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between rounded-lg bg-white p-2 dark:bg-slate-900">
+                  <span className="text-sm font-medium">Total Split</span>
+                  <span
+                    className={cn(
+                      "font-semibold",
+                      isValidSplitPayment
+                        ? "text-green-600"
+                        : "text-red-600",
+                    )}
+                  >
+                    {inr(cashAmt + onlineAmt)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="grid gap-2">
             <Label htmlFor="pay-notes">Notes</Label>
             <Textarea
               id="pay-notes"
               rows={2}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              {...register("notes")}
               placeholder="Optional"
             />
           </div>
@@ -122,14 +232,19 @@ const PayBillDialog = ({
       </div>
 
       <DialogFooter>
-        <Button variant="ghost" onClick={onClose}>
+        <Button type="button" variant="ghost" onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={submit} disabled={isPaying} className="gap-1">
+        <Button
+          type="submit"
+          disabled={isPaying || !isValidPayment}
+          className="gap-1"
+        >
           <CheckCircle2 className="h-4 w-4" />
           {isPaying ? "Processing…" : `Pay ${inr(bill.totalAmount)}`}
         </Button>
       </DialogFooter>
+    </form>
     </DialogContent>
   );
 };

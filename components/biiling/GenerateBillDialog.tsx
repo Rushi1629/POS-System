@@ -62,13 +62,13 @@ const GenerateBillDialog = ({
 
   // set default tableId
   useEffect(() => {
-    if (orders.length > 0) {
-      setValue("tableId", Number(orders[0].tableId));
+    if (orders?.length > 0) {
+      setValue("tableId", Number(orders[0]?.tableId ?? 0));
     }
   }, [orders, setValue]);
 
   const submit = async (values: GenerateBillRequest) => {
-    if (!values.tableId) {
+    if (!values.tableId || values.tableId === 0) {
       toast.error("Please select table id");
       return;
     }
@@ -97,7 +97,7 @@ const GenerateBillDialog = ({
 
   return (
     <DialogContent className="sm:max-w-lg flex flex-col max-h-[80vh]">
-      <DialogHeader>
+      <DialogHeader className="pb-2">
         <DialogTitle className="flex items-center gap-2">
           <Receipt className="h-5 w-5 text-primary" />
           Generate Bill

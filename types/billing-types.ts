@@ -3,10 +3,10 @@
 // One interface set per API endpoint (Generate / Pay / Get All)
 // ============================================================
 
-import { Banknote, CircleDollarSign, CreditCard, Smartphone, Wallet } from "lucide-react";
+import { Banknote, CircleDollarSign, CreditCard, IndianRupee, Smartphone, Wallet } from "lucide-react";
 
 export type PaymentStatus = "PAID" | "UNPAID" | "PARTIAL" | "REFUNDED";
-export type PaymentMethod = "CASH" | "CARD" | "UPI" | "ONLINE + CASH" | "OTHER";
+export type PaymentMethod = "CASH" | "CARD" | "UPI" | "CASH_ONLINE" | "OTHER";
 export type TableType = "FAMILY" | "COUPLE" | "HALL" | "OUTDOOR" | "PRIVATE";
 
 // ---------- Shared sub-shapes ----------
@@ -72,8 +72,8 @@ export interface GenerateBillData {
   mobileNumber: string;
   notes: string;
   createdAt: string;
-  session: BillSession;
-  order: BillOrder;
+  session?: BillSession;
+  order?: BillOrder;
 }
 
 export interface GenerateBillResponse {
@@ -89,6 +89,8 @@ export interface PayBillRequest {
   billingId: number;
   paymentMethod: PaymentMethod;
   notes: string;
+  cashAmount?: number;
+  onlineAmount?: number;
 }
 
 export interface PayBillData {
@@ -162,6 +164,14 @@ export const PAYMENT_ICONS: Record<PaymentMethod, typeof Banknote> = {
   CASH: Banknote,
   CARD: CreditCard,
   UPI: Smartphone,
-  "ONLINE + CASH": Wallet,
+  "CASH_ONLINE": IndianRupee,
   OTHER: CircleDollarSign,
+};
+
+export const PAYMENT_LABELS: Record<PaymentMethod, string> = {
+  CASH: "Cash",
+  CARD: "Card",
+  UPI: "UPI",
+  CASH_ONLINE: "Cash + Online", // 👈 UI label
+  OTHER: "Other",
 };
