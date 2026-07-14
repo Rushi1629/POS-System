@@ -68,6 +68,7 @@ export default function BillingPage() {
     data: allBills,
     isLoading: isLoadingBills,
     error,
+    refetch: refetchBills,
   } = useFetchAllBills();
   const { data: tableWiseData } = useFetchOrdersTableWise();
   const { mutateAsync: payBill, isPending: isPaying } = usePayBill();
@@ -91,18 +92,7 @@ export default function BillingPage() {
   useEffect(() => {
     if (!allBills || !Array.isArray(allBills)) return;
 
-    setBills((prev) => {
-      const newBills = allBills;
-
-      if (
-        prev.length === newBills.length &&
-        prev.every((p, i) => p?.id === newBills[i]?.id)
-      ) {
-        return prev;
-      }
-
-      return newBills;
-    });
+    setBills(allBills);
   }, [allBills]);
 
   const filtered = useMemo(() => {
@@ -135,35 +125,15 @@ export default function BillingPage() {
       throw new Error("Please choose a table with a valid table id.");
     }
 
-    const data = await generateBill({
+    const response = await generateBill({
       tableId: tableId!,
       mobileNumber,
       notes: notes || "n/a",
     });
 
-    const bill: BillListItem = {
-      id: data.id,
-      billNumber: data.billNumber,
-      sessionId: data.sessionId,
-      orderId: data.orderId,
-      subtotal: data.subtotal,
-      taxAmount: data.taxAmount,
-      discountAmount: data.discountAmount,
-      serviceCharge: data.serviceCharge,
-      timeChargeAmount: data.timeChargeAmount,
-      totalAmount: data.totalAmount,
-      paymentStatus: data.paymentStatus,
-      paymentMethod: data.paymentMethod,
-      paidAt: data.paidAt,
-      mobileNumber: data.mobileNumber,
-      notes: data.notes ?? null,
-      createdAt: data.createdAt,
-      session: data.session,
-      order: data.order ?? null,
-    };
+    await refetchBills(); // 👈 IMPORTANT
 
-    setBills((prev) => [bill, ...prev]);
-    return bill;
+    return response;
   };
 
   const handlePayBill = async (
@@ -172,9 +142,10 @@ export default function BillingPage() {
     notes: string,
     splitPaymentData?: { cashAmount: number; onlineAmount: number },
   ) => {
+    debugger;
     try {
       const paymentRequest: any = {
-        billingId: bill.id,
+        billingId: bill.billingId,
         paymentMethod: method === "CASH_ONLINE" ? "CASH_ONLINE" : method,
         notes: notes || "na",
       };
@@ -188,7 +159,7 @@ export default function BillingPage() {
 
       setBills((prev) =>
         prev.map((item) =>
-          item.id === bill.id
+          item.billingId === bill.billingId
             ? { ...item, ...updated, order: item.order }
             : item,
         ),
@@ -354,13 +325,13 @@ export default function BillingPage() {
                       </TableCell>
                     </TableRow>
                   )}
-                  {filtered.map((b) => {
+                  {filtered.map((b, index) => {
                     const PMIcon = b.paymentMethod
                       ? PAYMENT_ICONS[b.paymentMethod]
                       : Receipt;
                     return (
                       <TableRow
-                        key={b.id}
+                        key={index}
                         className="border-border/60 hover:bg-muted/40 transition"
                       >
                         <TableCell>
@@ -407,7 +378,7 @@ export default function BillingPage() {
                             {b.paymentMethod && (
                               <span className="text-xs text-muted-foreground flex items-center gap-1">
                                 <PMIcon className="h-3 w-3" />
-                                 {PAYMENT_LABELS[b.paymentMethod]}
+                                {PAYMENT_LABELS[b.paymentMethod]}
                               </span>
                             )}
                           </div>

@@ -127,7 +127,7 @@ export interface PayBillResponse {
 // 3) Get All Bills API   →  GET /bills
 // ============================================================
 export interface BillListItem {
-  id: number;
+  billingId: number;
   billNumber: string;
   sessionId: number;
   orderId: number | null;

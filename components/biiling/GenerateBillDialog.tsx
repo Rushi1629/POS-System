@@ -3,7 +3,7 @@
 import { BillListItem, GenerateBillRequest } from "@/types/billing-types";
 import { OrderAdminChef } from "@/types/order-types";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import {
@@ -49,6 +49,7 @@ const GenerateBillDialog = ({
     setValue,
     watch,
     reset,
+    control,
     formState: { errors },
   } = useForm<GenerateBillRequest>({
     defaultValues: {
@@ -118,35 +119,32 @@ const GenerateBillDialog = ({
           {orders.length === 0 ? (
             <p className="text-sm text-muted-foreground">No tables available</p>
           ) : (
-            <Select
-              value={selectedTableId?.toString()}
-              onValueChange={(value) => setValue("tableId", Number(value))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select table id" />
-              </SelectTrigger>
+            <Controller
+              name="tableId"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value ? String(field.value) : ""}
+                  onValueChange={(val) => field.onChange(Number(val))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select table id" />
+                  </SelectTrigger>
 
-              {/* <SelectContent>
-                {Array.from(new Set(orders.map((o) => String(o.tableId)))).map(
-                  (id) => (
-                    <SelectItem key={id} value={id}>
-                      {id}
-                    </SelectItem>
-                  ),
-                )}
-              </SelectContent> */}
-              <SelectContent>
-                {Array.from(
-                  new Map(
-                    orders.map((o) => [o.tableId, o.tableName]), // ✅ unique tableId + name
-                  ).entries(),
-                ).map(([tableId, tableName]) => (
-                  <SelectItem key={tableId} value={String(tableId)}>
-                    {tableName} {/* ✅ show name */}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  <SelectContent>
+                    {Array.from(
+                      new Map(
+                        orders.map((o) => [o.tableId, o.tableName]),
+                      ).entries(),
+                    ).map(([tableId, tableName]) => (
+                      <SelectItem key={tableId} value={String(tableId)}>
+                        {tableName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           )}
         </div>
 

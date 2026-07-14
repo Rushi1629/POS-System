@@ -22,5 +22,5 @@ export const generateBill = async (data: GenerateBillRequest) => {
     body: JSON.stringify(data),
   });
 
-  return res.data;
+  return res;
 };
