@@ -45,8 +45,8 @@ const ViewBillDialog = ({ bill }: { bill: BillListItem }) => {
               Order Items · {bill.order.orderNumber}
             </div>
             <div className="divide-y divide-border/60">
-              {bill.order.items.map((it) => (
-                <div key={it.id} className="p-3 space-y-1">
+              {bill.order.items.map((it,index) => (
+                <div key={index} className="p-3 space-y-1">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium text-foreground">
@@ -61,9 +61,9 @@ const ViewBillDialog = ({ bill }: { bill: BillListItem }) => {
                   </div>
                   {it.subMenuItems.length > 0 && (
                     <div className="pl-3 border-l-2 border-primary/30 space-y-0.5">
-                      {it.subMenuItems.map((s) => (
+                      {it.subMenuItems.map((s,index) => (
                         <div
-                          key={s.id}
+                          key={index}
                           className="flex justify-between text-xs text-muted-foreground"
                         >
                           <span>

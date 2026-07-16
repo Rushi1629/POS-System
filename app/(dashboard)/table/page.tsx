@@ -83,6 +83,14 @@ import {
 } from "@/client/hooks/useTable";
 import { isEqual } from "lodash-es";
 import TableStatusCustom from "@/components/TableStatus";
+import Image from "next/image";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 function Tables() {
   const { data: tables = [], isLoading: isTableLoading } = useFetchTables();
@@ -107,6 +115,8 @@ function Tables() {
     pageIndex: 0,
     pageSize: 5,
   });
+  const [qrModal, setQrModal] = useState(false);
+  const [selectedQR, setSelectedQR] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     return items
@@ -173,6 +183,23 @@ function Tables() {
         header: "Status",
         cell: ({ row }) => (
           <TableStatusCustom status={row.original.tableStatus} />
+        ),
+      },
+      {
+        id: "qr",
+        header: "QR Code",
+        cell: ({ row }) => (
+          <Image
+            src={row.original.qrCodeImageUrl || "/placeholder.png"}
+            alt="QR Code"
+            width={50}
+            height={50}
+            className="rounded-md border object-cover cursor-pointer"
+            onClick={() => {
+              setSelectedQR(row.original.qrCodeImageUrl || null);
+              setQrModal(true);
+            }}
+          />
         ),
       },
       {
@@ -629,6 +656,41 @@ function Tables() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {qrModal && (
+        <Dialog open={!!qrModal} onOpenChange={setQrModal}>
+          <DialogContent className="sm:max-w-md max-h-[80vh] flex flex-col items-center">
+            <DialogHeader>
+              <DialogTitle>QR Code</DialogTitle>
+            </DialogHeader>
+
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center no-scrollbar">
+              {selectedQR ? (
+                <Image
+                  src={selectedQR}
+                  alt="QR Large"
+                  width={250}
+                  height={250}
+                  className="mx-auto rounded-md"
+                />
+              ) : (
+                <p className="text-center text-muted-foreground">
+                  No QR available
+                </p>
+              )}
+            </div>
+
+            <DialogFooter className="w-full">
+              <Button
+                onClick={() => window.open(selectedQR!, "_blank")}
+                className="w-full mt-2"
+              >
+                Download QR
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

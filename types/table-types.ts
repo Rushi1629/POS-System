@@ -44,6 +44,7 @@ export interface FetchTableResponse {
   qrCode: string | null;
   isActive: boolean;
   guestCount: number;
+  qrCodeImageUrl?: string;
   // startTime?: string;
 }
 

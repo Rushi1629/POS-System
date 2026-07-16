@@ -279,142 +279,157 @@ export default function BillingPage() {
         </Card>
 
         {/* Table */}
-        <Card className="border-border/60 shadow-soft overflow-hidden">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">All Bills</CardTitle>
-            <CardDescription>
-              Showing {filtered.length} of {bills.length} bills
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent border-border/60">
-                    <TableHead className="text-xs uppercase tracking-wider">
-                      Bill
-                    </TableHead>
-                    <TableHead className="text-xs uppercase tracking-wider">
-                      Table / Guests
-                    </TableHead>
-                    <TableHead className="text-xs uppercase tracking-wider">
-                      Mobile
-                    </TableHead>
-                    <TableHead className="text-xs uppercase tracking-wider">
-                      Created
-                    </TableHead>
-                    <TableHead className="text-xs uppercase tracking-wider">
-                      Payment
-                    </TableHead>
-                    <TableHead className="text-xs uppercase tracking-wider text-right">
-                      Amount
-                    </TableHead>
-                    <TableHead className="text-xs uppercase tracking-wider text-right">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtered.length === 0 && (
-                    <TableRow>
-                      <TableCell
-                        colSpan={7}
-                        className="py-16 text-center text-sm text-muted-foreground"
-                      >
-                        No bills match your filters.
-                      </TableCell>
+        {isLoadingBills ? (
+          <>
+            <Card className="border-border/60 shadow-soft overflow-hidden">
+              <CardHeader className="py-16 flex justify-center items-center">
+                <div className="h-14 w-14 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+                <h3 className="mt-4 text-lg font-semibold">
+                  Loading table items...
+                </h3>
+              </CardHeader>
+            </Card>
+          </>
+        ) : (
+          <Card className="border-border/60 shadow-soft overflow-hidden">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold">
+                All Bills
+              </CardTitle>
+              <CardDescription>
+                Showing {filtered.length} of {bills.length} bills
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent border-border/60">
+                      <TableHead className="text-xs uppercase tracking-wider text-center">
+                        Bill
+                      </TableHead>
+                      <TableHead className="text-xs uppercase tracking-wider">
+                        Table / Guests
+                      </TableHead>
+                      <TableHead className="text-xs uppercase tracking-wider">
+                        Mobile
+                      </TableHead>
+                      <TableHead className="text-xs uppercase tracking-wider">
+                        Created
+                      </TableHead>
+                      <TableHead className="text-xs uppercase tracking-wider">
+                        Payment
+                      </TableHead>
+                      <TableHead className="text-xs uppercase tracking-wider text-right">
+                        Amount
+                      </TableHead>
+                      <TableHead className="text-xs uppercase tracking-wider text-right">
+                        Actions
+                      </TableHead>
                     </TableRow>
-                  )}
-                  {filtered.map((b, index) => {
-                    const PMIcon = b.paymentMethod
-                      ? PAYMENT_ICONS[b.paymentMethod]
-                      : Receipt;
-                    return (
-                      <TableRow
-                        key={index}
-                        className="border-border/60 hover:bg-muted/40 transition"
-                      >
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                              <Receipt className="h-5 w-5" />
-                            </div>
-                            <div>
-                              <div className="font-medium text-foreground">
-                                {b.billNumber}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {b.order?.orderNumber ??
-                                  `Session #${b.sessionId}`}
-                              </div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="font-medium">
-                            {b.session?.tableName}
-                          </div>
-                          <div className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Users className="h-3 w-3" />{" "}
-                            {b.session?.guestCount} · {b.session?.tableType}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {b.mobileNumber}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {fmtDate(b.createdAt)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-col gap-1">
-                            <Badge
-                              className={cn(
-                                "w-fit gap-1 font-medium border-0",
-                                STATUS_STYLES[b.paymentStatus],
-                              )}
-                            >
-                              {b.paymentStatus}
-                            </Badge>
-                            {b.paymentMethod && (
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <PMIcon className="h-3 w-3" />
-                                {PAYMENT_LABELS[b.paymentMethod]}
-                              </span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right font-semibold text-foreground">
-                          {inr(b.totalAmount)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1 justify-end">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="gap-1"
-                              onClick={() => setViewTarget(b)}
-                            >
-                              <Eye className="h-4 w-4" /> View
-                            </Button>
-                            {b.paymentStatus === "UNPAID" && (
-                              <Button
-                                size="sm"
-                                className="gap-1"
-                                onClick={() => setPayTarget(b)}
-                              >
-                                <IndianRupee className="h-4 w-4" /> Pay
-                              </Button>
-                            )}
-                          </div>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.length === 0 && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={7}
+                          className="py-16 text-center text-sm text-muted-foreground"
+                        >
+                          No bills match your filters.
                         </TableCell>
                       </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+                    )}
+                    {filtered.map((b, index) => {
+                      const PMIcon = b.paymentMethod
+                        ? PAYMENT_ICONS[b.paymentMethod]
+                        : Receipt;
+                      return (
+                        <TableRow
+                          key={index}
+                          className="border-border/60 hover:bg-muted/40 transition"
+                        >
+                          <TableCell className="px-3 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                                <Receipt className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <div className="font-medium text-foreground">
+                                  {b.billNumber}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {b.order?.orderNumber ??
+                                    `Session #${b.sessionId}`}
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="font-medium">
+                              {b.session?.tableName}
+                            </div>
+                            <div className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Users className="h-3 w-3" />{" "}
+                              {b.session?.guestCount} · {b.session?.tableType}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {b.mobileNumber}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {fmtDate(b.createdAt)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col gap-1">
+                              <Badge
+                                className={cn(
+                                  "w-fit gap-1 font-medium border-0",
+                                  STATUS_STYLES[b.paymentStatus],
+                                )}
+                              >
+                                {b.paymentStatus}
+                              </Badge>
+                              {b.paymentMethod && (
+                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <PMIcon className="h-3 w-3" />
+                                  {PAYMENT_LABELS[b.paymentMethod]}
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right font-semibold text-foreground">
+                            {inr(b.totalAmount)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1 justify-end">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="gap-1"
+                                onClick={() => setViewTarget(b)}
+                              >
+                                <Eye className="h-4 w-4" /> View
+                              </Button>
+                              {b.paymentStatus === "UNPAID" && (
+                                <Button
+                                  size="sm"
+                                  className="gap-1"
+                                  onClick={() => setPayTarget(b)}
+                                >
+                                  <IndianRupee className="h-4 w-4" /> Pay
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Pay dialog */}

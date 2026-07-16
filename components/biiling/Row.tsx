@@ -1,4 +1,3 @@
-import React from "react";
 
 const Row = ({ label, value }: { label: string; value: string }) => {
   return (

@@ -28,6 +28,7 @@ export const fetchAllTables = async (): Promise<FetchTableResponse[]> => {
     qrCode: u.qrCode ?? null,
     isActive: u.isActive,
     guestCount: Number(u.guestCount ?? 0),
+    qrCodeImageUrl: u.qrCodeImageUrl ?? null,
   }));
 };
 
