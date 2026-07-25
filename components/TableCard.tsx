@@ -48,21 +48,32 @@ import {
   EditTableSessionPayload,
   FetchTableResponse,
 } from "@/types/table-types";
+import { Switch } from "./ui/switch";
 
 export function TableCard({
   table,
   onUpdateSession,
   guestCount,
   isPending,
+  onToggleRushMode,
 }: {
   table: FetchTableResponse;
   guestCount: number;
   onUpdateSession: (data: EditTableSessionPayload) => Promise<any>;
   isPending: boolean;
+  onToggleRushMode: (tableId: number, value: boolean) => Promise<void>;
 }) {
   const [, setTick] = useState(0);
   const [seatDialog, setSeatDialog] = useState(false);
   const [guestInput, setGuestInput] = useState("");
+
+  // const [rushMode, setRushMode] = useState<boolean>(false);
+
+  // useEffect(() => {
+  //   if (table) {
+  //     setRushMode(table.rushMode);
+  //   }
+  // }, [table]);
 
   useEffect(() => {
     if (table.enableTimeRate) {
@@ -175,7 +186,7 @@ export function TableCard({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-1.5 flex-wrap">
+          <div className="flex gap-1.5 flex-wrap justify-between">
             {/* 🟢 Available */}
             {table.tableStatus === "AVAILABLE" && (
               <>
@@ -301,6 +312,13 @@ export function TableCard({
                 )}
               </Button>
             )}
+
+            <Switch
+              checked={table.rushMode}
+              onCheckedChange={async (value) => {
+                await onToggleRushMode(table.id, value);
+              }}
+            />
           </div>
         </CardContent>
       </Card>

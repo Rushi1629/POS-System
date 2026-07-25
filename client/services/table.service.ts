@@ -29,6 +29,7 @@ export const fetchAllTables = async (): Promise<FetchTableResponse[]> => {
     isActive: u.isActive,
     guestCount: Number(u.guestCount ?? 0),
     qrCodeImageUrl: u.qrCodeImageUrl ?? null,
+    rushMode: Boolean(u.rushMode),
   }));
 };
 
@@ -55,6 +56,7 @@ export const editTableById = async (
     qrCode: u.qrCode ?? null,
     isActive: u.isActive,
     guestCount: Number(u.guestCount ?? 0),
+    rushMode: u.rushMode,
   };
 };
 

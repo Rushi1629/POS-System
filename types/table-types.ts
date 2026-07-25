@@ -26,6 +26,7 @@ export interface EditTablePayload {
   qrCode?: string | null;
   isActive?: boolean;
   guestCount?: number;
+  rushMode?: boolean;
 }
 
 export interface getTableLiveChargeResponse {
@@ -44,6 +45,7 @@ export interface FetchTableResponse {
   qrCode: string | null;
   isActive: boolean;
   guestCount: number;
+  rushMode: boolean,
   qrCodeImageUrl?: string;
   // startTime?: string;
 }
