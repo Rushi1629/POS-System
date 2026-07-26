@@ -54,6 +54,7 @@ import {
 } from "@/client/hooks/useBilling";
 import { useFetchOrdersTableWise } from "@/client/hooks/useOrder";
 import { OrderAdminChef } from "@/types/order-types";
+import { useFetchTables } from "@/client/hooks/useTable";
 
 /* ---------- Page ---------- */
 export default function BillingPage() {
@@ -70,24 +71,11 @@ export default function BillingPage() {
     error,
     refetch: refetchBills,
   } = useFetchAllBills();
-  const { data: tableWiseData } = useFetchOrdersTableWise();
+  // const { data: tableWiseData } = useFetchOrdersTableWise();
+  const { data: tables } = useFetchTables();
   const { mutateAsync: payBill, isPending: isPaying } = usePayBill();
   const { mutateAsync: generateBill, isPending: isGenerating } =
     useGenerateBill();
-
-  const availableOrders = useMemo<OrderAdminChef[]>(() => {
-    if (!tableWiseData?.data) return [];
-
-    return tableWiseData.data.flatMap((table) =>
-      table.orders.map((order) => ({
-        ...order,
-        tableName: table.tableName,
-        tableId: table.tableId,
-      })),
-    );
-  }, [tableWiseData]);
-
-  console.log(availableOrders, "orders");
 
   useEffect(() => {
     if (!allBills || !Array.isArray(allBills)) return;
@@ -117,11 +105,7 @@ export default function BillingPage() {
     mobileNumber: string;
     notes: string;
   }) => {
-    debugger;
-    const selectedOrder = availableOrders.find((o) => o.tableId === tableId);
-    const GetTableId = selectedOrder?.tableId;
-
-    if (!GetTableId) {
+    if (!tableId) {
       throw new Error("Please choose a table with a valid table id.");
     }
 
@@ -210,7 +194,8 @@ export default function BillingPage() {
               </Button>
             </DialogTrigger>
             <GenerateBillDialog
-              orders={availableOrders}
+              // orders={availableOrders}
+              tables={tables ?? []}
               isGenerating={isGenerating}
               onClose={() => setOpenGenerate(false)}
               onSubmit={handleGenerateBill}

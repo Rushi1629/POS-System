@@ -27,14 +27,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { FetchTableResponse } from "@/types/table-types";
 
 const GenerateBillDialog = ({
-  orders,
+  tables,
   isGenerating,
   onClose,
   onSubmit,
 }: {
-  orders: OrderAdminChef[];
+  // orders: OrderAdminChef[];
+  tables: FetchTableResponse[];
   isGenerating: boolean;
   onClose: () => void;
   onSubmit: (payload: {
@@ -62,11 +64,11 @@ const GenerateBillDialog = ({
   const selectedTableId = watch("tableId");
 
   // set default tableId
-  useEffect(() => {
-    if (orders?.length > 0) {
-      setValue("tableId", Number(orders[0]?.tableId ?? 0));
-    }
-  }, [orders, setValue]);
+  // useEffect(() => {
+  //   if (tables?.length > 0) {
+  //     setValue("tableId", tables[0].id);
+  //   }
+  // }, [tables, setValue]);
 
   const submit = async (values: GenerateBillRequest) => {
     if (!values.tableId || values.tableId === 0) {
@@ -85,7 +87,7 @@ const GenerateBillDialog = ({
       onClose();
 
       reset({
-        tableId: orders[0]?.tableId ?? 0,
+        tableId: tables[0]?.id ?? 0,
         mobileNumber: "",
         notes: "",
       });
@@ -116,7 +118,7 @@ const GenerateBillDialog = ({
         <div className="grid gap-2">
           <Label>Table ID</Label>
 
-          {orders.length === 0 ? (
+          {tables.length === 0 ? (
             <p className="text-sm text-muted-foreground">No tables available</p>
           ) : (
             <Controller
@@ -124,7 +126,7 @@ const GenerateBillDialog = ({
               control={control}
               render={({ field }) => (
                 <Select
-                  value={field.value ? String(field.value) : ""}
+                  value={field.value ? String(field.value) : undefined}
                   onValueChange={(val) => field.onChange(Number(val))}
                 >
                   <SelectTrigger>
@@ -132,15 +134,13 @@ const GenerateBillDialog = ({
                   </SelectTrigger>
 
                   <SelectContent>
-                    {Array.from(
-                      new Map(
-                        orders.map((o) => [o.tableId, o.tableName]),
-                      ).entries(),
-                    ).map(([tableId, tableName]) => (
-                      <SelectItem key={tableId} value={String(tableId)}>
-                        {tableName}
-                      </SelectItem>
-                    ))}
+                    {tables
+                      .filter((t) => t.tableStatus === "OCCUPIED")
+                      .map((table) => (
+                        <SelectItem key={table.id} value={String(table.id)}>
+                          {table.name}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               )}
@@ -178,7 +178,7 @@ const GenerateBillDialog = ({
 
           <Button
             type="submit"
-            disabled={isGenerating || orders.length === 0}
+            disabled={isGenerating || tables.length === 0}
             className="gap-1"
           >
             <Plus className="h-4 w-4" />
