@@ -27,7 +27,7 @@ const MenuItemCard = ({
       className="bg-card rounded-2xl border border-border/60 hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group"
     >
       {/* Image placeholder / colored header */}
-      <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-primary/10 to-accent">
+      <div className="relative aspect-16/10 overflow-hidden bg-linear-to-br from-primary/10 to-accent">
         {item.imageUrl ? (
           <img
             src={item.imageUrl}
@@ -63,8 +63,8 @@ const MenuItemCard = ({
           {item.description}
         </p>
 
-        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-border/40">
-          <p className="text-base font-bold tabular-nums text-primary">
+        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-border/40 flex-wrap gap-1">
+          <p className="text-sm font-bold tabular-nums text-primary">
             ₹{item.price}
           </p>
           {quantity > 0 ? (
@@ -75,16 +75,16 @@ const MenuItemCard = ({
             >
               <button
                 onClick={onRemove}
-                className="p-1 text-[#e25f28] hover:bg-primary/10 transition-colors"
+                className="p-1 pr-0 text-[#e25f28] hover:bg-primary/10 transition-colors"
               >
                 <Minus className="w-3.5 h-3.5" />
               </button>
-              <span className="px-2.5 text-xs font-semibold text-[#e25f28] min-w-[24px] text-center">
+              <span className="px-1.5 text-xs font-semibold text-[#e25f28] min-w-6 text-center">
                 {quantity}
               </span>
               <button
                 onClick={onAdd}
-                className="p-1 text-[#e25f28] hover:bg-primary/10 transition-colors"
+                className="p-1 pl-0 text-[#e25f28] hover:bg-primary/10 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
               </button>
@@ -94,7 +94,7 @@ const MenuItemCard = ({
               variant="outline"
               size="sm"
               onClick={onAdd}
-              className="border-[#e25f28] text-[#e25f28] hover:bg-[#e25f28] hover:text-primary-foreground font-semibold text-xs px-4 h-8 rounded-lg"
+              className="border-[#e25f28] text-[#e25f28] hover:bg-[#e25f28] hover:text-primary-foreground font-semibold text-xs px-2 lg:px-4 md:px-4 sm:px-4 h-8 rounded-lg"
             >
               + Add
             </Button>

@@ -501,7 +501,7 @@ export default function CustomerDashboard() {
             <div className="sticky z-20 bg-(--background) backdrop-blur-xl border-b border-border/30">
               <div
                 ref={categoryScrollRef}
-                className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide"
+                className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide pl-[2px]"
               >
                 {categories.map((cat) => (
                   <CategoryPill
@@ -543,7 +543,7 @@ export default function CustomerDashboard() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
+                className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4"
               >
                 {isLoading ? (
                   // 🔥 Skeleton Loader Grid

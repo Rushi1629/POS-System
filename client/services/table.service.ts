@@ -45,18 +45,18 @@ export const editTableById = async (
   const u = res.data;
 
   return {
-    id: u.id,
-    name: u.name,
-    type: u.type,
-    tableStatus: u.tableStatus,
-    capacity: Number(u.capacity),
-    enableTimeRate: u.enableTimeRate,
-    ratePerMinute: Number(u.ratePerMinute),
-    chargePerPerson: Boolean(u.chargePerPerson),
-    qrCode: u.qrCode ?? null,
-    isActive: u.isActive,
-    guestCount: Number(u.guestCount ?? 0),
-    rushMode: u.rushMode,
+    id: u?.id,
+    name: u?.name,
+    type: u?.type,
+    tableStatus: u?.tableStatus,
+    capacity: Number(u?.capacity),
+    enableTimeRate: u?.enableTimeRate,
+    ratePerMinute: Number(u?.ratePerMinute),
+    chargePerPerson: Boolean(u?.chargePerPerson),
+    qrCode: u?.qrCode ?? null,
+    isActive: u?.isActive,
+    guestCount: Number(u?.guestCount ?? 0),
+    rushMode: u?.rushMode,
   };
 };
 
