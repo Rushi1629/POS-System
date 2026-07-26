@@ -32,6 +32,7 @@ import {
   Check,
   TimerIcon,
   User2,
+  Shuffle,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -110,6 +111,7 @@ function Tables() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<FetchTableResponse | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [loadingId, setLoadingId] = useState<number | null>(null);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -267,11 +269,38 @@ function Tables() {
             >
               <Trash2 className="h-4 w-4" />
             </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={async () => {
+                try {
+                  setLoadingId(row.original.id); // start loading
+
+                  await updateTable({
+                    id: row.original.id,
+                    data: { regenerateQr: true },
+                  });
+
+                  toast.success("QR regenerated successfully ✅");
+                } catch {
+                  toast.error("Failed to regenerate ❌");
+                } finally {
+                  setLoadingId(null); // stop loading
+                }
+              }}
+              className="h-9 w-9 text-chart-3 hover:bg-chart-3/10 hover:text-chart-3"
+            >
+              {loadingId === row.original.id ? (
+                <RotateCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Shuffle className="h-4 w-4" />
+              )}
+            </Button>
           </div>
         ),
       },
     ],
-    [],
+    [loadingId],
   );
 
   const table = useReactTable({

@@ -27,6 +27,7 @@ export interface EditTablePayload {
   isActive?: boolean;
   guestCount?: number;
   rushMode?: boolean;
+  regenerateQr?: boolean;
 }
 
 export interface getTableLiveChargeResponse {
