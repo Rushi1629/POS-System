@@ -155,7 +155,7 @@ export default function CustomerOrdersPage() {
   }
 
   return (
-    <div className="">
+    <div className="pt-6 lg:pt-8">
         {/* Header */}
         <div className="border-b border-border bg-card/40">
           <div className="flex flex-wrap items-center justify-between gap-4">

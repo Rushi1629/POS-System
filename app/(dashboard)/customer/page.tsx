@@ -469,178 +469,154 @@ export default function CustomerDashboard() {
 
   return (
     <>
-      {/* {isOccupied && ( */}
-      <>
-        <div className="w-full mb-4">
-          {/* <div className="flex flex-col md:flex-row gap-3 md:items-center"> */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative flex-1 min-w-65 max-w-2xl">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search food, drinks..."
-                className="h-12 rounded-full border-border bg-card pl-9 pr-4 text-sm shadow-sm"
-              />
-            </div>
-            {/* <Button
-              variant="outline"
-              className="h-12 gap-2 rounded-full bg-card px-5 shadow-sm"
-              onClick={() => {
-                setSearchQuery("");
-                setActiveCategory(null);
-              }}
-            >
-              <RotateCcw className="h-4 w-4" /> Reset
-            </Button> */}
-
-            <motion.div
-              animate={{ rotate: isRotating ? 360 : 0 }}
-              transition={{ duration: 0.5 }}
-              onClick={() => {
-                setSearchQuery("");
-                setActiveCategory(null);
-                setIsRotating(true);
-
-                  // reset after animation
-                  setTimeout(() => setIsRotating(false), 500);
-              }}
-              className={cn(
-                "h-12 w-12 rounded-full bg-card flex items-center justify-center shadow-sm cursor-pointer"
-              )}
-            >
-              <RotateCcw
-                className="cursor-pointer h-4 w-4"
-              />
-            </motion.div>
+      <div className="sticky top-0 z-30 bg-(--background) border-b border-border/30 -mt-6">
+        {/* 🔍 SEARCH + RESET */}
+        <div className="flex items-center gap-2 px-4 py-3">
+          <div className="relative flex-1 min-w-65 max-w-2xl">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search food, drinks..."
+              className="h-12 rounded-full border-border bg-card pl-9 pr-4 text-sm shadow-sm"
+            />
           </div>
-          {/* </div> */}
+
+          <motion.div
+            animate={{ rotate: isRotating ? 360 : 0 }}
+            transition={{ duration: 0.5 }}
+            onClick={() => {
+              setSearchQuery("");
+              setActiveCategory(null);
+              setIsRotating(true);
+              setTimeout(() => setIsRotating(false), 500);
+            }}
+            className="h-12 w-12 rounded-full bg-card flex items-center justify-center shadow-sm cursor-pointer"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </motion.div>
         </div>
 
-        <div className="bg-(--background) flex flex-col w-full relative">
-          {/* 📂 Category Scroll */}
-          {!searchQuery && (
-            <div className="sticky z-20 bg-(--background) backdrop-blur-xl border-b border-border/30">
-              <div
-                ref={categoryScrollRef}
-                className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide pl-[2px]"
-              >
-                {categories.map((cat) => (
-                  <CategoryPill
-                    key={cat.id}
-                    category={cat}
-                    isActive={Number(activeCategory) === Number(cat.id)}
-                    onClick={() => setActiveCategory(Number(cat.id))}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 🍽️ Menu Items */}
-          <div className="lg:px-3 sm:px-4 pb-24">
-            <button
-              onClick={() => setExpandedSection(!expandedSection)}
-              className="flex items-center justify-between w-full py-3 mt-1"
-            >
-              <h2 className="font-heading text-lg font-semibold text-foreground">
-                {searchQuery ? "Search Results" : activeCategoryData?.name}{" "}
-                <span className="text-muted-foreground font-body text-sm font-normal">
-                  ({filteredItems.length})
-                </span>
-              </h2>
-
-              {expandedSection ? (
-                <ChevronUp className="w-5 h-5 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-muted-foreground" />
-              )}
-            </button>
-
-            {/* <AnimatePresence> */}
-            {expandedSection && (
-              <motion.div
-                layout="position"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4"
-              >
-                {isLoading ? (
-                  // 🔥 Skeleton Loader Grid
-                  Array.from({ length: 8 }).map((_, i) => (
-                    <MenuItemSkeleton key={i} />
-                  ))
-                ) : (
-                  <>
-                    {filteredItems.map((item) => (
-                      <MenuItemCard
-                        key={item.id}
-                        item={item}
-                        quantity={Object.values(cart)
-                          .filter(
-                            (cartItem) =>
-                              cartItem.id === item.id &&
-                              cartItem.menuType === item.menuType,
-                          )
-                          .reduce(
-                            (sum, cartItem) => sum + cartItem.quantity,
-                            0,
-                          )}
-                        onAdd={() => handleAdd(item)}
-                        onRemove={() => removeFromCart(item.id, item.menuType)}
-                      />
-                    ))}
-
-                    {filteredItems.length === 0 && (
-                      <div className="text-center py-12 text-muted-foreground text-sm w-full">
-                        No items found
-                      </div>
-                    )}
-                  </>
-                )}
-              </motion.div>
-            )}
-            {/* </AnimatePresence> */}
+        {/* 📂 CATEGORY */}
+        {!searchQuery && (
+          <div
+            ref={categoryScrollRef}
+            className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide"
+          >
+            {categories.map((cat) => (
+              <CategoryPill
+                key={cat.id}
+                category={cat}
+                isActive={Number(activeCategory) === Number(cat.id)}
+                onClick={() => setActiveCategory(Number(cat.id))}
+              />
+            ))}
           </div>
+        )}
+      </div>
 
-          {/* 🛒 Cart Footer */}
+      <div className="bg-(--background) flex flex-col w-full relative">
+        {/* 📂 Category Scroll */}
+
+        {/* 🍽️ Menu Items */}
+        <div className="lg:px-3 sm:px-4 pb-24">
+          <button
+            onClick={() => setExpandedSection(!expandedSection)}
+            className="flex items-center justify-between w-full py-3 mt-1"
+          >
+            <h2 className="font-heading text-lg font-semibold text-foreground">
+              {searchQuery ? "Search Results" : activeCategoryData?.name}{" "}
+              <span className="text-muted-foreground font-body text-sm font-normal">
+                ({filteredItems.length})
+              </span>
+            </h2>
+
+            {expandedSection ? (
+              <ChevronUp className="w-5 h-5 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+            )}
+          </button>
+
           {/* <AnimatePresence> */}
-          {totalCartItems > 0 && (
+          {expandedSection && (
             <motion.div
-              initial={{ y: 80 }}
-              animate={{ y: 0 }}
-              exit={{ y: 80 }}
-              className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-lg px-4 z-40"
+              layout="position"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4"
             >
-              <div className="bg-[#e25f28] text-primary-foreground rounded-2xl px-5 py-3.5 flex items-center justify-between shadow-lg shadow-primary/25">
-                <div>
-                  <p className="text-xs font-medium opacity-80">
-                    {totalCartItems} item{totalCartItems > 1 ? "s" : ""}
-                  </p>
-                  <p className="text-lg font-bold">
-                    ₹ {totalCartPrice.toFixed(2)}
-                  </p>
-                </div>
+              {isLoading ? (
+                // 🔥 Skeleton Loader Grid
+                Array.from({ length: 8 }).map((_, i) => (
+                  <MenuItemSkeleton key={i} />
+                ))
+              ) : (
+                <>
+                  {filteredItems.map((item) => (
+                    <MenuItemCard
+                      key={item.id}
+                      item={item}
+                      quantity={Object.values(cart)
+                        .filter(
+                          (cartItem) =>
+                            cartItem.id === item.id &&
+                            cartItem.menuType === item.menuType,
+                        )
+                        .reduce((sum, cartItem) => sum + cartItem.quantity, 0)}
+                      onAdd={() => handleAdd(item)}
+                      onRemove={() => removeFromCart(item.id, item.menuType)}
+                    />
+                  ))}
 
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() =>
-                    router.push(`/customer/cart?tableToken=${tableToken}`)
-                  }
-                  className="font-semibold text-[#e25f28] bg-[#f1edea]"
-                >
-                  View Cart <ChevronRightCircleIcon />
-                </Button>
-              </div>
+                  {filteredItems.length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground text-sm w-full">
+                      No items found
+                    </div>
+                  )}
+                </>
+              )}
             </motion.div>
           )}
           {/* </AnimatePresence> */}
         </div>
-      </>
-      {/* )} */}
+
+        {/* 🛒 Cart Footer */}
+        {/* <AnimatePresence> */}
+        {totalCartItems > 0 && (
+          <motion.div
+            initial={{ y: 80 }}
+            animate={{ y: 0 }}
+            exit={{ y: 80 }}
+            className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-lg px-4 z-40"
+          >
+            <div className="bg-[#e25f28] text-primary-foreground rounded-2xl px-5 py-3.5 flex items-center justify-between shadow-lg shadow-primary/25">
+              <div>
+                <p className="text-xs font-medium opacity-80">
+                  {totalCartItems} item{totalCartItems > 1 ? "s" : ""}
+                </p>
+                <p className="text-lg font-bold">
+                  ₹ {totalCartPrice.toFixed(2)}
+                </p>
+              </div>
+
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() =>
+                  router.push(`/customer/cart?tableToken=${tableToken}`)
+                }
+                className="font-semibold text-[#e25f28] bg-[#f1edea]"
+              >
+                View Cart <ChevronRightCircleIcon />
+              </Button>
+            </div>
+          </motion.div>
+        )}
+        {/* </AnimatePresence> */}
+      </div>
 
       <Dialog
         open={selectedItem !== null}

@@ -245,7 +245,7 @@ const CartView = () => {
   }
 
   return (
-    <div className="flex flex-col xl:flex-row gap-8">
+    <div className="flex flex-col xl:flex-row gap-8 pt-6 lg:pt-8">
       {/* 🧾 Items */}
       <div className="flex-1 space-y-4">
         {items.map((item) => (

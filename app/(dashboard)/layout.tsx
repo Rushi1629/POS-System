@@ -12,6 +12,7 @@ import { setCartAction } from "../../store/cart/cartSlice";
 import { store } from "../../store/store";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useFetchTableByTokenCustomer } from "@/client/hooks/useCustomer";
+import { cn } from "@/lib/utils";
 
 export default function DashboardLayout({
   children,
@@ -50,13 +51,16 @@ export default function DashboardLayout({
           <Sidebar />
         </div>
       )}
-      {/* <div className="hidden md:block w-64 bg-gray-900 text-white">
-      </div> */}
 
       <div className="flex-1 flex flex-col min-w-0">
         <Header table={table} />
 
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto pb-20 bg-(--background) scrollbar-orange">
+        <main
+          className={cn(
+            "flex-1 overflow-y-auto pb-20 bg-(--background) scrollbar-orange",
+            pathname.startsWith("/customer") ? "pt-0 pr-6 pl-6 pb-6 lg:pr-8 lg:pl-8 lg:pb-8" : "p-6 lg:p-8",
+          )}
+        >
           <Suspense
             fallback={<SecretCafeLoader message="Loading dashboard..." />}
           >
