@@ -187,6 +187,6 @@ export const STATUS_TRANSITIONS: StatusTransition[] = [
   {
     from: "ANY",
     to: "CANCELLED",
-    roles: ["Admin", "Waiter"],
+    roles: ["Super Admin", "Waiter"],
   },
 ];

@@ -142,6 +142,10 @@ export default function page() {
 
           const next = getNextStatus(i.status, role);
 
+          if (next === "CANCELLED") {
+            return i;
+          }
+
           if (!next) {
             // ✅ show only once
             if (!errorShown) {
@@ -174,7 +178,7 @@ export default function page() {
               },
               onError: (err: any) => {
                 const msg =
-                  err?.response?.data?.message || "Failed to update status";
+                  err?.message || "Failed to update status";
                 toast.error(msg);
               },
             },
@@ -185,6 +189,56 @@ export default function page() {
 
         return { ...o, items };
       }),
+    );
+  };
+
+  const handleCancel = (itemId: number) => {
+    const item = orders.flatMap((o) => o.items).find((i) => i.id === itemId);
+
+    if (!item) return;
+
+    // 🚫 Already cancelled
+    if (item.isCancelled || item.status === "CANCELLED") {
+      toast.error("Item already cancelled");
+      return;
+    }
+
+    // 🚫 Completed cannot cancel
+    if (item.status === "COMPLETED") {
+      toast.error("Completed item cannot be cancelled");
+      return;
+    }
+
+    updateStatus(
+      {
+        orderItemId: itemId,
+        status: "CANCELLED",
+      },
+      {
+        onSuccess: () => {
+          toast.success("Item cancelled");
+
+          // ✅ Update UI immediately
+          setOrders((prev) =>
+            prev.map((o) => ({
+              ...o,
+              items: o.items.map((i) =>
+                i.id === itemId
+                  ? { ...i, status: "CANCELLED", isCancelled: true }
+                  : i,
+              ),
+            })),
+          );
+        },
+        onError: (error: any) => {
+          const message =
+            error?.response?.data?.message ||
+            error.message ||
+            "Failed to cancel item";
+
+          toast.error(message);
+        },
+      },
     );
   };
 
@@ -324,6 +378,7 @@ export default function page() {
             key={o.id}
             order={o}
             onAdvance={(itemId) => advanceItem(o.id, itemId)}
+            onCancel={handleCancel}
             // onBumpAll={() => bumpAll(o.id)}
           />
         ))}

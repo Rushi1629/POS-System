@@ -48,7 +48,7 @@ export const useUpdateItemOrderStatus = () => {
     },
 
     onError: (error) => {
-      console.error("Update failed", error);
+      console.error("Update failed", error.message);
     },
   });
 };

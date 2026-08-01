@@ -3,16 +3,18 @@ import { ItemStatus, KOrder, NEXT, STATUS_STYLES } from "@/types/chef-types";
 import React from "react";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Check, Clock, StickyNote } from "lucide-react";
+import { ArrowRight, Check, Clock, StickyNote, X } from "lucide-react";
 import { Button } from "./ui/button";
 
 const ChefCard = ({
   order,
   onAdvance,
   // onBumpAll,
+  onCancel,
 }: {
   order: KOrder;
   onAdvance: (itemId: number) => void;
+  onCancel: (itemId: number) => void;
   // onBumpAll: () => void;
 }) => {
   const allServed = order.items.every((i) => i.status === "SERVED");
@@ -52,6 +54,9 @@ const ChefCard = ({
           const s = STATUS_STYLES[item.status];
           const next = NEXT[item.status];
           const isCancelled = item.isCancelled;
+
+          const isItemCancelled = item.status === "CANCELLED" || isCancelled;
+          
           return (
             <div
               key={item.id}
@@ -60,7 +65,15 @@ const ChefCard = ({
               <span className={cn("h-2 w-2 shrink-0 rounded-full", s.dot)} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="truncate text-sm font-semibold">{item.name}</p>
+                  <p
+                    className={cn(
+                      "truncate text-sm font-semibold",
+                      isItemCancelled &&
+                        "line-through text-muted-foreground opacity-70",
+                    )}
+                  >
+                    {item.name}
+                  </p>
                   <span className="text-xs font-medium text-muted-foreground">
                     ×{item.qty}
                   </span>
@@ -80,7 +93,7 @@ const ChefCard = ({
               <Badge variant="outline" className={cn("border", s.chip)}>
                 {s.label}
               </Badge>
-              {!isCancelled && next ? (
+              {/* {!isCancelled && next ? (
                 <Button
                   size="icon"
                   variant="ghost"
@@ -93,7 +106,41 @@ const ChefCard = ({
                 <div className="flex h-7 w-7 items-center justify-center text-muted-foreground">
                   <Check className="h-4 w-4" />
                 </div>
-              )}
+              )} */}
+              <div className="flex items-center gap-1">
+                {!isCancelled && (
+                  // 🔴 Cancel button
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    disabled={isCancelled}
+                    className="h-7 w-7 rounded-full text-red-500 hover:bg-red-100"
+                    onClick={() => onCancel(item.id)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+
+                {next && (
+                  // 🟢 Forward button (still visible even if cancelled)
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    disabled={isCancelled}
+                    className="h-7 w-7 rounded-full hover:bg-primary/10 hover:text-primary"
+                    onClick={() => onAdvance(item.id)}
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                )}
+
+                {!next && !isCancelled && (
+                  // ✅ Only show check if NOT cancelled
+                  <div className="flex h-7 w-7 items-center justify-center text-muted-foreground">
+                    <Check className="h-4 w-4" />
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
