@@ -2,7 +2,7 @@
 
 import { useProfile } from "@/client/hooks/useAuth";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch } from "@/store/hooks";
 import { setUser, clearUser } from "@/store/auth/authSlice";
 import ApiLoader from "./ApiLoader";
@@ -67,12 +67,6 @@ export default function AuthInitializer({ children }: Props) {
       dispatch(setUser(user));
     }
 
-    // ✅ Redirect logged-in user away from login page
-    if (user && pathname === "/login") {
-      router.replace("/user-management");
-      return;
-    }
-
     // ✅ Role-based route protection
     const findNavItem = navItems.find((item) => pathname.startsWith(item.href));
 
@@ -81,7 +75,13 @@ export default function AuthInitializer({ children }: Props) {
       user?.role?.name &&
       !findNavItem.roles.includes(user.role.name)
     ) {
-      router.replace("/unauthorized");
+      router.push("/unauthorized");
+    }
+
+    // ✅ Redirect logged-in user away from login page
+    if (user && pathname === "/login") {
+      router.replace("/user-management");
+      return;
     }
   }, [pathname, user, isLoading, isError, router]);
 
