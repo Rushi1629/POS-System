@@ -39,6 +39,7 @@ import { Label } from "@/components/ui/label";
 import ApiLoader from "@/components/ApiLoader";
 import { useProfile } from "@/client/hooks/useAuth";
 import { getCartKey } from "@/types/cart-types";
+import { cn } from "@/lib/utils";
 
 export default function CustomerDashboard() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
@@ -54,6 +55,7 @@ export default function CustomerDashboard() {
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<any[]>([]);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const [isRotating, setIsRotating] = useState(false);
 
   const {
     data: tableData,
@@ -481,7 +483,7 @@ export default function CustomerDashboard() {
                 className="h-12 rounded-full border-border bg-card pl-9 pr-4 text-sm shadow-sm"
               />
             </div>
-            <Button
+            {/* <Button
               variant="outline"
               className="h-12 gap-2 rounded-full bg-card px-5 shadow-sm"
               onClick={() => {
@@ -490,7 +492,27 @@ export default function CustomerDashboard() {
               }}
             >
               <RotateCcw className="h-4 w-4" /> Reset
-            </Button>
+            </Button> */}
+
+            <motion.div
+              animate={{ rotate: isRotating ? 360 : 0 }}
+              transition={{ duration: 0.5 }}
+              onClick={() => {
+                setSearchQuery("");
+                setActiveCategory(null);
+                setIsRotating(true);
+
+                  // reset after animation
+                  setTimeout(() => setIsRotating(false), 500);
+              }}
+              className={cn(
+                "h-12 w-12 rounded-full bg-card flex items-center justify-center shadow-sm cursor-pointer"
+              )}
+            >
+              <RotateCcw
+                className="cursor-pointer h-4 w-4"
+              />
+            </motion.div>
           </div>
           {/* </div> */}
         </div>
