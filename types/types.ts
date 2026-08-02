@@ -345,6 +345,14 @@ export const navItems: NavItem[] = [
     roles: ["Super Admin"],
   },
   {
+    id: "nav-submenu",
+    label: "Submenu",
+    icon: UtensilsCrossed,
+    href: "/submenu",
+    group: "Operations",
+    roles: ["Super Admin"],
+  },
+  {
     id: "nav-customer",
     label: "Customer",
     icon: User2,
@@ -368,14 +376,14 @@ export const navItems: NavItem[] = [
     group: "Management",
     roles: ["Super Admin","Chef","Waiter"],
   },
-  {
-    id: "nav-order-status-management",
-    label: "order status Management",
-    icon: ChefHat,
-    href: "/order-status-management",
-    group: "Management",
-    roles: ["Super Admin","Chef","Waiter"],
-  },
+  // {
+  //   id: "nav-order-status-management",
+  //   label: "order status Management",
+  //   icon: ChefHat,
+  //   href: "/order-status-management",
+  //   group: "Management",
+  //   roles: ["Super Admin","Chef","Waiter"],
+  // },
   {
     id: "nav-customer-management",
     label: "Customer-Order",
