@@ -3,7 +3,7 @@ import { ItemStatus, KOrder, NEXT, STATUS_STYLES } from "@/types/chef-types";
 import React from "react";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Check, Clock, StickyNote, X } from "lucide-react";
+import { ArrowRight, Check, Clock, Loader2, StickyNote, X } from "lucide-react";
 import { Button } from "./ui/button";
 
 const ChefCard = ({
@@ -11,10 +11,12 @@ const ChefCard = ({
   onAdvance,
   // onBumpAll,
   onCancel,
+  loadingItems,
 }: {
   order: KOrder;
   onAdvance: (itemId: number) => void;
   onCancel: (itemId: number) => void;
+  loadingItems: { [key: number]: "advance" | "cancel" };
   // onBumpAll: () => void;
 }) => {
   const allServed = order.items.every((i) => i.status === "SERVED");
@@ -56,7 +58,11 @@ const ChefCard = ({
           const isCancelled = item.isCancelled;
 
           const isItemCancelled = item.status === "CANCELLED" || isCancelled;
-          
+
+          const isCancelLoading = loadingItems[item.id] === "cancel";
+
+          const isAdvanceLoading = loadingItems[item.id] === "advance";
+
           return (
             <div
               key={item.id}
@@ -111,26 +117,34 @@ const ChefCard = ({
                 {!isCancelled && (
                   // 🔴 Cancel button
                   <Button
+                    disabled={!!loadingItems[item.id]}
                     size="icon"
                     variant="ghost"
-                    disabled={isCancelled}
                     className="h-7 w-7 rounded-full text-red-500 hover:bg-red-100"
                     onClick={() => onCancel(item.id)}
                   >
-                    <X className="h-4 w-4" />
+                    {isCancelLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <X className="h-4 w-4" />
+                    )}
                   </Button>
                 )}
 
                 {next && (
                   // 🟢 Forward button (still visible even if cancelled)
                   <Button
+                    disabled={!!loadingItems[item.id]}
                     size="icon"
                     variant="ghost"
-                    disabled={isCancelled}
                     className="h-7 w-7 rounded-full hover:bg-primary/10 hover:text-primary"
                     onClick={() => onAdvance(item.id)}
                   >
-                    <ArrowRight className="h-4 w-4" />
+                    {isAdvanceLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <ArrowRight className="h-4 w-4" />
+                    )}
                   </Button>
                 )}
 

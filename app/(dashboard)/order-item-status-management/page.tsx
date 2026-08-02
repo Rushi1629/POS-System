@@ -74,6 +74,10 @@ export default function page() {
 
   const [orders, setOrders] = useState<KOrder[]>([]);
 
+  const [loadingItems, setLoadingItems] = useState<{
+    [key: number]: "advance" | "cancel";
+  }>({});
+
   const role = profile?.role?.name as UserRole | undefined;
 
   if (!role) {
@@ -116,79 +120,80 @@ export default function page() {
   }, [orders]);
 
   const advanceItem = (orderId: number, itemId: number) => {
-    debugger;
     if (!role) {
       toast.error("Role not loaded yet");
       return;
     }
 
-    let errorShown = false;
+    const order = orders.find((o) => o.id === orderId);
+    const item = order?.items.find((i) => i.id === itemId);
+    if (!item) return;
+
+    if (item.status === "CANCELLED" || item.isCancelled) {
+      toast.error(`${item.name} is cancelled and cannot be forwarded`);
+      return;
+    }
+
+    const next = getNextStatus(item.status, role);
+
+    // ❌ Not allowed
+    if (!next) {
+      toast.error(
+        `Not allowed: ${role} cannot move ${item.name} from ${item.status}`,
+      );
+      return;
+    }
+
+    // ❌ Same status
+    if (next === item.status) {
+      toast.error(
+        `Invalid transition: ${item.status} → ${next} for ${item.name}`,
+      );
+      return;
+    }
+
+    // ❌ Prevent cancel transition
+    if (next === "CANCELLED") return;
+
+    // ✅ START LOADING
+    setLoadingItems((prev) => ({
+      ...prev,
+      [itemId]: "advance",
+    }));
+
+    updateStatus(
+      {
+        orderItemId: item.id,
+        status: next,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`${item.name} moved to ${next}`);
+        },
+        onError: (err: any) => {
+          toast.error(err?.message || "Failed to update status");
+        },
+        onSettled: () => {
+          setLoadingItems((prev) => {
+            const copy = { ...prev };
+            delete copy[itemId];
+            return copy;
+          });
+        },
+      },
+    );
 
     setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id !== orderId) return o;
-
-        const items = o.items.map((i) => {
-          if (i.id !== itemId) return i;
-
-          // 🚫 Cancelled check
-          if (i.isCancelled) {
-            if (!errorShown) {
-              toast.error(`${i.name} is cancelled`);
-              errorShown = true;
+      prev.map((o) =>
+        o.id === orderId
+          ? {
+              ...o,
+              items: o.items.map((i) =>
+                i.id === itemId ? { ...i, status: next } : i,
+              ),
             }
-            return i;
-          }
-
-          const next = getNextStatus(i.status, role);
-
-          if (next === "CANCELLED") {
-            return i;
-          }
-
-          if (!next) {
-            // ✅ show only once
-            if (!errorShown) {
-              toast.error(
-                `Not allowed: ${role} cannot move ${i.name} from ${i.status}`,
-              );
-              errorShown = true;
-            }
-            return i;
-          }
-
-          if (next === i.status) {
-            if (!errorShown) {
-              toast.error(
-                `Invalid transition: ${i.status} → ${next} for ${i.name}`,
-              );
-              errorShown = true;
-            }
-            return i;
-          }
-
-          updateStatus(
-            {
-              orderItemId: i.id,
-              status: next,
-            },
-            {
-              onSuccess: () => {
-                toast.success(`${i.name} moved to ${next}`);
-              },
-              onError: (err: any) => {
-                const msg =
-                  err?.message || "Failed to update status";
-                toast.error(msg);
-              },
-            },
-          );
-
-          return { ...i, status: next };
-        });
-
-        return { ...o, items };
-      }),
+          : o,
+      ),
     );
   };
 
@@ -196,6 +201,9 @@ export default function page() {
     const item = orders.flatMap((o) => o.items).find((i) => i.id === itemId);
 
     if (!item) return;
+
+    // 🚫 Prevent duplicate clicks
+    if (loadingItems[itemId]) return;
 
     // 🚫 Already cancelled
     if (item.isCancelled || item.status === "CANCELLED") {
@@ -209,6 +217,11 @@ export default function page() {
       return;
     }
 
+    // ✅ START LOADING
+    setLoadingItems((prev) => ({
+      ...prev,
+      [itemId]: "cancel",
+    }));
     updateStatus(
       {
         orderItemId: itemId,
@@ -218,7 +231,7 @@ export default function page() {
         onSuccess: () => {
           toast.success("Item cancelled");
 
-          // ✅ Update UI immediately
+          // ✅ Update UI
           setOrders((prev) =>
             prev.map((o) => ({
               ...o,
@@ -237,6 +250,13 @@ export default function page() {
             "Failed to cancel item";
 
           toast.error(message);
+        },
+        onSettled: () => {
+          setLoadingItems((prev) => {
+            const copy = { ...prev };
+            delete copy[itemId];
+            return copy;
+          });
         },
       },
     );
@@ -379,6 +399,7 @@ export default function page() {
             order={o}
             onAdvance={(itemId) => advanceItem(o.id, itemId)}
             onCancel={handleCancel}
+            loadingItems={loadingItems}
             // onBumpAll={() => bumpAll(o.id)}
           />
         ))}

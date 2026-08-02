@@ -63,7 +63,10 @@ function getNextStatus(
   if (isCancelled) return null;
 
   const transition = STATUS_TRANSITIONS.find(
-    (t) => (t.from === current || t.from === "ANY") && t.roles.includes(role),
+    (t) =>
+      (t.from === current || t.from === "ANY") &&
+      t.roles.includes(role) &&
+      t.to !== "CANCELLED", // 🔥 ignore cancel here
   );
 
   return transition ? (transition.to as ItemStatus) : null;
