@@ -345,6 +345,17 @@ function MenuPage() {
       if (editing) {
         const data = JSON.parse(String(formData.get("data") || "{}"));
 
+        const normalizeSubmenu = (items: Array<{ subMenuItemId?: number | string }> = []) =>
+          [...items]
+            .filter(
+              (item) =>
+                item?.subMenuItemId !== undefined &&
+                item?.subMenuItemId !== null &&
+                String(item.subMenuItemId).trim() !== "",
+            )
+            .map((item) => Number(item.subMenuItemId))
+            .sort((a, b) => a - b);
+
         const payload = {
           name: data.name,
           description: data.description,
@@ -352,6 +363,7 @@ function MenuPage() {
           menuType: data.menuType,
           available: data.available,
           categoryId: data.categoryId,
+          submenu: normalizeSubmenu(data.submenu),
         };
 
         const isSame = isEqual(
@@ -362,6 +374,11 @@ function MenuPage() {
             menuType: editing.menuType,
             available: editing.available,
             categoryId: editing.category?.id,
+            submenu: normalizeSubmenu(
+              (editing.subMenuItems || []).map((item) => ({
+                subMenuItemId: Number(item.id),
+              })),
+            ),
           },
           payload,
         );
