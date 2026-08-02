@@ -151,7 +151,13 @@ function MenuDialog({
   function addSub() {
     setSubmenu((prev) => [
       ...prev,
-      { subMenuItemId: undefined, name: "", price: "", available: true, description: "" },
+      {
+        subMenuItemId: undefined,
+        name: "",
+        price: "",
+        available: true,
+        description: "",
+      },
     ]);
   }
   function removeSub(i: number) {
@@ -200,6 +206,10 @@ function MenuDialog({
     debugger;
     console.log("🔥 SUBMIT CALLED");
     try {
+      if (!values.categoryId) {
+        toast.error("Please select a category");
+        return;
+      }
       // ✅ FIX HERE
       const payload: MenuPayload = {
         name: values.name,
@@ -211,7 +221,9 @@ function MenuDialog({
       };
 
       const cleanSubmenu = (values.submenu || [])
-        .filter((s) => s.subMenuItemId !== undefined && s.subMenuItemId !== null)
+        .filter(
+          (s) => s.subMenuItemId !== undefined && s.subMenuItemId !== null,
+        )
         .map((s) => ({
           subMenuItemId: Number(s.subMenuItemId),
         }));
@@ -255,6 +267,7 @@ function MenuDialog({
           <DialogTitle className="text-xl">
             {initial ? "Edit menu item" : "Create new menu item"}
           </DialogTitle>
+          
           <DialogDescription>
             {initial
               ? "Update the details below and save your changes."
@@ -347,7 +360,9 @@ function MenuDialog({
               <Label>Category</Label>
               <Select
                 value={watch("categoryId") ? String(watch("categoryId")) : ""}
-                onValueChange={(v) => setValue("categoryId", Number(v))} // ✅ convert here
+                onValueChange={(v) =>
+                  setValue("categoryId", v ? Number(v) : undefined)
+                } // ✅ convert here
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
