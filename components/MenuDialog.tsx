@@ -246,7 +246,7 @@ function MenuDialog({
       }}
     >
       <DialogContent
-        className="sm:max-w-[640px] max-h-[90vh] flex flex-col"
+        className="sm:max-w-160 max-h-[90vh] flex flex-col"
         onInteractOutside={(e) => {
           e.preventDefault();
         }}

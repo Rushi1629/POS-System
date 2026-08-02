@@ -26,7 +26,7 @@ const ChefCard = ({
       {/* Accent bar */}
       <div
         className={cn(
-          "absolute inset-x-0 top-0 h-[0.9px] bg-gradient-to-r",
+          "absolute inset-x-0 top-0 h-[0.9px] bg-linear-to-r",
           headerTone.accent,
         )}
       />
