@@ -20,7 +20,9 @@ export default function LoginForm() {
 
   // Login API mutation using custom hook
   const loginMutation = useLogin();
-  const { data: user } = useProfile({ enabled: true });
+  const { data: user } = useProfile({
+    enabled: false,
+  });
 
   useEffect(() => {
     if (user) {
@@ -39,13 +41,18 @@ export default function LoginForm() {
   //   }
   // }, [loginMutation.isSuccess, loginMutation.isError]);
 
+  const getDefaultRouteByRole = (roleName?: string) => {
+    if (roleName === "Super Admin") return "/user-management";
+    return "/dashboard";
+  };
+
   const handleLogin = async (data: any) => {
     try {
       const res = await loginMutation.mutateAsync(data);
+      const roleName = res?.user?.role?.name ?? res?.data?.role?.name ?? user?.role?.name;
 
       toast.success("Login successful 🎉");
-
-      router.push("/user-management");
+      router.replace(getDefaultRouteByRole(roleName));
     } catch (error) {
       toast.error("Login failed");
     }

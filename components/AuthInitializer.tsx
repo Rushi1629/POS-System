@@ -26,7 +26,12 @@ export default function AuthInitializer({ children }: Props) {
     isLoading,
     isError,
     refetch,
-  } = useProfile({ enabled: !isPublicCustomerRoute });
+  } = useProfile({
+    enabled:
+      !isPublicCustomerRoute &&
+      pathname !== "/login" &&
+      pathname !== "/register",
+  });
 
   useEffect(() => {
     // Public routes that should NOT trigger profile fetch or redirects

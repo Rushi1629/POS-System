@@ -41,9 +41,14 @@ export default function Sidebar() {
   const queryClient = useQueryClient();
   const {
     data: user,
-    isLoading,    
+    isLoading,
     isError,
-  } = useProfile({ enabled: !pathname.startsWith("/customer"), });
+  } = useProfile({
+    enabled:
+      !pathname.startsWith("/customer") &&
+      pathname !== "/login" &&
+      pathname !== "/register",
+  });
 
   console.log(user,"user sidebar");
 
@@ -56,8 +61,9 @@ export default function Sidebar() {
     try {
       await logoutMutation.mutateAsync();
       queryClient.clear();
-      dispatch(clearUser()); // clear redux
-      router.replace("/login"); // redirect
+      queryClient.removeQueries({ queryKey: ["me"] });
+      dispatch(clearUser());
+      router.replace("/login");
     } catch (error) {
       console.error("Logout failed");
     }

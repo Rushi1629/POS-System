@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchUserProfile, login, logout } from "../services/auth.service";
+import { clearAuthCookies } from "../client";
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -25,9 +26,13 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: logout,
     onSuccess: () => {
+      clearAuthCookies();
       queryClient.clear();
+      queryClient.removeQueries({ queryKey: ["me"] });
     },
     onError: (err) => {
+      clearAuthCookies();
+      queryClient.clear();
       console.log("❌ API ERROR", err);
     },
   });
