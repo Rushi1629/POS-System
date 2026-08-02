@@ -60,10 +60,7 @@ export type MenuPayload = {
   categoryId: number;
   available: boolean;
   menuType: "Veg" | "NonVeg";
-  subMenu?: {
-    name: string;
-    price: number;
-    available: boolean;
-    description?: string;
+  submenu?: {
+    subMenuItemId: number;
   }[];
 };

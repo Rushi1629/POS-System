@@ -279,10 +279,11 @@ export interface NavItem {
 }
 
 export type SubFormRow = {
-  name: string;
-  price: string;
-  available: boolean;
-  description: string;
+  subMenuItemId?: number;
+  name?: string;
+  price?: string | number;
+  available?: boolean;
+  description?: string;
 };
 
 export type MenuType = "Veg" | "NonVeg";

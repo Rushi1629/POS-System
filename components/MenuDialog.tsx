@@ -37,6 +37,7 @@ import { FormValues, menuDialogProps, MenuPayload } from "@/types/menu-types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useFetchSubMenus } from "@/client/hooks/useSubmenu";
 
 function MenuDialog({
   open,
@@ -68,6 +69,7 @@ function MenuDialog({
   });
 
   const [submenu, setSubmenu] = useState<SubFormRow[]>([]);
+  const { data: submenuOptions = [] } = useFetchSubMenus();
 
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -106,6 +108,7 @@ function MenuDialog({
       // 👉 EDIT MODE
       const mappedSubmenu =
         initial.subMenuItems?.map((s: SubMenuItem) => ({
+          subMenuItemId: Number(s.id),
           name: s.name,
           price: Number(s.price),
           available: s.available,
@@ -148,7 +151,7 @@ function MenuDialog({
   function addSub() {
     setSubmenu((prev) => [
       ...prev,
-      { name: "", price: "", available: true, description: "" },
+      { subMenuItemId: undefined, name: "", price: "", available: true, description: "" },
     ]);
   }
   function removeSub(i: number) {
@@ -156,16 +159,35 @@ function MenuDialog({
   }
   function updateSub(i: number, patch: Partial<SubFormRow>) {
     setSubmenu((prev) => {
-      const updated = prev.map((s, idx) =>
-        idx === i ? { ...s, ...patch } : s,
-      );
+      const updated = prev.map((s, idx) => {
+        if (idx !== i) return s;
 
-      // ✅ sync with RHF
+        const next = { ...s, ...patch };
+
+        if (patch.subMenuItemId !== undefined) {
+          const selected = submenuOptions.find(
+            (item) => Number(item.id) === Number(patch.subMenuItemId),
+          );
+
+          if (selected) {
+            next.name = selected.name;
+            next.price = Number(selected.price);
+            next.available = selected.available;
+            next.description = selected.description || "";
+          }
+        }
+
+        return next;
+      });
+
       setValue(
         "submenu",
         updated.map((s) => ({
-          ...s,
-          price: Number(s.price),
+          subMenuItemId: s.subMenuItemId ? Number(s.subMenuItemId) : undefined,
+          name: s.name || "",
+          price: s.price !== undefined ? Number(s.price) : undefined,
+          available: s.available ?? true,
+          description: s.description || "",
         })),
       );
 
@@ -179,8 +201,6 @@ function MenuDialog({
     console.log("🔥 SUBMIT CALLED");
     try {
       // ✅ FIX HERE
-      const formattedSubmenu = values.submenu || [];
-
       const payload: MenuPayload = {
         name: values.name,
         description: values.description || "",
@@ -188,18 +208,16 @@ function MenuDialog({
         categoryId: values.categoryId,
         available: values.available,
         menuType: values.menuType,
-        // subMenu: formattedSubmenu, // ⚠️ match backend key (NOT subMenuItems)
       };
 
-      const cleanSubmenu = (values.submenu || []).map((s) => ({
-        name: s.name,
-        price: Number(s.price),
-        available: s.available,
-        description: s.description || "",
-      }));
+      const cleanSubmenu = (values.submenu || [])
+        .filter((s) => s.subMenuItemId !== undefined && s.subMenuItemId !== null)
+        .map((s) => ({
+          subMenuItemId: Number(s.subMenuItemId),
+        }));
 
-      if (!initial && cleanSubmenu.length > 0) {
-        payload.subMenu = cleanSubmenu;
+      if (cleanSubmenu.length > 0) {
+        payload.submenu = cleanSubmenu;
       }
 
       const formData = new FormData();
@@ -436,66 +454,73 @@ function MenuDialog({
               </div>
             ) : (
               <div className="space-y-3">
-                {submenu.map((s, i) => (
-                  <div key={i} className="rounded-lg border bg-muted/30 p-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-xs font-semibold text-muted-foreground">
-                        Add-on #{i + 1}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => removeSub(i)}
-                        className="text-muted-foreground hover:text-destructive"
-                        aria-label="Remove add-on"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                      <Input
-                        value={s.name}
-                        onChange={(e) => updateSub(i, { name: e.target.value })}
-                        placeholder="Name (e.g. Extra cheese)"
-                      />
-                      <div className="relative">
-                        <IndianRupee className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={s.price}
-                          onChange={(e) =>
-                            updateSub(i, { price: e.target.value })
-                          }
-                          placeholder="Price"
-                          className="pl-9"
-                        />
+                {submenu.map((s, i) => {
+                  const selectedSubmenu = submenuOptions.find(
+                    (item) => Number(item.id) === Number(s.subMenuItemId),
+                  );
+
+                  return (
+                    <div key={i} className="rounded-lg border bg-muted/30 p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-xs font-semibold text-muted-foreground">
+                          Add-on #{i + 1}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeSub(i)}
+                          className="text-muted-foreground hover:text-destructive"
+                          aria-label="Remove add-on"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
                       </div>
+
+                      <div className="mt-2 space-y-2">
+                        <Select
+                          value={s.subMenuItemId ? String(s.subMenuItemId) : ""}
+                          onValueChange={(value) =>
+                            updateSub(i, { subMenuItemId: Number(value) })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select submenu item" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {submenuOptions.map((item) => (
+                              <SelectItem key={item.id} value={String(item.id)}>
+                                {item.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        {selectedSubmenu ? (
+                          <div className="rounded-md border bg-background/60 p-2 text-xs text-muted-foreground">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-medium text-foreground">
+                                {selectedSubmenu.name}
+                              </span>
+                              <span className="font-semibold text-foreground">
+                                ₹{Number(selectedSubmenu.price).toFixed(2)}
+                              </span>
+                            </div>
+                            {selectedSubmenu.description ? (
+                              <p className="mt-1 text-[11px]">
+                                {selectedSubmenu.description}
+                              </p>
+                            ) : null}
+                          </div>
+                        ) : null}
+                      </div>
+
+                      {errors.submenu?.[i]?.subMenuItemId && (
+                        <p className="mt-1 text-xs text-destructive">
+                          {errors.submenu[i]?.subMenuItemId?.message}
+                        </p>
+                      )}
                     </div>
-                    <Input
-                      value={s.description}
-                      onChange={(e) =>
-                        updateSub(i, { description: e.target.value })
-                      }
-                      placeholder="Description"
-                      className="mt-2"
-                    />
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">
-                        Available
-                      </span>
-                      <Switch
-                        checked={s.available}
-                        onCheckedChange={(v) => updateSub(i, { available: v })}
-                      />
-                    </div>
-                    {errors.submenu?.[i]?.name && (
-                      <p className="mt-1 text-xs text-destructive">
-                        {errors.submenu[i]?.name?.message}
-                      </p>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
