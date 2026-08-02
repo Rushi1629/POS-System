@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Toaster } from "sonner";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useLogin } from "@/client/hooks/useAuth";
+import { useLogin, useProfile } from "@/client/hooks/useAuth";
 import SecretCafeLoader from "@/components/SecretCafeLoader";
 import { DemoCredential } from "@/types/types";
 import { useAppDispatch } from "@/store/hooks";
@@ -20,6 +20,13 @@ export default function LoginForm() {
 
   // Login API mutation using custom hook
   const loginMutation = useLogin();
+  const { data: user } = useProfile({ enabled: true });
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/user-management");
+    }
+  }, [user, router]);
 
   // useEffect(() => {
   //   if (loginMutation.isSuccess) {

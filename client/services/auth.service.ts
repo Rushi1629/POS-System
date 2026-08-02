@@ -16,5 +16,11 @@ export const fetchUserProfile = async () => {
     method: "GET",
   });
 
-  return res.data;
+  const user = res?.data ?? res?.user ?? res;
+
+  if (!user) {
+    throw new Error("User profile not found");
+  }
+
+  return user;
 };
