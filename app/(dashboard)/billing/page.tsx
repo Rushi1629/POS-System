@@ -55,6 +55,7 @@ import {
 import { useFetchOrdersTableWise } from "@/client/hooks/useOrder";
 import { OrderAdminChef } from "@/types/order-types";
 import { useFetchTables } from "@/client/hooks/useTable";
+import { useFetchDiscounts } from "@/client/hooks/useDiscount";
 
 /* ---------- Page ---------- */
 export default function BillingPage() {
@@ -76,6 +77,9 @@ export default function BillingPage() {
   const { mutateAsync: payBill, isPending: isPaying } = usePayBill();
   const { mutateAsync: generateBill, isPending: isGenerating } =
     useGenerateBill();
+  const { data: discounts = [], isLoading } = useFetchDiscounts();
+
+  console.log(discounts, "hvhvhhf");
 
   useEffect(() => {
     if (!allBills || !Array.isArray(allBills)) return;
@@ -99,10 +103,15 @@ export default function BillingPage() {
   const handleGenerateBill = async ({
     tableId,
     mobileNumber,
+    discounts,
     notes,
   }: {
     tableId: number;
     mobileNumber: string;
+    discounts: {
+      discountId: number;
+      sequence: number;
+    }[];
     notes: string;
   }) => {
     if (!tableId) {
@@ -112,6 +121,7 @@ export default function BillingPage() {
     const response = await generateBill({
       tableId: tableId!,
       mobileNumber,
+      discounts,
       notes: notes || "n/a",
     });
 
@@ -194,8 +204,8 @@ export default function BillingPage() {
               </Button>
             </DialogTrigger>
             <GenerateBillDialog
-              // orders={availableOrders}
               tables={tables ?? []}
+              discounts={discounts ?? []}
               isGenerating={isGenerating}
               onClose={() => setOpenGenerate(false)}
               onSubmit={handleGenerateBill}

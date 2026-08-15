@@ -50,9 +50,26 @@ export interface BillOrder {
 // ============================================================
 // 1) Generate Bill API   →  POST /bills/generate
 // ============================================================
+
+export interface Discount {
+  id: number;
+  name: string;
+  description: string;
+  type: "AMOUNT" | "PERCENTAGE";
+  value: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SelectedDiscount {
+  discountId: number;
+  sequence: number;
+}
 export interface GenerateBillRequest {
   tableId: number;
   mobileNumber: string;
+  discounts: SelectedDiscount[];
   notes: string;
 }
 

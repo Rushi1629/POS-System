@@ -1,6 +1,10 @@
 "use client";
 
-import { BillListItem, GenerateBillRequest } from "@/types/billing-types";
+import {
+  BillListItem,
+  Discount,
+  GenerateBillRequest,
+} from "@/types/billing-types";
 import { OrderAdminChef } from "@/types/order-types";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -14,7 +18,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 
-import { Plus, Receipt } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, Receipt } from "lucide-react";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
@@ -28,22 +32,21 @@ import {
   SelectValue,
 } from "../ui/select";
 import { FetchTableResponse } from "@/types/table-types";
+import { Checkbox } from "../ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 const GenerateBillDialog = ({
   tables,
+  discounts,
   isGenerating,
   onClose,
   onSubmit,
 }: {
-  // orders: OrderAdminChef[];
   tables: FetchTableResponse[];
+  discounts: Discount[];
   isGenerating: boolean;
   onClose: () => void;
-  onSubmit: (payload: {
-    tableId: number;
-    mobileNumber: string;
-    notes: string;
-  }) => Promise<BillListItem>;
+  onSubmit: (payload: GenerateBillRequest) => Promise<BillListItem>;
 }) => {
   const {
     register,
@@ -57,6 +60,7 @@ const GenerateBillDialog = ({
     defaultValues: {
       tableId: 0,
       mobileNumber: "",
+      discounts: [],
       notes: "",
     },
   });
@@ -80,6 +84,10 @@ const GenerateBillDialog = ({
       const data = await onSubmit({
         tableId: Number(values.tableId), // ✅ FIX
         mobileNumber: values.mobileNumber.trim(),
+        discounts: (values.discounts ?? []).map((discount, index) => ({
+          discountId: discount.discountId,
+          sequence: index + 1,
+        })),
         notes: values.notes.trim() || "n/a",
       });
 
@@ -89,6 +97,7 @@ const GenerateBillDialog = ({
       reset({
         tableId: tables[0]?.id ?? 0,
         mobileNumber: "",
+        discounts: [],
         notes: "",
       });
     } catch (error) {
@@ -168,6 +177,119 @@ const GenerateBillDialog = ({
         <div className="grid gap-2">
           <Label>Notes</Label>
           <Textarea {...register("notes")} placeholder="Optional notes" />
+        </div>
+
+        {/* Discounts */}
+        <div className="grid gap-2">
+          <Label>Discounts</Label>
+
+          <Controller
+            name="discounts"
+            control={control}
+            render={({ field }) => {
+              const selectedDiscounts = field.value ?? [];
+
+              const toggleDiscount = (discountId: number) => {
+                const exists = selectedDiscounts.some(
+                  (item) => item.discountId === discountId,
+                );
+
+                if (exists) {
+                  // Remove discount
+                  const updated = selectedDiscounts
+                    .filter((item) => item.discountId !== discountId)
+                    .map((item, index) => ({
+                      ...item,
+                      sequence: index + 1,
+                    }));
+
+                  field.onChange(updated);
+                } else {
+                  // Add discount
+                  field.onChange([
+                    ...selectedDiscounts,
+                    {
+                      discountId,
+                      sequence: selectedDiscounts.length + 1,
+                    },
+                  ]);
+                }
+              };
+
+              return (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      role="combobox"
+                      className="w-full justify-between font-normal"
+                    >
+                      {selectedDiscounts.length === 0
+                        ? "Select discounts"
+                        : `${selectedDiscounts.length} discount${
+                            selectedDiscounts.length > 1 ? "s" : ""
+                          } selected`}
+
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+
+                  <PopoverContent
+                    className="w-[--radix-popover-trigger-width] p-2"
+                    align="start"
+                  >
+                    <div className="max-h-60 overflow-y-auto space-y-1">
+                      {discounts.filter((d) => d.isActive).length === 0 ? (
+                        <p className="p-2 text-sm text-muted-foreground">
+                          No discounts available
+                        </p>
+                      ) : (
+                        discounts
+                          .filter((discount) => discount.isActive)
+                          .map((discount) => {
+                            const selected = selectedDiscounts.some(
+                              (item) => item.discountId === discount.id,
+                            );
+
+                            return (
+                              <div
+                                key={discount.id}
+                                className="flex items-center gap-2 rounded-md p-2 hover:bg-muted cursor-pointer"
+                                onClick={() => toggleDiscount(discount.id)}
+                              >
+                                <Checkbox
+                                  checked={selected}
+                                  onCheckedChange={() =>
+                                    toggleDiscount(discount.id)
+                                  }
+                                />
+
+                                <div className="flex flex-1 flex-col">
+                                  <span className="text-sm font-medium">
+                                    {discount.name}
+                                  </span>
+
+                                  <span className="text-xs text-muted-foreground">
+                                    {discount.type === "AMOUNT"
+                                      ? `₹${discount.value} OFF`
+                                      : `${discount.value}% OFF`}
+                                  </span>
+                                </div>
+
+                                {selected && (
+                                  <Check className="h-4 w-4 text-primary" />
+                                )}
+                              </div>
+                            );
+                          })
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              );
+            }}
+          />
         </div>
 
         {/* Footer */}
