@@ -139,32 +139,34 @@ const CartView = () => {
 
     setOrderError("");
     try {
-      await placeOrder({
-        tableId,
-        notes: orderNotes || undefined,
-        orderItems: items.map((item) => {
+      // Build payload: only include
+      // - new items (no orderItemId)
+      // - existing items that were changed (quantity changed / cancelled / marked updated)
+      const orderItemsPayload = items
+        .filter((item) => {
+          const isCancelled = item.quantity === 0;
+          const isExisting = typeof item.orderItemId === "number";
+          const qtyChanged =
+            typeof item.originalQuantity === "number" &&
+            item.quantity !== item.originalQuantity;
+
+          return !isExisting || isCancelled || qtyChanged || !!item.isUpdated;
+        })
+        .map((item) => {
           const isCancelled = item.quantity === 0;
 
           return {
             menuItemId: Number(item.id),
-
-            // ✅ IMPORTANT FIX
-            quantity: isCancelled
-              ? item.originalQuantity || 1 // send old qty OR 1
-              : item.quantity,
-
-              // ...(item.orderItemId && { orderItemId: item.orderItemId }),
+            quantity: isCancelled ? item.originalQuantity || 1 : item.quantity,
             ...(typeof item.orderItemId === "number" &&
             ((typeof item.originalQuantity === "number" &&
               item.quantity !== item.originalQuantity) ||
-              isCancelled)
+              isCancelled ||
+              !!item.isUpdated)
               ? { orderItemId: item.orderItemId }
               : {}),
-
             ...(isCancelled && { isCancelled: true }),
-
             notes: item.notes || undefined,
-
             orderSubMenuItems: Array.isArray(item.extras)
               ? item.extras.map((e) => ({
                   subMenuItemId: e.id,
@@ -172,7 +174,12 @@ const CartView = () => {
                 }))
               : [],
           };
-        }),
+        });
+
+      await placeOrder({
+        tableId,
+        notes: orderNotes || undefined,
+        orderItems: orderItemsPayload,
       });
       // dispatch(clearCartAction());
 
