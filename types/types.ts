@@ -269,6 +269,12 @@ export interface FetchCategoriesResponse {
   };
 }
 
+export interface CustomerCategoryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
 export interface FetchCategoriesParams {
   page: number;
   limit: number;

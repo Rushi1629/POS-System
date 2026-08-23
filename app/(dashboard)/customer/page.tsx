@@ -42,7 +42,7 @@ import { getCartKey } from "@/types/cart-types";
 import { cn } from "@/lib/utils";
 
 export default function CustomerDashboard() {
-  const [activeCategory, setActiveCategory] = useState<number | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedSection, setExpandedSection] = useState(true);
   const [guestCountDialog, setGuestCountDialog] = useState(false);
@@ -99,10 +99,14 @@ export default function CustomerDashboard() {
     isPending: isFetchingCategories,
     isFetching,
     isError,
-  } = useFetchCategoriesCustomer();
+  } = useFetchCategoriesCustomer({
+    page: 1,
+    limit: 100,
+    search: searchQuery,
+  });
 
   const categories = useMemo(() => {
-    return allCategory.filter((c) => c.isActive === true);
+    return allCategory.filter((category) => category.isActive);
   }, [allCategory]);
 
   const { data: menuItems = [], isLoading } = useFetchMenusCustomer();
@@ -223,25 +227,34 @@ export default function CustomerDashboard() {
 
   // ✅ Filter logic
   const filteredItems = useMemo(() => {
+    const search = searchQuery.trim().toLowerCase();
+
     return menuItems.filter((item) => {
       const matchesCategory = activeCategory
-        ? item.category.id === activeCategory
+        ? String(item.category.id) === activeCategory
         : true;
-      const matchesSearch = item.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
 
-      return searchQuery ? matchesSearch : matchesCategory;
+      const matchesSearch = search
+        ? item.name.toLowerCase().includes(search)
+        : true;
+
+      if (search) {
+        return matchesSearch;
+      }
+
+      return matchesCategory;
     });
   }, [menuItems, activeCategory, searchQuery]);
 
   console.log(filteredItems, "filter");
+  
   const activeCategoryData = useMemo(() => {
-    return categories.find((c) => Number(c.id) === activeCategory);
+    return categories.find((c) => c.id === activeCategory);
   }, [categories, activeCategory]);
 
   function resetFilters() {
     setSearchQuery("");
+    setActiveCategory(null);
   }
 
   const handleGuestCountConfirm = async () => {
@@ -486,10 +499,13 @@ export default function CustomerDashboard() {
             animate={{ rotate: isRotating ? 360 : 0 }}
             transition={{ duration: 0.5 }}
             onClick={() => {
-              setSearchQuery("");
-              setActiveCategory(null);
+              resetFilters();
+
               setIsRotating(true);
-              setTimeout(() => setIsRotating(false), 500);
+
+              setTimeout(() => {
+                setIsRotating(false);
+              }, 500);
             }}
             className="h-12 w-12 rounded-full bg-card flex items-center justify-center shadow-sm cursor-pointer"
           >
@@ -507,8 +523,8 @@ export default function CustomerDashboard() {
               <CategoryPill
                 key={cat.id}
                 category={cat}
-                isActive={Number(activeCategory) === Number(cat.id)}
-                onClick={() => setActiveCategory(Number(cat.id))}
+                isActive={activeCategory === cat.id}
+                onClick={() => setActiveCategory(cat.id)}
               />
             ))}
           </div>

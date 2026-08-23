@@ -5,7 +5,7 @@ import {
   fetchAllMenusCustomer,
   fetchTableByTokenCustomer,
 } from "../services/customer.service";
-import { Category } from "@/types/types";
+import { Category, CustomerCategoryParams } from "@/types/types";
 
 export const useFetchMenusCustomer = () => {
   return useQuery({
@@ -17,16 +17,15 @@ export const useFetchMenusCustomer = () => {
   });
 };
 
-export const useFetchCategoriesCustomer = () => {
+export const useFetchCategoriesCustomer = (params?: CustomerCategoryParams) => {
   return useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: fetchAllCategoriesCustomer,
+    queryKey: ["customer-categories", params],
+    queryFn: () => fetchAllCategoriesCustomer(params),
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,
   });
 };
-
 export const useFetchTableByTokenCustomer = (token: any) => {
   return useQuery({
     queryKey: ["table", token],

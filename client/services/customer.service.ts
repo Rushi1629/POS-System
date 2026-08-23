@@ -1,6 +1,6 @@
 import { FetchMenuResponse, FetchMenusApiResponse } from "@/types/menu-types";
 import { fetcher } from "../client";
-import { FetchCategoriesResponse } from "@/types/types";
+import { Category, CustomerCategoryParams, FetchCategoriesResponse } from "@/types/types";
 import { EditTableSessionPayload } from "@/types/table-types";
 
 export const fetchAllMenusCustomer = async (): Promise<FetchMenuResponse[]> => {
@@ -19,18 +19,33 @@ export const fetchAllMenusCustomer = async (): Promise<FetchMenuResponse[]> => {
   }));
 };
 
-export const fetchAllCategoriesCustomer = async (): Promise<
-  FetchCategoriesResponse[]
-> => {
-  const res = await fetcher("/customer/categories");
+export const fetchAllCategoriesCustomer = async (
+  params?: CustomerCategoryParams,
+): Promise<Category[]> => {
+  const page = params?.page ?? 1;
+  const limit = params?.limit ?? 100;
+  const search = params?.search?.trim() ?? "";
 
-  return res.data.map((u: any) => ({
+  const query = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+
+  if (search) {
+    query.set("search", search);
+  }
+
+  const res: FetchCategoriesResponse = await fetcher(
+    `/customer/categories?${query.toString()}`,
+  );
+
+  return res.data.map((u) => ({
     id: String(u.id),
     name: u.name,
-    description: u.description,
-    isActive: u.isActive,
-    imageUrl: u.imageUrl || "", // ✅ FIX
-    createdAt: new Date(u.createdAt).getTime(), // ✅ FIX (important)
+    description: u.description ?? "",
+    isActive: Boolean(u.isActive),
+    imageUrl: u.imageUrl ?? "",
+    createdAt: new Date(u.createdAt).getTime(),
   }));
 };
 
