@@ -1,20 +1,21 @@
 import { Chart, baseChartOptions, themePalette } from "./Chart";
+import type { RevenueVsOrdersPoint } from "@/types/dashboard-types";
 
-export function ExpensesRevenueChart() {
+export function ExpensesRevenueChart({ data }: { data: RevenueVsOrdersPoint[] }) {
   return (
     <Chart
       type="bar"
       height={300}
       series={[
-        { name: "Revenue", data: [38, 42, 51, 47, 58, 72, 64] },
-        { name: "Expenses", data: [22, 24, 28, 26, 30, 34, 32] },
+        { name: "Revenue", data: data.map((point) => point.revenue) },
+        { name: "Orders", data: data.map((point) => point.orders) },
       ]}
       options={{
         ...baseChartOptions,
         colors: [themePalette[0], themePalette[3]],
         plotOptions: { bar: { columnWidth: "55%", borderRadius: 6 } },
         xaxis: {
-          categories: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          categories: data.map((point) => point.label),
           labels: { style: { colors: "oklch(0.55 0.02 60)", fontSize: "11px" } },
           axisBorder: { show: false },
           axisTicks: { show: false },
@@ -22,7 +23,7 @@ export function ExpensesRevenueChart() {
         yaxis: {
           labels: {
             style: { colors: "oklch(0.55 0.02 60)", fontSize: "11px" },
-            formatter: (v) => `₹${v}k`,
+            formatter: (v) => `₹${v}`,
           },
         },
       }}

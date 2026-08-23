@@ -1,15 +1,14 @@
 import { Chart, baseChartOptions, themePalette } from "./Chart";
+import type { SalesTrendPoint } from "@/types/dashboard-types";
 
-const categories = ["09:00", "11:00", "13:00", "15:00", "17:00", "19:00", "21:00", "23:00"];
-
-export function SalesTrendChart() {
+export function SalesTrendChart({ data }: { data: SalesTrendPoint[] }) {
   return (
     <Chart
       type="area"
       height={310}
       series={[
-        { name: "Revenue", data: [1200, 2400, 4800, 3200, 5400, 7800, 9200, 6400] },
-        { name: "Orders", data: [12, 22, 41, 28, 47, 64, 78, 52] },
+        { name: "Revenue", data: data.map((point) => point.revenue) },
+        { name: "Orders", data: data.map((point) => point.orders) },
       ]}
       options={{
         ...baseChartOptions,
@@ -25,7 +24,7 @@ export function SalesTrendChart() {
           },
         },
         xaxis: {
-          categories,
+          categories: data.map((point) => point.label),
           labels: { style: { colors: "oklch(0.55 0.02 60)", fontSize: "11px" } },
           axisBorder: { show: false },
           axisTicks: { show: false },

@@ -5,12 +5,13 @@ import { OrderStatusChart } from "@/components/charts/OrderStatusChart";
 import { PaymentMethodsChart } from "@/components/charts/PaymentMethodsChart";
 import { SalesTrendChart } from "@/components/charts/SalesTrendChart";
 import { TopItemsChart } from "@/components/charts/TopItemsChart";
-import { FilterBar } from "@/components/FilterBar";
 import { KpiCard } from "@/components/KpiCard";
 import { LowStockAlerts } from "@/components/LowStockAlerts";
 import { RecentOrders } from "@/components/RecentOrders";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Boxes,
@@ -23,13 +24,60 @@ import {
   Wallet,
 } from "lucide-react";
 import React, { useState } from "react";
+import { useDashboard } from "@/client/hooks/useDashboard";
+import type { DashboardGroupBy, DashboardPeriod } from "@/types/dashboard-types";
+import {
+  formatCurrency,
+  formatDateInput,
+  formatDashboardDate,
+  numberValue,
+  parseDateInput,
+} from "@/utils/utils";
+
+type DatePickerFieldProps = {
+  label: string;
+  value: string;
+  displayValue: string;
+  onChange: (value: string) => void;
+  disabled: (date: Date) => boolean;
+};
+
+function DatePickerField({
+  label,
+  value,
+  displayValue,
+  onChange,
+  disabled,
+}: DatePickerFieldProps) {
+  return (
+    <div className="grid gap-1 text-xs font-medium text-muted-foreground">
+      <span>{label}</span>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="w-36 justify-start text-left font-normal">
+            {displayValue}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="end">
+          <Calendar
+            mode="single"
+            selected={parseDateInput(value)}
+            onSelect={(date) => date && onChange(formatDateInput(date))}
+            disabled={disabled}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
 
 const page = () => {
-  const [range, setRange] = useState("today");
-  const [category, setCategory] = useState("all");
-  const [shift, setShift] = useState("all");
-  const [payment, setPayment] = useState("all");
-  const [query, setQuery] = useState("");
+  const [startDate, setStartDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [endDate, setEndDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [salesGroupBy, setSalesGroupBy] = useState<DashboardGroupBy>("hour");
+  const [revenueGroupBy, setRevenueGroupBy] = useState<DashboardGroupBy>("week");
+  const dashboard = useDashboard("today" as DashboardPeriod, salesGroupBy, revenueGroupBy, startDate, endDate);
+  const summary = dashboard.summary;
   return (
     <div className="custom-space-y">
       {/* Header */}
@@ -45,61 +93,55 @@ const page = () => {
             Monday, Nov 11 · Real-time business performance and operations
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" className="rounded-full">
-            Reports
-          </Button>
-          <Button className="rounded-full bg-primary hover:bg-primary/90">
-            + New Order
-          </Button>
+        <div className="flex items-end gap-2">
+          <DatePickerField
+            label="Start date"
+            value={startDate}
+            displayValue={formatDashboardDate(startDate)}
+            onChange={setStartDate}
+            disabled={(date) => date > parseDateInput(endDate)}
+          />
+          <DatePickerField
+            label="End date"
+            value={endDate}
+            displayValue={formatDashboardDate(endDate)}
+            onChange={setEndDate}
+            disabled={(date) => date < parseDateInput(startDate)}
+          />
         </div>
       </div>
-
-      {/* Filter bar */}
-      <FilterBar
-        range={range}
-        onRangeChange={setRange}
-        category={category}
-        onCategoryChange={setCategory}
-        shift={shift}
-        onShiftChange={setShift}
-        payment={payment}
-        onPaymentChange={setPayment}
-        query={query}
-        onQueryChange={setQuery}
-      />
 
       {/* KPI row */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           label="Today's Revenue"
-          value="₹48,920"
-          delta={12.4}
+          value={formatCurrency(summary?.revenue?.amount)}
+          delta={numberValue(summary?.revenue?.comparisonPercentage)}
           hint="vs yesterday"
           icon={IndianRupee}
           tone="primary"
         />
         <KpiCard
           label="Orders"
-          value="184"
-          delta={8.1}
-          hint="avg ₹486"
+          value={String(numberValue(summary?.orders?.count))}
+          delta={numberValue(summary?.orders?.comparisonPercentage)}
+          hint="orders"
           icon={ShoppingBag}
           tone="info"
         />
         <KpiCard
           label="Active Tables"
-          value="14 / 24"
-          delta={-3.2}
-          hint="58% occupied"
+          value={`${numberValue(summary?.activeTables?.active)} / ${numberValue(summary?.activeTables?.total)}`}
+          delta={numberValue(summary?.activeTables?.occupancyPercentage)}
+          hint={`${numberValue(summary?.activeTables?.occupancyPercentage)}% occupied`}
           icon={Utensils}
           tone="success"
         />
         <KpiCard
           label="Items Sold"
-          value="612"
-          delta={5.6}
-          hint="Burger leads"
+          value={String(numberValue(summary?.itemsSold?.quantity))}
+          delta={numberValue(summary?.itemsSold?.comparisonPercentage)}
+          hint="items sold"
           icon={TrendingUp}
           tone="warning"
         />
@@ -109,31 +151,31 @@ const page = () => {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           label="Gross Profit"
-          value="₹18,240"
-          delta={4.2}
-          hint="37% margin"
+          value={formatCurrency(summary?.grossProfit?.amount)}
+          delta={numberValue(summary?.grossProfit?.comparisonPercentage)}
+          hint={`${numberValue(summary?.grossProfit?.marginPercentage)}% margin`}
           icon={Wallet}
           tone="success"
         />
         <KpiCard
           label="Outstanding"
-          value="₹2,140"
-          delta={-1.8}
-          hint="6 unpaid bills"
+          value={formatCurrency(summary?.outstanding?.amount)}
+          delta={numberValue(summary?.outstanding?.comparisonPercentage)}
+          hint={`${numberValue(summary?.outstanding?.unpaidBills)} unpaid bills`}
           icon={Receipt}
           tone="warning"
         />
         <KpiCard
           label="New Customers"
-          value="42"
-          delta={14.0}
-          hint="vs last week"
+          value={String(numberValue(summary?.newCustomers?.count))}
+          delta={numberValue(summary?.newCustomers?.comparisonPercentage)}
+          hint="new customers"
           icon={Users}
           tone="info"
         />
         <KpiCard
           label="Low Stock"
-          value="3"
+          value={String(numberValue(summary?.lowStock?.count))}
           hint="needs restock"
           icon={Boxes}
           tone="warning"
@@ -150,7 +192,7 @@ const page = () => {
                 Hourly revenue and order volume
               </p>
             </div>
-            <Tabs defaultValue="hour">
+            <Tabs value={salesGroupBy} onValueChange={(value) => setSalesGroupBy(value as DashboardGroupBy)}>
               <TabsList className="h-8 rounded-full bg-muted/60">
                 <TabsTrigger value="hour" className="rounded-full text-xs">
                   Hour
@@ -165,7 +207,7 @@ const page = () => {
             </Tabs>
           </CardHeader>
           <CardContent>
-            <SalesTrendChart />
+            <SalesTrendChart data={dashboard.salesTrend} />
           </CardContent>
         </Card>
 
@@ -177,7 +219,7 @@ const page = () => {
             </p>
           </CardHeader>
           <CardContent>
-            <OrderStatusChart />
+            <OrderStatusChart data={dashboard.orderStatus} />
           </CardContent>
         </Card>
       </div>
@@ -192,7 +234,7 @@ const page = () => {
             </p>
           </CardHeader>
           <CardContent>
-            <TopItemsChart />
+            <TopItemsChart data={dashboard.topItems} />
           </CardContent>
         </Card>
         <Card className="border-border/60 shadow-[--shadow-card]">
@@ -203,7 +245,7 @@ const page = () => {
             </p>
           </CardHeader>
           <CardContent>
-            <PaymentMethodsChart />
+            <PaymentMethodsChart data={dashboard.paymentMethods} />
           </CardContent>
         </Card>
         <Card className="border-border/60 shadow-[--shadow-card]">
@@ -214,7 +256,7 @@ const page = () => {
             </p>
           </CardHeader>
           <CardContent>
-            <InventoryStockChart />
+            <InventoryStockChart data={dashboard.inventory} />
           </CardContent>
         </Card>
       </div>
@@ -222,9 +264,9 @@ const page = () => {
       {/* Recent orders + Low stock */}
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <RecentOrders />
+            <RecentOrders orders={dashboard.recentOrders} />
         </div>
-        <LowStockAlerts />
+        <LowStockAlerts items={dashboard.lowStock} />
       </div>
 
       {/* Expenses vs Revenue */}
@@ -251,7 +293,7 @@ const page = () => {
           </Tabs>
         </CardHeader>
         <CardContent>
-          <ExpensesRevenueChart />
+          <ExpensesRevenueChart data={dashboard.revenueVsOrders} />
         </CardContent>
       </Card>
     </div>

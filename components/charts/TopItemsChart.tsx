@@ -1,11 +1,12 @@
 import { Chart, baseChartOptions, themePalette } from "./Chart";
+import type { TopItem } from "@/types/dashboard-types";
 
-export function TopItemsChart() {
+export function TopItemsChart({ data }: { data: TopItem[] }) {
   return (
     <Chart
       type="bar"
       height={300}
-      series={[{ name: "Sold", data: [142, 118, 96, 84, 72, 58, 44] }]}
+      series={[{ name: "Sold", data: data.map((item) => item.quantity) }]}
       options={{
         ...baseChartOptions,
         colors: [themePalette[0]],
@@ -13,15 +14,7 @@ export function TopItemsChart() {
           bar: { horizontal: true, borderRadius: 6, barHeight: "70%", distributed: false },
         },
         xaxis: {
-          categories: [
-            "Veg Cheese Burger",
-            "Margherita Pizza",
-            "Cold Coffee",
-            "Pasta Alfredo",
-            "French Fries",
-            "Choco Lava",
-            "Mojito",
-          ],
+          categories: data.map((item) => item.name),
           labels: { style: { colors: "oklch(0.55 0.02 60)", fontSize: "11px" } },
           axisBorder: { show: false },
           axisTicks: { show: false },

@@ -1,11 +1,12 @@
 import { Chart, baseChartOptions, themePalette } from "./Chart";
+import type { InventoryLevel } from "@/types/dashboard-types";
 
-export function InventoryStockChart() {
+export function InventoryStockChart({ data }: { data: InventoryLevel[] }) {
   return (
     <Chart
       type="bar"
       height={260}
-      series={[{ name: "Stock %", data: [85, 62, 24, 91, 14, 48, 78] }]}
+      series={[{ name: "Stock %", data: data.map((item) => item.percentage) }]}
       options={{
         ...baseChartOptions,
         plotOptions: {
@@ -20,7 +21,7 @@ export function InventoryStockChart() {
           themePalette[1], "oklch(0.65 0.2 25)", themePalette[3], themePalette[1],
         ],
         xaxis: {
-          categories: ["Tomato", "Cheese", "Buns", "Flour", "Chicken", "Lettuce", "Sauce"],
+          categories: data.map((item) => item.name),
           labels: { style: { colors: "oklch(0.55 0.02 60)", fontSize: "11px" } },
           axisBorder: { show: false },
           axisTicks: { show: false },

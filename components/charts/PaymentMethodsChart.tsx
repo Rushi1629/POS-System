@@ -1,14 +1,15 @@
 import { Chart, baseChartOptions, themePalette } from "./Chart";
+import type { PaymentMethod } from "@/types/dashboard-types";
 
-export function PaymentMethodsChart() {
+export function PaymentMethodsChart({ data }: { data: PaymentMethod[] }) {
   return (
     <Chart
       type="radialBar"
       height={300}
-      series={[68, 22, 10]}
+      series={data.map((item) => item.percentage || item.count)}
       options={{
         ...baseChartOptions,
-        labels: ["UPI", "Cash", "Card"],
+        labels: data.map((item) => item.name),
         colors: [themePalette[0], themePalette[1], themePalette[2]],
         plotOptions: {
           radialBar: {
@@ -20,7 +21,7 @@ export function PaymentMethodsChart() {
               total: {
                 show: true,
                 label: "Avg ticket",
-                formatter: () => "₹486",
+                formatter: () => "",
               },
             },
           },
