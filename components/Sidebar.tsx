@@ -123,7 +123,7 @@ export default function Sidebar() {
         </div>
 
         {/* Shift indicator */}
-        {!collapsed && (
+        {/* {!collapsed && (
           <div className="mx-3 mt-3 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg">
             <p className="text-xs text-amber-400 font-medium">
               Morning Shift Active
@@ -132,7 +132,7 @@ export default function Sidebar() {
               Started 06:00 AM · 2h 01m
             </p>
           </div>
-        )}
+        )} */}
 
         {/* Navigation */}
         <nav className="flex-1 px-2 py-3 overflow-y-auto custom-scrollbar">
@@ -197,31 +197,6 @@ export default function Sidebar() {
 
         {/* Bottom actions */}
         <div className="border-t border-stone-800 p-2">
-          <Link
-            href="/dashboard"
-            title={collapsed ? "Settings" : undefined}
-            className={`flex items-center gap-3 px-2 py-2 rounded-lg text-stone-400 hover:bg-stone-800 hover:text-stone-100 transition-all duration-150 mb-1 ${collapsed ? "justify-center" : ""}`}
-          >
-            <Bell size={18} className="shrink-0" />
-            {!collapsed && (
-              <span className="text-sm font-medium">Notifications</span>
-            )}
-            {!collapsed && (
-              <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                2
-              </span>
-            )}
-          </Link>
-          <Link
-            href="/dashboard"
-            title={collapsed ? "Settings" : undefined}
-            className={`flex items-center gap-3 px-2 py-2 rounded-lg text-stone-400 hover:bg-stone-800 hover:text-stone-100 transition-all duration-150 mb-1 ${collapsed ? "justify-center" : ""}`}
-          >
-            <Settings size={18} className="shrink-0" />
-            {!collapsed && (
-              <span className="text-sm font-medium">Settings</span>
-            )}
-          </Link>
 
           {/* User profile */}
           <div

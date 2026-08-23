@@ -23,6 +23,7 @@ import {
   Clock,
   IndianRupee,
   Receipt,
+  RotateCcw,
   ShoppingBag,
   TrendingUp,
   Utensils,
@@ -48,55 +49,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-type DatePickerFieldProps = {
-  label: string;
-  value: string;
-  displayValue: string;
-  onChange: (value: string) => void;
-  disabled: (date: Date) => boolean;
-};
-
-function DatePickerField({
-  label,
-  value,
-  displayValue,
-  onChange,
-  disabled,
-}: DatePickerFieldProps) {
-  const [open, setOpen] = React.useState(false);
-
-  return (
-    <Field className="w-36 gap-1">
-      <FieldLabel htmlFor={label}>{label}</FieldLabel>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            id={label}
-            className="w-full justify-start font-normal"
-          >
-            {displayValue}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={parseDateInput(value)}
-            defaultMonth={parseDateInput(value)}
-            captionLayout="dropdown"
-            onSelect={(date) => {
-              if (!date) return;
-              onChange(formatDateInput(date));
-              setOpen(false);
-            }}
-            disabled={disabled}
-          />
-        </PopoverContent>
-      </Popover>
-    </Field>
-  );
-}
+import DatePickerField from "@/components/charts/DatePickerField";
 
 const page = () => {
   const [startDate, setStartDate] = useState(() =>
@@ -109,6 +62,14 @@ const page = () => {
   const [salesGroupBy, setSalesGroupBy] = useState<DashboardGroupBy>("hour");
   const [revenueGroupBy, setRevenueGroupBy] =
     useState<DashboardGroupBy>("week");
+  const resetFilters = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    setStartDate(today);
+    setEndDate(today);
+    setPeriod("today");
+    setSalesGroupBy("hour");
+    setRevenueGroupBy("week");
+  };
   const currentRole = useAppSelector(
     (state) => state.auth.user?.role,
   ) as unknown;
@@ -136,7 +97,7 @@ const page = () => {
           <p className="text-sm font-medium text-primary">
             Welcome back, {roleName} 👋
           </p>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground lg:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground lg:text-3xl">
             Dashboard Overview
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -175,6 +136,16 @@ const page = () => {
               </SelectContent>
             </Select>
           </Field>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 gap-1.5"
+            onClick={resetFilters}
+            title="Reset dashboard filters"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Reset filters
+          </Button>
         </div>
       </div>
 
