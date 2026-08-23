@@ -22,10 +22,23 @@ export const useCreateCategory = () => {
   });
 };
 
-export const useFetchCategories = () => {
-  return useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: fetchAllCategories,
+export const useFetchCategories = (
+  page: number,
+  limit: number,
+  search: string,
+  status: "all" | "active" | "inactive",
+) => {
+  return useQuery<FetchCategoriesResponse>({
+    queryKey: ["categories", page, limit, search, status],
+
+    queryFn: () =>
+      fetchAllCategories({
+        page,
+        limit,
+        search,
+        status,
+      }),
+
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

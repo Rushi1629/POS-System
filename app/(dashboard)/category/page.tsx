@@ -86,7 +86,20 @@ function CategoriesPage() {
     pageSize: 5,
   });
 
-  const { data: categories = [], isLoading, error } = useFetchCategories();
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  const { data, isLoading, error } = useFetchCategories(
+    pagination.pageIndex + 1,
+    pagination.pageSize,
+    debouncedSearch,
+    statusFilter,
+  );
+
+  const categories = data?.data ?? [];
+
+  const total = data?.pagination.total ?? 0;
+
+  const totalPages = data?.pagination.totalPages ?? 0;
 
   useEffect(() => {
     setPagination((prev) => ({
@@ -94,6 +107,19 @@ function CategoriesPage() {
       pageIndex: 0,
     }));
   }, [search, statusFilter, view]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: 0,
+      }));
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const { mutateAsync: createCategory, isPending: isCreating } =
     useCreateCategory();
@@ -109,25 +135,25 @@ function CategoriesPage() {
     setDialogOpen(true);
   }, []);
 
-  const filtered = useMemo(() => {
-    return categories
-      .filter((c) =>
-        statusFilter === "all"
-          ? true
-          : statusFilter === "active"
-            ? c.isActive
-            : !c.isActive,
-      )
-      .filter(
-        (c) =>
-          (c.name ?? "").toLowerCase().includes(search.toLowerCase()) ||
-          (c.description ?? "").toLowerCase().includes(search.toLowerCase()),
-      )
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-  }, [categories, search, statusFilter]);
+  // const filtered = useMemo(() => {
+  //   return categories
+  //     .filter((c) =>
+  //       statusFilter === "all"
+  //         ? true
+  //         : statusFilter === "active"
+  //           ? c.isActive
+  //           : !c.isActive,
+  //     )
+  //     .filter(
+  //       (c) =>
+  //         (c.name ?? "").toLowerCase().includes(search.toLowerCase()) ||
+  //         (c.description ?? "").toLowerCase().includes(search.toLowerCase()),
+  //     )
+  //     .sort(
+  //       (a, b) =>
+  //         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  //     );
+  // }, [categories, search, statusFilter]);
 
   const stats = useMemo(
     () => ({
@@ -203,8 +229,7 @@ function CategoriesPage() {
               variant="ghost"
               aria-label="More"
               className="h-9 w-9"
-            >
-            </Button>
+            ></Button>
           </div>
         ),
       },
@@ -213,22 +238,20 @@ function CategoriesPage() {
   );
 
   const table = useReactTable({
-    data: filtered,
+    data: categories,
     columns,
-    state: { pagination },
-    onPaginationChange: setPagination,
+
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    autoResetPageIndex: true,
   });
 
-  const pageCount = table.getPageCount();
-  const pageIndex = table.getState().pagination.pageIndex;
-  const pageSize = table.getState().pagination.pageSize;
-  const startIndex = pageIndex * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, filtered.length);
+  const pageIndex = pagination.pageIndex;
+  const pageSize = pagination.pageSize;
+
+  const pageCount = totalPages;
+
+  const startIndex = total === 0 ? 0 : pageIndex * pageSize + 1;
+
+  const endIndex = Math.min((pageIndex + 1) * pageSize, total);
 
   function openCreate() {
     setEditing(null);
@@ -357,7 +380,7 @@ function CategoriesPage() {
               value={statusFilter}
               onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}
             >
-              <SelectTrigger className="h-11 w-[160px] rounded-full">
+              <SelectTrigger className="h-11 w-40 rounded-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -391,7 +414,7 @@ function CategoriesPage() {
       </Card>
 
       {/* Content */}
-      {filtered.length === 0 ? (
+      {categories.length === 0 ? (
         <Card className="mt-6 border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             {isLoading ? (
@@ -431,7 +454,7 @@ function CategoriesPage() {
         </Card>
       ) : view === "grid" ? (
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((c) => (
+          {categories.map((c) => (
             <CategoryCard
               key={c.id}
               category={c}
@@ -480,30 +503,19 @@ function CategoriesPage() {
 
           <div className="flex flex-col items-center justify-between gap-3 border-t bg-muted/20 px-4 py-3 text-sm text-muted-foreground sm:flex-row">
             <div className="flex items-center gap-3">
-              <span>
-                Showing{" "}
-                <strong className="text-foreground">
-                  {filtered.length === 0 ? 0 : startIndex + 1}
-                </strong>
-                –
-                <strong className="text-foreground">
-                  {Math.min(startIndex + pageSize, filtered.length)}
-                </strong>{" "}
-                of{" "}
-                <strong className="text-foreground">{filtered.length}</strong>
-              </span>
               <Select
                 value={String(pageSize)}
-                onValueChange={(v) =>
-                  setPagination((prev) => ({
-                    ...prev,
-                    pageSize: Number(v),
-                  }))
-                }
+                onValueChange={(value) => {
+                  setPagination({
+                    pageIndex: 0,
+                    pageSize: Number(value),
+                  });
+                }}
               >
-                <SelectTrigger className="h-8 w-[110px] rounded-full">
+                <SelectTrigger className="h-8 w-27.5 rounded-full">
                   <SelectValue />
                 </SelectTrigger>
+
                 <SelectContent>
                   {[5, 10, 20, 50].map((n) => (
                     <SelectItem key={n} value={String(n)}>
@@ -515,21 +527,25 @@ function CategoriesPage() {
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-xs">
-                Page{" "}
-                <strong className="text-foreground">{pageIndex + 1}</strong> of{" "}
-                <strong className="text-foreground">
-                  {Math.max(1, pageCount)}
-                </strong>
+              <span>
+                Showing{" "}
+                <strong className="text-foreground">{startIndex}</strong>
+                {" – "}
+                <strong className="text-foreground">{endIndex}</strong> of{" "}
+                <strong className="text-foreground">{total}</strong>
               </span>
               <div className="flex items-center gap-1">
                 <Button
                   variant="outline"
                   size="icon"
                   className="h-8 w-8 rounded-full"
-                  onClick={() => table.setPageIndex(0)}
-                  disabled={!table.getCanPreviousPage()}
-                  aria-label="First page"
+                  onClick={() =>
+                    setPagination((prev) => ({
+                      ...prev,
+                      pageIndex: 0,
+                    }))
+                  }
+                  disabled={pageIndex === 0}
                 >
                   <ChevronsLeft className="h-4 w-4" />
                 </Button>
@@ -537,9 +553,13 @@ function CategoriesPage() {
                   variant="outline"
                   size="icon"
                   className="h-8 w-8 rounded-full"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                  aria-label="Previous page"
+                  onClick={() =>
+                    setPagination((prev) => ({
+                      ...prev,
+                      pageIndex: Math.max(prev.pageIndex - 1, 0),
+                    }))
+                  }
+                  disabled={pageIndex === 0}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -547,9 +567,13 @@ function CategoriesPage() {
                   variant="outline"
                   size="icon"
                   className="h-8 w-8 rounded-full"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                  aria-label="Next page"
+                  onClick={() =>
+                    setPagination((prev) => ({
+                      ...prev,
+                      pageIndex: prev.pageIndex + 1,
+                    }))
+                  }
+                  disabled={pageIndex >= pageCount - 1}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -557,9 +581,13 @@ function CategoriesPage() {
                   variant="outline"
                   size="icon"
                   className="h-8 w-8 rounded-full"
-                  onClick={() => table.setPageIndex(pageCount - 1)}
-                  disabled={!table.getCanNextPage()}
-                  aria-label="Last page"
+                  onClick={() =>
+                    setPagination((prev) => ({
+                      ...prev,
+                      pageIndex: pageCount - 1,
+                    }))
+                  }
+                  disabled={pageIndex >= pageCount - 1}
                 >
                   <ChevronsRight className="h-4 w-4" />
                 </Button>

@@ -140,7 +140,7 @@ export const empty: UserFormValues = {
   password: "",
   phoneNumber: "",
   role: "Waiter",
-   isActive: true,
+  isActive: true,
 };
 
 export interface AddUserProps {
@@ -250,7 +250,7 @@ export type CategoryDialogProps = {
   loading?: boolean; // ✅ ADD THIS
 };
 
-export interface CreateCategoryPayload{
+export interface CreateCategoryPayload {
   name: string;
   description: string;
   isActive: boolean;
@@ -258,12 +258,22 @@ export interface CreateCategoryPayload{
 }
 
 export interface FetchCategoriesResponse {
-  id: string;
-  name: string;
-  description: string;
-  isActive: boolean;
-  imageUrl?: string;
-  createdAt: number;
+  status: boolean;
+  message: string;
+  data: Category[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface FetchCategoriesParams {
+  page: number;
+  limit: number;
+  search?: string;
+  status?: "all" | "active" | "inactive";
 }
 
 // Sidebar navigation items start here
@@ -374,7 +384,7 @@ export const navItems: NavItem[] = [
     icon: ChefHat,
     href: "/order-item-status-management",
     group: "Management",
-    roles: ["Super Admin","Chef","Waiter"],
+    roles: ["Super Admin", "Chef", "Waiter"],
   },
   // {
   //   id: "nav-order-status-management",

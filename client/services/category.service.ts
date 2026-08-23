@@ -1,6 +1,7 @@
 import {
   Category,
   CreateCategoryPayload,
+  FetchCategoriesParams,
   FetchCategoriesResponse,
 } from "@/types/types";
 import { fetcher } from "../client";
@@ -11,19 +12,46 @@ export const createCategory = (data: FormData) =>
     body: data, // ✅ send FormData directly
   });
 
-export const fetchAllCategories = async (): Promise<
-  FetchCategoriesResponse[]
-> => {
-  const res = await fetcher("/category");
+export const fetchAllCategories = async ({
+  page,
+  limit,
+  search = "",
+  status = "all",
+}: FetchCategoriesParams): Promise<FetchCategoriesResponse> => {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    search,
+  });
 
-  return res.data.map((u: any) => ({
-    id: String(u.id),
-    name: u.name,
-    description: u.description,
-    isActive: u.isActive,
-    imageUrl: u.imageUrl || "", // ✅ FIX
-    createdAt: new Date(u.createdAt).getTime(), // ✅ FIX (important)
-  }));
+  if (status !== "all") {
+    params.append("status", status);
+  }
+
+  const res = await fetcher(`/category?${params.toString()}`);
+
+  return {
+    status: res.status,
+    message: res.message,
+
+    data: res.data.map(
+      (u: any): Category => ({
+        id: String(u.id),
+        name: u.name,
+        description: u.description ?? null,
+        isActive: u.isActive,
+        imageUrl: u.imageUrl ?? null,
+        createdAt: new Date(u.createdAt).getTime(),
+      }),
+    ),
+
+    pagination: {
+      page: res.pagination.page,
+      limit: res.pagination.limit,
+      total: res.pagination.total,
+      totalPages: res.pagination.totalPages,
+    },
+  };
 };
 
 export const editCategoryById = async (
