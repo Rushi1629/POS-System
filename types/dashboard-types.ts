@@ -18,17 +18,20 @@ export type DashboardSummary = {
 		comparisonPercentage?: number | null;
 		comparisonDirection?: string;
 	};
-	grossProfit: {
+	timeCharges: {
 		amount: number;
 		comparisonPercentage?: number | null;
-		marginPercentage?: number;
 	};
 	outstanding: {
 		amount: number;
 		comparisonPercentage?: number | null;
-		unpaidBills?: number;
+		billCount: number;
 	};
-	newCustomers: { count: number; comparisonPercentage?: number | null };
+	avgBill: {
+		averageAmount: number;
+		billCount: number;
+		comparisonPercentage?: number | null;
+	};
 	lowStock: { count: number };
 };
 

@@ -20,13 +20,12 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Boxes,
+  Clock,
   IndianRupee,
   Receipt,
   ShoppingBag,
   TrendingUp,
-  Users,
   Utensils,
-  Wallet,
 } from "lucide-react";
 import React, { useState } from "react";
 import { useDashboard } from "@/client/hooks/useDashboard";
@@ -119,6 +118,8 @@ const page = () => {
     endDate,
   );
   const summary = dashboard.summary;
+  const comparisonValue = (value: number | null | undefined) =>
+    value == null ? undefined : numberValue(value);
   return (
     <div className="custom-space-y">
       {/* Header */}
@@ -157,7 +158,7 @@ const page = () => {
         <KpiCard
           label="Today's Revenue"
           value={formatCurrency(summary?.revenue?.amount)}
-          delta={numberValue(summary?.revenue?.comparisonPercentage)}
+          delta={comparisonValue(summary?.revenue?.comparisonPercentage)}
           hint="vs yesterday"
           icon={IndianRupee}
           tone="primary"
@@ -165,61 +166,60 @@ const page = () => {
         <KpiCard
           label="Orders"
           value={String(numberValue(summary?.orders?.count))}
-          delta={numberValue(summary?.orders?.comparisonPercentage)}
+          delta={comparisonValue(summary?.orders?.comparisonPercentage)}
           hint="orders"
           icon={ShoppingBag}
-          tone="info"
+          tone="primary"
         />
         <KpiCard
           label="Active Tables"
           value={`${numberValue(summary?.activeTables?.active)} / ${numberValue(summary?.activeTables?.total)}`}
-          delta={numberValue(summary?.activeTables?.occupancyPercentage)}
           hint={`${numberValue(summary?.activeTables?.occupancyPercentage)}% occupied`}
           icon={Utensils}
-          tone="success"
+          tone="primary"
         />
         <KpiCard
           label="Items Sold"
           value={String(numberValue(summary?.itemsSold?.quantity))}
-          delta={numberValue(summary?.itemsSold?.comparisonPercentage)}
+          delta={comparisonValue(summary?.itemsSold?.comparisonPercentage)}
           hint="items sold"
           icon={TrendingUp}
-          tone="warning"
+          tone="primary"
         />
       </div>
 
       {/* Secondary KPI row */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
-          label="Gross Profit"
-          value={formatCurrency(summary?.grossProfit?.amount)}
-          delta={numberValue(summary?.grossProfit?.comparisonPercentage)}
-          hint={`${numberValue(summary?.grossProfit?.marginPercentage)}% margin`}
-          icon={Wallet}
-          tone="success"
+          label="Time Charges"
+          value={formatCurrency(summary?.timeCharges?.amount)}
+          delta={comparisonValue(summary?.timeCharges?.comparisonPercentage)}
+          hint="service charges"
+          icon={Clock}
+          tone="primary"
         />
         <KpiCard
           label="Outstanding"
           value={formatCurrency(summary?.outstanding?.amount)}
-          delta={numberValue(summary?.outstanding?.comparisonPercentage)}
-          hint={`${numberValue(summary?.outstanding?.unpaidBills)} unpaid bills`}
+          delta={comparisonValue(summary?.outstanding?.comparisonPercentage)}
+          hint={`${numberValue(summary?.outstanding?.billCount)} unpaid bills`}
           icon={Receipt}
-          tone="warning"
+          tone="primary"
         />
         <KpiCard
-          label="New Customers"
-          value={String(numberValue(summary?.newCustomers?.count))}
-          delta={numberValue(summary?.newCustomers?.comparisonPercentage)}
-          hint="new customers"
-          icon={Users}
-          tone="info"
+          label="Average Bill"
+          value={formatCurrency(summary?.avgBill?.averageAmount)}
+          delta={comparisonValue(summary?.avgBill?.comparisonPercentage)}
+          hint={`${numberValue(summary?.avgBill?.billCount)} bills`}
+          icon={IndianRupee}
+          tone="primary"
         />
         <KpiCard
           label="Low Stock"
           value={String(numberValue(summary?.lowStock?.count))}
           hint="needs restock"
           icon={Boxes}
-          tone="warning"
+          tone="primary"
         />
       </div>
 
