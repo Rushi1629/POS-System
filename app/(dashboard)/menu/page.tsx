@@ -105,11 +105,13 @@ function MenuPage() {
   const { mutateAsync: deleteMenu } = useDeleteMenu();
 
   const {
-    data: allCategory = [],
+    data: categoryResponse,
     isPending: isFetchingCategories,
     isFetching,
     isError: categoryError,
-  } = useFetchCategories();
+  } = useFetchCategories(1, 1000, "", "all");
+
+  const allCategory = categoryResponse?.data ?? [];
 
   useEffect(() => {
     if (categoryError) {
@@ -345,7 +347,9 @@ function MenuPage() {
       if (editing) {
         const data = JSON.parse(String(formData.get("data") || "{}"));
 
-        const normalizeSubmenu = (items: Array<{ subMenuItemId?: number | string }> = []) =>
+        const normalizeSubmenu = (
+          items: Array<{ subMenuItemId?: number | string }> = [],
+        ) =>
           [...items]
             .filter(
               (item) =>
@@ -557,20 +561,24 @@ function MenuPage() {
             {isLoading ? (
               <>
                 <div className="h-14 w-14 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
-                <h3 className="mt-4 text-lg font-semibold">Loading menu items...</h3>
+                <h3 className="mt-4 text-lg font-semibold">
+                  Loading menu items...
+                </h3>
               </>
             ) : (
               <>
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <UtensilsCrossed className="h-6 w-6" />
-            </div>
-            <h3 className="mt-4 text-lg font-semibold">No menu items found</h3>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Try adjusting your filters, or create your first menu item.
-            </p>
-            <Button onClick={openCreate} className="mt-5 gap-2">
-              <Plus className="h-4 w-4" /> New Menu Item
-            </Button>
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <UtensilsCrossed className="h-6 w-6" />
+                </div>
+                <h3 className="mt-4 text-lg font-semibold">
+                  No menu items found
+                </h3>
+                <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                  Try adjusting your filters, or create your first menu item.
+                </p>
+                <Button onClick={openCreate} className="mt-5 gap-2">
+                  <Plus className="h-4 w-4" /> New Menu Item
+                </Button>
               </>
             )}
           </CardContent>
