@@ -39,19 +39,30 @@ export function RecentOrders({ orders }: { orders: RecentOrder[] }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((o) => (
-              <TableRow key={o.id} className="border-border/40">
-                <TableCell className="font-medium text-foreground">{o.id}</TableCell>
-                <TableCell className="text-muted-foreground">{o.customer}</TableCell>
-                <TableCell className="text-muted-foreground">{o.table}</TableCell>
-                <TableCell className="text-right">{o.items}</TableCell>
-                <TableCell className="text-right font-semibold">{formatCurrency(o.total)}</TableCell>
-                <TableCell className="text-muted-foreground">{o.payment}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={tone[o.status.toLowerCase()] ?? tone.pending}>{o.status}</Badge>
+            {orders.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={7}
+                  className="h-28 text-center text-sm text-muted-foreground"
+                >
+                  No data found.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              orders.map((o) => (
+                <TableRow key={o.id} className="border-border/40">
+                  <TableCell className="font-medium text-foreground">{o.id}</TableCell>
+                  <TableCell className="text-muted-foreground">{o.customer}</TableCell>
+                  <TableCell className="text-muted-foreground">{o.table}</TableCell>
+                  <TableCell className="text-right">{o.items}</TableCell>
+                  <TableCell className="text-right font-semibold">{formatCurrency(o.total)}</TableCell>
+                  <TableCell className="text-muted-foreground">{o.payment}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={tone[o.status.toLowerCase()] ?? tone.pending}>{o.status}</Badge>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </CardContent>

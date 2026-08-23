@@ -11,7 +11,12 @@ import { RecentOrders } from "@/components/RecentOrders";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Field, FieldLabel } from "@/components/ui/field";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Boxes,
@@ -25,7 +30,10 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { useDashboard } from "@/client/hooks/useDashboard";
-import type { DashboardGroupBy, DashboardPeriod } from "@/types/dashboard-types";
+import type {
+  DashboardGroupBy,
+  DashboardPeriod,
+} from "@/types/dashboard-types";
 import {
   formatCurrency,
   formatDateInput,
@@ -33,6 +41,7 @@ import {
   numberValue,
   parseDateInput,
 } from "@/utils/utils";
+import { useAppSelector } from "@/store/hooks";
 
 type DatePickerFieldProps = {
   label: string;
@@ -49,34 +58,66 @@ function DatePickerField({
   onChange,
   disabled,
 }: DatePickerFieldProps) {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <div className="grid gap-1 text-xs font-medium text-muted-foreground">
-      <span>{label}</span>
-      <Popover>
+    <Field className="w-36 gap-1">
+      <FieldLabel htmlFor={label}>{label}</FieldLabel>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="w-36 justify-start text-left font-normal">
+          <Button
+            variant="outline"
+            id={label}
+            className="w-full justify-start font-normal"
+          >
             {displayValue}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="end">
+        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
           <Calendar
             mode="single"
             selected={parseDateInput(value)}
-            onSelect={(date) => date && onChange(formatDateInput(date))}
+            defaultMonth={parseDateInput(value)}
+            captionLayout="dropdown"
+            onSelect={(date) => {
+              if (!date) return;
+              onChange(formatDateInput(date));
+              setOpen(false);
+            }}
             disabled={disabled}
           />
         </PopoverContent>
       </Popover>
-    </div>
+    </Field>
   );
 }
 
 const page = () => {
-  const [startDate, setStartDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [endDate, setEndDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [startDate, setStartDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
+  const [endDate, setEndDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
   const [salesGroupBy, setSalesGroupBy] = useState<DashboardGroupBy>("hour");
-  const [revenueGroupBy, setRevenueGroupBy] = useState<DashboardGroupBy>("week");
-  const dashboard = useDashboard("today" as DashboardPeriod, salesGroupBy, revenueGroupBy, startDate, endDate);
+  const [revenueGroupBy, setRevenueGroupBy] =
+    useState<DashboardGroupBy>("week");
+  const currentRole = useAppSelector(
+    (state) => state.auth.user?.role,
+  ) as unknown;
+  const roleName =
+    typeof currentRole === "string"
+      ? currentRole
+      : currentRole && typeof currentRole === "object" && "name" in currentRole
+        ? String(currentRole.name)
+        : "Admin";
+  const dashboard = useDashboard(
+    "today" as DashboardPeriod,
+    salesGroupBy,
+    revenueGroupBy,
+    startDate,
+    endDate,
+  );
   const summary = dashboard.summary;
   return (
     <div className="custom-space-y">
@@ -84,13 +125,13 @@ const page = () => {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-sm font-medium text-primary">
-            Welcome back, Admin 👋
+            Welcome back, {roleName} 👋
           </p>
           <h1 className="text-2xl font-bold tracking-tight text-foreground lg:text-3xl">
             Dashboard Overview
           </h1>
           <p className="text-sm text-muted-foreground">
-            Monday, Nov 11 · Real-time business performance and operations
+            Live overview of your cafe&apos;s sales, operations, and performance
           </p>
         </div>
         <div className="flex items-end gap-2">
@@ -192,7 +233,12 @@ const page = () => {
                 Hourly revenue and order volume
               </p>
             </div>
-            <Tabs value={salesGroupBy} onValueChange={(value) => setSalesGroupBy(value as DashboardGroupBy)}>
+            <Tabs
+              value={salesGroupBy}
+              onValueChange={(value) =>
+                setSalesGroupBy(value as DashboardGroupBy)
+              }
+            >
               <TabsList className="h-8 rounded-full bg-muted/60">
                 <TabsTrigger value="hour" className="rounded-full text-xs">
                   Hour
@@ -264,7 +310,7 @@ const page = () => {
       {/* Recent orders + Low stock */}
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-            <RecentOrders orders={dashboard.recentOrders} />
+          <RecentOrders orders={dashboard.recentOrders} />
         </div>
         <LowStockAlerts items={dashboard.lowStock} />
       </div>

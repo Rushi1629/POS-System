@@ -83,6 +83,19 @@ export const fetchOrderStatus = async (
       `/dashboard/order-status?${periodParams(period, startDate, endDate)}`,
     ),
   );
+  if (
+    Array.isArray(data) &&
+    data.length === 1 &&
+    data[0] &&
+    typeof data[0] === "object"
+  ) {
+    return Object.fromEntries(
+      Object.entries(data[0]).map(([name, value]) => [
+        name.toLowerCase(),
+        numberValue(value),
+      ]),
+    );
+  }
   if (data && typeof data === "object" && !Array.isArray(data)) {
     return Object.fromEntries(
       Object.entries(data).map(([name, value]) => [
