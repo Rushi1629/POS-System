@@ -41,6 +41,13 @@ import {
   parseDateInput,
 } from "@/utils/utils";
 import { useAppSelector } from "@/store/hooks";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type DatePickerFieldProps = {
   label: string;
@@ -98,6 +105,7 @@ const page = () => {
   const [endDate, setEndDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
   );
+  const [period, setPeriod] = useState<DashboardPeriod>("today");
   const [salesGroupBy, setSalesGroupBy] = useState<DashboardGroupBy>("hour");
   const [revenueGroupBy, setRevenueGroupBy] =
     useState<DashboardGroupBy>("week");
@@ -111,7 +119,7 @@ const page = () => {
         ? String(currentRole.name)
         : "Admin";
   const dashboard = useDashboard(
-    "today" as DashboardPeriod,
+    period,
     salesGroupBy,
     revenueGroupBy,
     startDate,
@@ -128,7 +136,7 @@ const page = () => {
           <p className="text-sm font-medium text-primary">
             Welcome back, {roleName} 👋
           </p>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground lg:text-3xl">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground lg:text-3xl">
             Dashboard Overview
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -150,6 +158,23 @@ const page = () => {
             onChange={setEndDate}
             disabled={(date) => date < parseDateInput(startDate)}
           />
+          <Field className="w-32 gap-1">
+            <FieldLabel htmlFor="dashboard-period">Period</FieldLabel>
+            <Select
+              value={period}
+              onValueChange={(value) => setPeriod(value as DashboardPeriod)}
+            >
+              <SelectTrigger id="dashboard-period" className="w-full">
+                <SelectValue placeholder="Select period" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="week">This week</SelectItem>
+                <SelectItem value="month">This month</SelectItem>
+                <SelectItem value="year">This year</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
         </div>
       </div>
 
@@ -249,6 +274,9 @@ const page = () => {
                 <TabsTrigger value="week" className="rounded-full text-xs">
                   Week
                 </TabsTrigger>
+                <TabsTrigger value="month" className="rounded-full text-xs">
+                  Month
+                </TabsTrigger>
               </TabsList>
             </Tabs>
           </CardHeader>
@@ -315,25 +343,33 @@ const page = () => {
         <LowStockAlerts items={dashboard.lowStock} />
       </div>
 
-      {/* Expenses vs Revenue */}
+      {/* Revenue vs Orders */}
       <Card className="border-border/60 shadow-[--shadow-card]">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-base">Revenue vs Expenses</CardTitle>
+            <CardTitle className="text-base">Revenue vs Orders</CardTitle>
             <p className="text-xs text-muted-foreground">
-              Last 7 days · in thousands (₹)
+              Revenue and order volume by period
             </p>
           </div>
-          <Tabs defaultValue="week">
+          <Tabs
+            value={revenueGroupBy}
+            onValueChange={(value) =>
+              setRevenueGroupBy(value as DashboardGroupBy)
+            }
+          >
             <TabsList className="h-8 rounded-full bg-muted/60">
+              <TabsTrigger value="hour" className="rounded-full text-xs">
+                Hour
+              </TabsTrigger>
+              <TabsTrigger value="day" className="rounded-full text-xs">
+                Day
+              </TabsTrigger>
               <TabsTrigger value="week" className="rounded-full text-xs">
                 Week
               </TabsTrigger>
               <TabsTrigger value="month" className="rounded-full text-xs">
                 Month
-              </TabsTrigger>
-              <TabsTrigger value="year" className="rounded-full text-xs">
-                Year
               </TabsTrigger>
             </TabsList>
           </Tabs>

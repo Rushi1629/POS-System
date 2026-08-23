@@ -28,9 +28,9 @@ const unwrap = <T>(response: ApiResponse<T>) => response.data;
 export const dateRange = (period: DashboardPeriod) => {
   const end = new Date();
   const start = new Date(end);
-  if (period === "7d") start.setDate(end.getDate() - 6);
-  if (period === "30d") start.setDate(end.getDate() - 29);
-  if (period === "ytd") start.setMonth(0, 1);
+  if (period === "week") start.setDate(end.getDate() - 6);
+  if (period === "month") start.setMonth(end.getMonth() - 1);
+  if (period === "year") start.setFullYear(end.getFullYear() - 1);
   return {
     startDate: start.toISOString().slice(0, 10),
     endDate: end.toISOString().slice(0, 10),
@@ -44,7 +44,7 @@ export const periodParams = (
 ) => {
   const range =
     startDate && endDate ? { startDate, endDate } : dateRange(period);
-  return `period=${period === "7d" || period === "30d" || period === "ytd" ? period : "today"}&startDate=${range.startDate}&endDate=${range.endDate}`;
+  return `period=${period}&startDate=${range.startDate}&endDate=${range.endDate}`;
 };
 
 export const fetchDashboardSummary = async (
@@ -208,6 +208,6 @@ export const fetchRevenueVsOrders = async (
   return toRecordArray(data).map((item, index) => ({
     label: String(firstValue(item, ["label", "date", "period"]) ?? index + 1),
     revenue: numberValue(firstValue(item, ["revenue", "amount"])),
-    orders: numberValue(firstValue(item, ["orders", "orderCount", "expenses"])),
+    orders: numberValue(firstValue(item, ["orders", "orderCount", "count"])),
   }));
 };

@@ -1,5 +1,5 @@
-export type DashboardPeriod = "today" | "7d" | "30d" | "ytd";
-export type DashboardGroupBy = "hour" | "day" | "week";
+export type DashboardPeriod = "today" | "week" | "month" | "year";
+export type DashboardGroupBy = "hour" | "day" | "week" | "month";
 
 export type DashboardSummary = {
 	revenue: {
