@@ -47,7 +47,7 @@ export const useDeleteUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => deleteUserById(id),
+    mutationFn: (userId: string) => deleteUserById(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["users"],
@@ -63,8 +63,8 @@ export const useEditUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<User> }) =>
-      editUserById(id, data),
+    mutationFn: ({ userId, data }: { userId: string; data: Partial<User> }) =>
+      editUserById(userId, data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });

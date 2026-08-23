@@ -89,7 +89,7 @@ export const statusBg: Record<string, string> = {
 export type UserRole = "Super Admin" | "Admin" | "Chef" | "Waiter" | "Customer";
 
 export interface Role {
-  id: number;
+  roleId: string;
   name: UserRole;
   description?: string | null;
   isActive: boolean;
@@ -122,7 +122,8 @@ export type UsersResponse = {
 };
 
 export interface User {
-  id: number;
+  userId: string;
+  roleId: string;
   name: string;
   username: string;
   email: string;
@@ -168,10 +169,9 @@ export interface CreateUserPayload {
   email: string;
   password?: string;
   phoneNumber: string;
-  roleId: number;
+  roleId: string;
   isActive: boolean;
 }
-
 export const roleMap: Record<UserRole, number> = {
   "Super Admin": 1,
   Admin: 2,

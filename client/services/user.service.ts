@@ -12,6 +12,8 @@ export const fetchAllUsers = async (): Promise<User[]> => {
 
   return res.data.map((u: any) => ({
     ...u,
+    userId: u.userId,
+    roleId: u.role.roleId,
     role: u.role.name,
   }));
 };
@@ -21,16 +23,16 @@ export const fetchRoles = async (): Promise<Role[]> => {
   return res.data;
 };
 
-export const deleteUserById = async (id: number): Promise<void> => {
-  await fetcher(`/users/${id}`, {
+export const deleteUserById = async (userId: string): Promise<void> => {
+  await fetcher(`/users/${userId}`, {
     method: "DELETE",
   });
 };
 export const editUserById = async (
-  id: number,
-  data: Partial<User>
+  userId: string,
+  data: Partial<User>,
 ): Promise<User> => {
-  const res = await fetcher(`/users/${id}`, {
+  const res = await fetcher(`/users/${userId}`, {
     method: "PATCH",
     body: JSON.stringify(data),
   });

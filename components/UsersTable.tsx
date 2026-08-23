@@ -256,7 +256,7 @@ export function UsersTable({ users, onEdit, onDelete, roles }: userProps) {
           <SelectContent>
             <SelectItem value="all">All roles</SelectItem>
             {roles.map((role) => (
-              <SelectItem key={role.id} value={role.name}>
+              <SelectItem key={role.roleId} value={role.name}>
                 {role.name}
               </SelectItem>
             ))}

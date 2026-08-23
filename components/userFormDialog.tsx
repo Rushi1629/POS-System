@@ -195,9 +195,12 @@ export function UserFormDialog({
                     Role
                   </Label>
                   <Select
-                    value={watch("role")}
-                    onValueChange={(v) => {
-                      setValue("role", v as UserRole, { shouldValidate: true });
+                    value={watch("role") ?? ""}
+                    onValueChange={(value) => {
+                      setValue("role", value as UserRole, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
                     }}
                   >
                     <SelectTrigger id="role" className="w-full">
@@ -207,8 +210,8 @@ export function UserFormDialog({
                       </div>
                     </SelectTrigger>
                     <SelectContent>
-                      {roles.map((role: any) => (
-                        <SelectItem key={role.id} value={role.name}>
+                      {roles.map((role) => (
+                        <SelectItem key={role.roleId} value={role.name}>
                           {role.name}
                         </SelectItem>
                       ))}

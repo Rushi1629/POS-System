@@ -25,8 +25,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { UsersTable } from "@/components/UsersTable";
 import { UserFormDialog } from "@/components/userFormDialog";
 import {
-  roleMap,
-  roleReverseMap,
   type User,
   type UserFormValues,
 } from "@/types/types";
@@ -39,7 +37,6 @@ import {
 } from "@/client/hooks/useUser";
 import ApiLoader from "@/components/ApiLoader";
 
-import { isEqual } from "lodash-es";
 import { delay } from "@/utils/utils";
 
 export default function UsersPage() {
@@ -86,7 +83,7 @@ export default function UsersPage() {
     setFormOpen(true);
     setLoadingForm(true);
     await delay(400);
-    const fresh = users.find((u) => u.id === user.id) ?? user;
+    const fresh = users.find((u) => u.userId === user.userId) ?? user;
     setEditing(fresh);
     setLoadingForm(false);
   };
@@ -110,7 +107,7 @@ export default function UsersPage() {
         email: values.email,
         password: values.password,
         phoneNumber: values.phoneNumber,
-        roleId: role.id,
+        roleId: role.roleId,
         isActive: values.isActive,
         ...(values.password && { password: values.password }),
       };
@@ -130,7 +127,7 @@ export default function UsersPage() {
     setDeleting(true);
 
     try {
-      await deleteUser(deleteTarget.id);
+      await deleteUser(deleteTarget.userId);
 
       toast.success("User deleted successfully - goodbye! 👋");
       setDeleteTarget(null);
@@ -172,12 +169,12 @@ export default function UsersPage() {
         username: values.username,
         email: values.email,
         phoneNumber: values.phoneNumber,
-        roleId: role.id,
+        roleId: role.roleId,
         isActive: values.isActive,
       };
 
       await editUser({
-        id: editing.id,
+        userId: editing.userId,
         data: payload,
       });
 
