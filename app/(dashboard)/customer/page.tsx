@@ -199,7 +199,7 @@ export default function CustomerDashboard() {
   }, [selectedExtras]);
 
   const removeFromCart = useCallback(
-    (id: number, menuType?: string) => {
+    (id: string, menuType?: string) => {
       const cartKey = [...Object.values(cart)]
         .reverse()
         .find((item) => item.id === id && item.menuType === menuType)?.cartKey;

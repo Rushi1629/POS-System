@@ -25,7 +25,7 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
     // existingItem.notes = existingItem.notes ?? item.notes;
 
     // merge extras
-    const extrasMap = new Map<number, any>();
+    const extrasMap = new Map<string | number, any>();
 
     [...(existingItem.extras || []), ...(item.extras || [])].forEach((extra) => {
       if (extrasMap.has(extra.id)) {

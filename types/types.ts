@@ -295,7 +295,7 @@ export interface NavItem {
 }
 
 export type SubFormRow = {
-  subMenuItemId?: number;
+  subMenuItemId?: string;
   name?: string;
   price?: string | number;
   available?: boolean;
@@ -307,7 +307,7 @@ export type MenuType = "Veg" | "NonVeg";
 export type MenuFormData = z.infer<typeof menuSchema>;
 
 export type SubMenuItem = {
-  id: number;
+  id: string;
   name: string;
   price: string | number;
   available: boolean;

@@ -1,10 +1,14 @@
 import { z } from "zod";
 
 export const subSchema = z.object({
-  subMenuItemId: z.coerce.number().optional(),
+  subMenuItemId: z.string().optional(),
+
   name: z.string().trim().min(1, "Required").optional().or(z.literal("")),
+
   price: z.coerce.number().min(0, "Must be ≥ 0").optional(),
+
   available: z.boolean().optional(),
+
   description: z.string().trim().max(300).optional().or(z.literal("")),
 });
 

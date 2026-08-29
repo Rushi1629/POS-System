@@ -128,7 +128,7 @@ function MenuPage() {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<FetchMenuResponse | null>(null);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -348,7 +348,7 @@ function MenuPage() {
         const data = JSON.parse(String(formData.get("data") || "{}"));
 
         const normalizeSubmenu = (
-          items: Array<{ subMenuItemId?: number | string }> = [],
+          items: Array<{ subMenuItemId?: string }> = [],
         ) =>
           [...items]
             .filter(
@@ -357,8 +357,8 @@ function MenuPage() {
                 item?.subMenuItemId !== null &&
                 String(item.subMenuItemId).trim() !== "",
             )
-            .map((item) => Number(item.subMenuItemId))
-            .sort((a, b) => a - b);
+            .map((item) => String(item.subMenuItemId))
+            .sort();
 
         const payload = {
           name: data.name,
@@ -380,7 +380,7 @@ function MenuPage() {
             categoryId: editing.category?.id,
             submenu: normalizeSubmenu(
               (editing.subMenuItems || []).map((item) => ({
-                subMenuItemId: Number(item.id),
+                subMenuItemId: item.id,
               })),
             ),
           },
@@ -423,6 +423,8 @@ function MenuPage() {
       setDeleteId(null);
     } catch {
       toast.error("Delete failed ❌");
+    } finally {
+      setDialogOpen(false);
     }
   }
 

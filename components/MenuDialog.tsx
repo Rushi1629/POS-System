@@ -108,7 +108,7 @@ function MenuDialog({
       // 👉 EDIT MODE
       const mappedSubmenu =
         initial.subMenuItems?.map((s: SubMenuItem) => ({
-          subMenuItemId: Number(s.id),
+          subMenuItemId: s.id,
           name: s.name,
           price: Number(s.price),
           available: s.available,
@@ -172,7 +172,7 @@ function MenuDialog({
 
         if (patch.subMenuItemId !== undefined) {
           const selected = submenuOptions.find(
-            (item) => Number(item.id) === Number(patch.subMenuItemId),
+            (item) => item.id === patch.subMenuItemId,
           );
 
           if (selected) {
@@ -189,7 +189,7 @@ function MenuDialog({
       setValue(
         "submenu",
         updated.map((s) => ({
-          subMenuItemId: s.subMenuItemId ? Number(s.subMenuItemId) : undefined,
+          subMenuItemId: s.subMenuItemId || undefined,
           name: s.name || "",
           price: s.price !== undefined ? Number(s.price) : undefined,
           available: s.available ?? true,
@@ -222,10 +222,13 @@ function MenuDialog({
 
       const cleanSubmenu = (values.submenu || [])
         .filter(
-          (s) => s.subMenuItemId !== undefined && s.subMenuItemId !== null,
+          (s) =>
+            s.subMenuItemId !== undefined &&
+            s.subMenuItemId !== null &&
+            String(s.subMenuItemId).trim() !== "",
         )
         .map((s) => ({
-          subMenuItemId: Number(s.subMenuItemId),
+          subMenuItemId: String(s.subMenuItemId),
         }));
 
       if (cleanSubmenu.length > 0) {
@@ -468,7 +471,7 @@ function MenuDialog({
               <div className="space-y-3">
                 {submenu.map((s, i) => {
                   const selectedSubmenu = submenuOptions.find(
-                    (item) => Number(item.id) === Number(s.subMenuItemId),
+                    (item) => item.id === s.subMenuItemId,
                   );
 
                   return (
@@ -491,7 +494,7 @@ function MenuDialog({
                         <Select
                           value={s.subMenuItemId ? String(s.subMenuItemId) : ""}
                           onValueChange={(value) =>
-                            updateSub(i, { subMenuItemId: Number(value) })
+                            updateSub(i, { subMenuItemId: value })
                           }
                         >
                           <SelectTrigger>
@@ -499,7 +502,7 @@ function MenuDialog({
                           </SelectTrigger>
                           <SelectContent>
                             {submenuOptions.map((item) => (
-                              <SelectItem key={item.id} value={String(item.id)}>
+                              <SelectItem key={item.id} value={item.id}>
                                 {item.name}
                               </SelectItem>
                             ))}

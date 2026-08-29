@@ -1,5 +1,5 @@
 export type CartItem = {
-  id: number;
+  id: string;
   cartKey: string;
   name: string;
   description?: string;
@@ -14,14 +14,14 @@ export type CartItem = {
   notes?: string;
   orderItemId?: number; // ⚠️ not in original type, but needed for mapping orders to cart
   extras?: {
-    id: number;
+    id: string;
     name: string;
     price: number;
     quantity: number;
   }[];
 };
 export const getCartKey = (
-  id: number,
+  id: string,
   // extras?: { id: number }[],
   // menuType?: "Veg" | "NonVeg",
 ) => {

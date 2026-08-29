@@ -2,7 +2,7 @@ import type { menuSchema } from "@/Schema/menuScheme";
 import { z } from "zod";
 
 export interface SubMenuItem {
-  id: number;
+  id: string;
   name: string;
   price: number;
   available: boolean;
@@ -16,7 +16,7 @@ export interface allCategory {
 }
 
 export interface FetchMenuResponse {
-  id: number;
+  id: string;
   name: string;
   price: number;
   menuType: "Veg" | "NonVeg";
@@ -61,6 +61,6 @@ export type MenuPayload = {
   available: boolean;
   menuType: "Veg" | "NonVeg";
   submenu?: {
-    subMenuItemId: number;
+    subMenuItemId: string;
   }[];
 };
