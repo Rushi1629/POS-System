@@ -316,14 +316,14 @@ export type SubMenuItem = {
 };
 
 export type MenuItem = {
-  id: number;
+  id: string;
   name: string;
   price: number;
   menuType: MenuType;
   description: string;
   available: boolean;
   imageUrl?: string | null;
-  category: { id: number; name: string };
+  category: { id: string; name: string };
   subMenuItems: SubMenuItem[];
 };
 

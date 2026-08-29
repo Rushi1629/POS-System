@@ -11,7 +11,7 @@ export interface SubMenuItem {
 }
 
 export interface allCategory {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -37,7 +37,7 @@ export type MenuFormValues = {
   name: string;
   price: number;
   description?: string;
-  categoryId: number;
+  categoryId: string;
   available: boolean;
   imageFile?: File;
 };
@@ -57,7 +57,7 @@ export type MenuPayload = {
   name: string;
   description: string;
   price: number;
-  categoryId: number;
+  categoryId: string;
   available: boolean;
   menuType: "Veg" | "NonVeg";
   submenu?: {

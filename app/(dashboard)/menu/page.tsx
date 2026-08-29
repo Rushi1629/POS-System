@@ -80,7 +80,7 @@ import MenuDialog from "@/components/MenuDialog";
 import StatusPill from "@/components/StatusPill";
 import VegBadge from "@/components/VegBadge";
 import Thumb from "@/components/Thumb";
-import { Category, MenuItem } from "@/types/types";
+import { Category } from "@/types/types";
 import StatCard from "@/components/StatCard";
 import MenuCard from "@/components/MenuCard";
 import {
@@ -96,7 +96,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { allCategory } from "@/types/menu-types";
+import { allCategory, FetchMenuResponse } from "@/types/menu-types";
 
 function MenuPage() {
   const { data: items = [], isLoading } = useFetchMenus();
@@ -127,7 +127,7 @@ function MenuPage() {
   const [categoryFilter, setCategoryFilter] = useState<"all" | string>("all");
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<MenuItem | null>(null);
+  const [editing, setEditing] = useState<FetchMenuResponse | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -170,7 +170,7 @@ function MenuPage() {
     [items],
   );
 
-  const columns = useMemo<ColumnDef<MenuItem>[]>(
+  const columns = useMemo<ColumnDef<FetchMenuResponse>[]>(
     () => [
       {
         id: "image",
@@ -337,7 +337,7 @@ function MenuPage() {
     setDialogOpen(true);
   }
 
-  function openEdit(m: MenuItem) {
+  function openEdit(m: FetchMenuResponse) {
     setEditing(m);
     setDialogOpen(true);
   }
@@ -427,7 +427,7 @@ function MenuPage() {
   }
 
   const mapCategoryToAllCategory = (c: Category): allCategory => ({
-    id: Number(c.id), // ✅ FIX
+    id: String(c.id), // ✅ UUID remains string
     name: c.name,
   });
 

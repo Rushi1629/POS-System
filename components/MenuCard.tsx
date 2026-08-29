@@ -5,17 +5,20 @@ import VegBadge from "./VegBadge";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Pencil, Trash2 } from "lucide-react";
-import { MenuItem } from "@/types/types";
+import { FetchMenuResponse } from "@/types/menu-types";
 
 function MenuCard({
   item,
   onEdit,
   onDelete,
 }: {
-  item: MenuItem;
+  item: FetchMenuResponse;
   onEdit: () => void;
   onDelete: () => void;
 }) {
+
+  console.log(item,"item");
+  
   return (
     <Card className="group overflow-hidden border-border/70 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg">
       <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-primary/10 to-accent">

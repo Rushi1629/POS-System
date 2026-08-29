@@ -15,9 +15,6 @@ export const menuSchema = z.object({
   menuType: z.enum(["Veg", "NonVeg"]),
   description: z.string().trim().max(500).optional().or(z.literal("")),
   available: z.boolean(),
-  categoryId: z
-  .number()
-  .min(1, "Select a category")
-  .optional(),
+  categoryId: z.string().min(1, "Please select a category"),
   submenu: z.array(subSchema).optional(),
 });

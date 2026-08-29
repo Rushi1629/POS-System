@@ -60,7 +60,7 @@ function MenuDialog({
       name: "",
       description: "",
       price: 0,
-      categoryId: 0,
+      categoryId: "",
       available: true,
       menuType: "Veg",
       submenu: [],
@@ -119,7 +119,7 @@ function MenuDialog({
         name: initial.name,
         description: initial.description,
         price: initial.price,
-        categoryId: Number(initial.category?.id),
+        categoryId: String(initial.category?.id),
         available: initial.available,
         menuType: initial.menuType,
         submenu: mappedSubmenu,
@@ -135,7 +135,7 @@ function MenuDialog({
         name: "",
         description: "",
         price: 0,
-        categoryId: undefined, // ✅ important
+        categoryId: "", // ✅ important
         available: true,
         menuType: "Veg",
         submenu: [],
@@ -215,7 +215,7 @@ function MenuDialog({
         name: values.name,
         description: values.description || "",
         price: values.price,
-        categoryId: values.categoryId,
+        categoryId: String(values.categoryId),
         available: values.available,
         menuType: values.menuType,
       };
@@ -267,7 +267,6 @@ function MenuDialog({
           <DialogTitle className="text-xl">
             {initial ? "Edit menu item" : "Create new menu item"}
           </DialogTitle>
-          
           <DialogDescription>
             {initial
               ? "Update the details below and save your changes."
@@ -360,16 +359,14 @@ function MenuDialog({
               <Label>Category</Label>
               <Select
                 value={watch("categoryId") ? String(watch("categoryId")) : ""}
-                onValueChange={(v) =>
-                  setValue("categoryId", v ? Number(v) : undefined)
-                } // ✅ convert here
+                onValueChange={(v) => setValue("categoryId", v)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
                   {allCategory.map((c) => (
-                    <SelectItem key={c.id} value={String(c.id)}>
+                    <SelectItem key={c.id} value={c.id}>
                       {c.name}
                     </SelectItem>
                   ))}
