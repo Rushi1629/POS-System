@@ -4,6 +4,8 @@ import {
   EditTablePayload,
   FetchTableResponse,
   getTableLiveChargeResponse,
+  FetchTablesParams,
+  FetchTablesResponse,
 } from "@/types/table-types";
 import { fetcher } from "../client";
 
@@ -13,28 +15,47 @@ export const createTable = (data: CreateTablePayload) =>
     body: JSON.stringify(data),
   });
 
-export const fetchAllTables = async (): Promise<FetchTableResponse[]> => {
-  const res = await fetcher("/table");
+export const fetchAllTables = async ({
+  page,
+  limit,
+  status = "all",
+}: FetchTablesParams): Promise<FetchTablesResponse> => {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    status,
+  });
 
-  return res.data.map((u: any) => ({
-    id: u.id,
-    name: u.name,
-    type: u.type,
-    tableStatus: u.tableStatus,
-    capacity: Number(u.capacity),
-    enableTimeRate: u.enableTimeRate,
-    ratePerMinute: Number(u.ratePerMinute),
-    chargePerPerson: Boolean(u.chargePerPerson),
-    qrCode: u.qrCode ?? null,
-    isActive: u.isActive,
-    guestCount: Number(u.guestCount ?? 0),
-    qrCodeImageUrl: u.qrCodeImageUrl ?? null,
-    rushMode: Boolean(u.rushMode),
-  }));
+  const res = await fetcher(`/table?${params.toString()}`);
+
+  return {
+    data: res.data.map((u: any) => ({
+      id: u.id,
+      name: u.name,
+      type: u.type,
+      tableStatus: u.tableStatus,
+      capacity: Number(u.capacity),
+      enableTimeRate: Boolean(u.enableTimeRate),
+      ratePerMinute: Number(u.ratePerMinute ?? 0),
+      chargePerPerson: Boolean(u.chargePerPerson),
+      qrCode: u.qrCode ?? null,
+      qrCodeImageUrl: u.qrCodeImageUrl ?? null,
+      isActive: Boolean(u.isActive),
+      guestCount: Number(u.guestCount ?? 0),
+      rushMode: Boolean(u.rushMode),
+    })),
+
+    pagination: {
+      page: Number(res.pagination?.page ?? page),
+      limit: Number(res.pagination?.limit ?? limit),
+      total: Number(res.pagination?.total ?? 0),
+      totalPages: Number(res.pagination?.totalPages ?? 0),
+    },
+  };
 };
 
 export const editTableById = async (
-  id: number,
+  id: string,
   data: EditTablePayload,
 ): Promise<FetchTableResponse> => {
   const res = await fetcher(`/table/${id}`, {
@@ -60,7 +81,7 @@ export const editTableById = async (
   };
 };
 
-export const deleteTableById = async (id: number): Promise<void> => {
+export const deleteTableById = async (id: string): Promise<void> => {
   await fetcher(`/table/${id}`, {
     method: "DELETE",
   });
@@ -73,7 +94,7 @@ export const editTableSession = (data: EditTableSessionPayload) =>
   });
 
 export const getTableLiveCharge = async (
-  id: number,
+  id: string,
 ): Promise<getTableLiveChargeResponse> => {
   try {
     const res = await fetcher(`/table/live-charge/${id}`, {

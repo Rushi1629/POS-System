@@ -58,7 +58,7 @@ const GenerateBillDialog = ({
     formState: { errors },
   } = useForm<GenerateBillRequest>({
     defaultValues: {
-      tableId: 0,
+      tableId: "0",
       mobileNumber: "",
       discounts: [],
       notes: "",
@@ -75,14 +75,14 @@ const GenerateBillDialog = ({
   // }, [tables, setValue]);
 
   const submit = async (values: GenerateBillRequest) => {
-    if (!values.tableId || values.tableId === 0) {
+    if (!values.tableId || values.tableId === "0") {
       toast.error("Please select table id");
       return;
     }
 
     try {
       const data = await onSubmit({
-        tableId: Number(values.tableId), // ✅ FIX
+        tableId: values.tableId, // ✅ FIX
         mobileNumber: values.mobileNumber.trim(),
         discounts: (values.discounts ?? []).map((discount, index) => ({
           discountId: discount.discountId,

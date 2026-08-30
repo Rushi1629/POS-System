@@ -61,7 +61,7 @@ export function TableCard({
   guestCount: number;
   onUpdateSession: (data: EditTableSessionPayload) => Promise<any>;
   isPending: boolean;
-  onToggleRushMode: (tableId: number, value: boolean) => Promise<void>;
+  onToggleRushMode: (tableId: string, value: boolean) => Promise<void>;
 }) {
   const [, setTick] = useState(0);
   const [seatDialog, setSeatDialog] = useState(false);

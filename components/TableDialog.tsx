@@ -82,7 +82,7 @@ function TableDialog({
         enableTimeRate: initial.enableTimeRate,
         ratePerMinute: Number(initial.ratePerMinute) || 0,
         isActive: initial.isActive,
-        chargePerPerson: initial.chargePerPerson,
+        chargePerPerson: initial.chargePerPerson ?? false,
         // guestCount: Number(initial.guestCount) || 0,
       });
     } else {

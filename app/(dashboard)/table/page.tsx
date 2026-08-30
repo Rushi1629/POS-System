@@ -94,7 +94,18 @@ import {
 } from "@/components/ui/dialog";
 
 function Tables() {
-  const { data: tables = [], isLoading: isTableLoading } = useFetchTables();
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5,
+  });
+  const [statusFilter, setStatusFilter] = useState<"all" | TableStatus>("all");
+  const { data: tablesResponse, isLoading: isTableLoading } = useFetchTables(
+    pagination.pageIndex + 1,
+    pagination.pageSize,
+    statusFilter,
+  );
+  const tables = tablesResponse?.data ?? [];
+  const serverPagination = tablesResponse?.pagination;
   console.log(tables, "tables");
 
   const { mutateAsync: createTable, isPending: isCreating } = useCreateTable();
@@ -106,17 +117,11 @@ function Tables() {
   const items = tables;
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | TableType>("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | TableStatus>("all");
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<FetchTableResponse | null>(null);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [loadingId, setLoadingId] = useState<number | null>(null);
-
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 5,
-  });
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
   const [qrModal, setQrModal] = useState(false);
   const [selectedQR, setSelectedQR] = useState<string | null>(null);
 
@@ -190,19 +195,35 @@ function Tables() {
       {
         id: "qr",
         header: "QR Code",
-        cell: ({ row }) => (
-          <Image
-            src={row.original.qrCodeImageUrl || "/placeholder.png"}
-            alt="QR Code"
-            width={50}
-            height={50}
-            className="rounded-md border object-cover cursor-pointer"
-            onClick={() => {
-              setSelectedQR(row.original.qrCodeImageUrl || null);
-              setQrModal(true);
-            }}
-          />
-        ),
+        cell: ({ row }) => {
+          const qrUrl = row.original.qrCodeImageUrl;
+          const tableName = row.original.name;
+
+          if (!qrUrl) {
+            return (
+              <div
+                className="flex h-[50px] w-[50px] items-center justify-center rounded-md border bg-muted/50 text-xs font-semibold text-muted-foreground"
+                title={`QR not available for ${tableName}`}
+              >
+                {tableName}
+              </div>
+            );
+          }
+
+          return (
+            <Image
+              src={qrUrl}
+              alt={`QR Code for ${tableName}`}
+              width={50}
+              height={50}
+              className="cursor-pointer rounded-md border object-cover"
+              onClick={() => {
+                setSelectedQR(qrUrl);
+                setQrModal(true);
+              }}
+            />
+          );
+        },
       },
       {
         accessorKey: "chargePerPerson",
@@ -306,20 +327,29 @@ function Tables() {
   const table = useReactTable({
     data: filtered,
     columns,
-    state: { pagination },
+    state: {
+      pagination,
+    },
     onPaginationChange: setPagination,
+
+    manualPagination: true,
+
+    pageCount: serverPagination?.totalPages ?? 0,
+
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    autoResetPageIndex: true,
+
+    autoResetPageIndex: false,
   });
 
-  const pageCount = table.getPageCount();
-  const pageIndex = table.getState().pagination.pageIndex;
-  const pageSize = table.getState().pagination.pageSize;
-  const startIndex = pageIndex * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, filtered.length);
+  const pageCount = serverPagination?.totalPages ?? 0;
+  const pageIndex = pagination.pageIndex;
+  const pageSize = pagination.pageSize;
+
+  const totalItems = serverPagination?.total ?? 0;
+
+  const startIndex = totalItems === 0 ? 0 : pageIndex * pageSize + 1;
+
+  const endIndex = Math.min((pageIndex + 1) * pageSize, totalItems);
 
   function openCreate() {
     setEditing(null);
@@ -371,7 +401,7 @@ function Tables() {
 
         console.log("Updating menu...");
         await updateTable({
-          id: Number(editing.id),
+          id: String(editing.id),
           data: data,
         });
 
@@ -395,7 +425,7 @@ function Tables() {
     if (!deleteId) return;
 
     try {
-      await deleteTable(Number(deleteId));
+      await deleteTable(String(deleteId));
 
       toast.success("Table Deleted Sucessfully 🗑  ️");
       setDeleteId(null);
@@ -573,11 +603,9 @@ function Tables() {
             <div className="flex items-center gap-3">
               <span>
                 Showing{" "}
-                <strong className="text-foreground">
-                  {filtered.length === 0 ? 0 : startIndex + 1}
-                </strong>
-                –<strong className="text-foreground">{endIndex}</strong> of{" "}
-                <strong className="text-foreground">{filtered.length}</strong>
+                <strong className="text-foreground">{startIndex}</strong>–
+                <strong className="text-foreground">{endIndex}</strong> of{" "}
+                <strong className="text-foreground">{totalItems}</strong>
               </span>
               <Select
                 value={String(pageSize)}

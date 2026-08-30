@@ -29,10 +29,19 @@ export const useCreateTable = () => {
   });
 };
 
-export const useFetchTables = () => {
-  return useQuery<FetchTableResponse[]>({
-    queryKey: ["tables"],
-    queryFn: fetchAllTables,
+export const useFetchTables = (
+  page: number,
+  limit: number,
+  status: string = "all",
+) => {
+  return useQuery({
+    queryKey: ["tables", page, limit, status],
+    queryFn: () =>
+      fetchAllTables({
+        page,
+        limit,
+        status,
+      }),
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,
@@ -43,7 +52,7 @@ export const useDeleteTable = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => deleteTableById(id),
+    mutationFn: (id: string) => deleteTableById(id),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["tables"],
@@ -59,13 +68,8 @@ export const useEditTable = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: EditTablePayload;
-    }) => editTableById(id, data),
+    mutationFn: ({ id, data }: { id: string; data: EditTablePayload }) =>
+      editTableById(id, data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tables"] });
@@ -91,12 +95,12 @@ export const useEditTableSession = () => {
   });
 };
 
-export const useFetchLiveCharge = (id?: number) => {
+export const useFetchLiveCharge = (id?: string) => {
   return useQuery({
     queryKey: ["liveCharge", id],
     queryFn: async () => {
       console.log("🔄 Fetching live charge for table:", id);
-      const res = await getTableLiveCharge(id as number);
+      const res = await getTableLiveCharge(id as string);
       console.log("📊 Live charge result:", res);
       return res ?? { totalMinutes: 0, currentCharge: 0 };
     },

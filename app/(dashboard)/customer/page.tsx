@@ -263,7 +263,7 @@ export default function CustomerDashboard() {
     if (count > 0 && count <= (table?.capacity ?? 0)) {
       try {
         await updateTableSession({
-          tableId: table?.id as number,
+          tableId: table?.id as string,
           guestCount: count,
           status: "OCCUPIED",
           notes: "Guest count updated from customer",

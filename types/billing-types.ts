@@ -12,7 +12,7 @@ export type TableType = "FAMILY" | "COUPLE" | "HALL" | "OUTDOOR" | "PRIVATE";
 // ---------- Shared sub-shapes ----------
 export interface BillSession {
   id: number;
-  tableId: number;
+  tableId: string;
   tableName: string;
   tableType: TableType;
   guestCount: number;
@@ -67,7 +67,7 @@ export interface SelectedDiscount {
   sequence: number;
 }
 export interface GenerateBillRequest {
-  tableId: number;
+  tableId: string;
   mobileNumber: string;
   discounts: SelectedDiscount[];
   notes: string;

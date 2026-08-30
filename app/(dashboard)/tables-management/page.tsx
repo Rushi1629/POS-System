@@ -13,17 +13,30 @@ import {
   TABLE_TYPES,
   TableType,
   EditTableSessionPayload,
+  TableStatus,
 } from "@/types/table-types";
 import { useQueryClient } from "@tanstack/react-query";
+import { PaginationState } from "@tanstack/react-table";
 
 export default function TablesManagement() {
   const [filter, setFilter] = useState<TableType | "ALL">("ALL");
 
-  const { data: tables = [], isLoading } = useFetchTables();
+    const [pagination, setPagination] = useState<PaginationState>({
+      pageIndex: 0,
+      pageSize: 5,
+    });
+    const [statusFilter, setStatusFilter] = useState<"all" | TableStatus>("all");
+    const { data: tablesResponse, isLoading: isTableLoading } = useFetchTables(
+      pagination.pageIndex + 1,
+      pagination.pageSize,
+      statusFilter,
+    );
+    const tables = tablesResponse?.data ?? [];
+    const serverPagination = tablesResponse?.pagination;
 
-  const [guestMap, setGuestMap] = useState<Record<number, number>>({});
+  const [guestMap, setGuestMap] = useState<Record<string, number>>({});
 
-  const [loadingTableId, setLoadingTableId] = useState<number | null>(null);
+  const [loadingTableId, setLoadingTableId] = useState<string | null>(null);
 
   const { mutateAsync: updateTableSession, isPending: isPending } =
     useEditTableSession();
@@ -66,7 +79,7 @@ export default function TablesManagement() {
     rushMode: Boolean(t.rushMode),
   }));  
 
-  const handleToggleRushMode = async (tableId: number, value: boolean) => {
+  const handleToggleRushMode = async (tableId: string, value: boolean) => {
     // optimistic update
     queryClient.setQueryData(["tables"], (old: any) =>
       old?.map((t: any) => (t.id === tableId ? { ...t, rushMode: value } : t)),
@@ -197,7 +210,7 @@ export default function TablesManagement() {
             <TableCard
               key={table.id}
               table={table}
-              guestCount={guestMap[table.id] ?? 0}
+              guestCount={guestMap[table.id] ?? "0"}
               onUpdateSession={handleUpdateSession}
               onToggleRushMode={handleToggleRushMode}
               isPending={loadingTableId === table.id}

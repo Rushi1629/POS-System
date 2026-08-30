@@ -3,13 +3,13 @@ export interface CreateTablePayload {
   type: TableType;
   capacity: number;
   enableTimeRate: boolean;
-  chargePerPerson : boolean;
+  chargePerPerson: boolean;
   ratePerMinute: number;
   isActive: boolean;
 }
 
 export interface EditTableSessionPayload {
-  tableId: number;
+  tableId: string;
   guestCount: number;
   status: TableStatus;
   notes: string;
@@ -35,7 +35,7 @@ export interface getTableLiveChargeResponse {
   currentCharge: number;
 }
 export interface FetchTableResponse {
-  id: number;
+  id: string;
   name: string;
   type: TableType;
   tableStatus: TableStatus;
@@ -46,9 +46,27 @@ export interface FetchTableResponse {
   qrCode: string | null;
   isActive: boolean;
   guestCount: number;
-  rushMode: boolean,
+  rushMode: boolean;
   qrCodeImageUrl?: string;
   // startTime?: string;
+}
+
+export interface TablePagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface FetchTablesParams {
+  page: number;
+  limit: number;
+  status?: string;
+}
+
+export interface FetchTablesResponse {
+  data: FetchTableResponse[];
+  pagination: TablePagination;
 }
 
 export const TABLE_TYPES = ["FAMILY", "POD", "HALL"] as const;

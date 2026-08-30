@@ -56,6 +56,8 @@ import { useFetchOrdersTableWise } from "@/client/hooks/useOrder";
 import { OrderAdminChef } from "@/types/order-types";
 import { useFetchTables } from "@/client/hooks/useTable";
 import { useFetchDiscounts } from "@/client/hooks/useDiscount";
+import { PaginationState } from "@tanstack/react-table";
+import { TableStatus } from "@/types/table-types";
 
 /* ---------- Page ---------- */
 export default function BillingPage() {
@@ -73,7 +75,17 @@ export default function BillingPage() {
     refetch: refetchBills,
   } = useFetchAllBills();
   // const { data: tableWiseData } = useFetchOrdersTableWise();
-  const { data: tables } = useFetchTables();
+  const [pagination, setPagination] = useState<PaginationState>({
+      pageIndex: 0,
+      pageSize: 5,
+    });
+    const [statusFilter, setStatusFilter] = useState<"all" | TableStatus>("all");
+  const { data: tablesResponse, isLoading: isTableLoading } = useFetchTables(
+    pagination.pageIndex + 1,
+    pagination.pageSize,
+    statusFilter,
+  );
+  const tables = tablesResponse?.data ?? [];
   const { mutateAsync: payBill, isPending: isPaying } = usePayBill();
   const { mutateAsync: generateBill, isPending: isGenerating } =
     useGenerateBill();
@@ -106,7 +118,7 @@ export default function BillingPage() {
     discounts,
     notes,
   }: {
-    tableId: number;
+    tableId: string;
     mobileNumber: string;
     discounts: {
       discountId: number;
