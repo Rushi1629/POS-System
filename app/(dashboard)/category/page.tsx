@@ -92,7 +92,7 @@ function CategoriesPage() {
     pagination.pageIndex + 1,
     pagination.pageSize,
     debouncedSearch,
-    statusFilter,
+    // statusFilter,
   );
 
   const categories = data?.data ?? [];

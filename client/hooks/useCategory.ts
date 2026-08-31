@@ -26,7 +26,7 @@ export const useFetchCategories = (
   page: number,
   limit: number,
   search: string,
-  status: "all" | "active" | "inactive",
+  status?: string,
 ) => {
   return useQuery<FetchCategoriesResponse>({
     queryKey: ["categories", page, limit, search, status],

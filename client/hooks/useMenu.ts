@@ -22,10 +22,23 @@ export const useCreateMenu = () => {
   });
 };
 
-export const useFetchMenus = () => {
+export const useFetchMenus = (
+  page: number,
+  limit: number,
+  search: string = "",
+  status?: string,
+) => {
   return useQuery({
-    queryKey: ["menus"],
-    queryFn: fetchAllMenus,
+    queryKey: ["menus", page, limit, search, status],
+
+    queryFn: () =>
+      fetchAllMenus({
+        page,
+        limit,
+        search,
+        status,
+      }),
+
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

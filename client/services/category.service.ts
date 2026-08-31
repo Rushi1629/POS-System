@@ -16,7 +16,7 @@ export const fetchAllCategories = async ({
   page,
   limit,
   search = "",
-  status = "all",
+  status,
 }: FetchCategoriesParams): Promise<FetchCategoriesResponse> => {
   const params = new URLSearchParams({
     page: String(page),
@@ -24,11 +24,16 @@ export const fetchAllCategories = async ({
     search,
   });
 
-  if (status !== "all") {
-    params.append("status", status);
+  if (status && status === "all") {
+    params.set("status", status);
   }
 
   const res = await fetcher(`/category?${params.toString()}`);
+
+
+  console.log("🔥 CATEGORY RAW RESPONSE:", res);
+  console.log("🔥 CATEGORY DATA:", res?.data);
+  console.log("🔥 CATEGORY PAGINATION:", res?.pagination);
 
   return {
     status: res.status,

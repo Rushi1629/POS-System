@@ -1,6 +1,32 @@
 import type { menuSchema } from "@/Schema/menuScheme";
 import { z } from "zod";
 
+export interface FetchMenusParams {
+  page: number;
+  limit: number;
+  search?: string;
+  status?: string;
+}
+
+export interface MenuPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface FetchMenusApiResponse {
+  status: boolean;
+  message: string;
+  data: FetchMenuResponse[];
+  pagination?: MenuPagination;
+}
+
+export interface FetchMenusResponse {
+  data: FetchMenuResponse[];
+  pagination: MenuPagination;
+}
+
 export interface SubMenuItem {
   id: string;
   name: string;

@@ -99,7 +99,21 @@ import {
 import { allCategory, FetchMenuResponse } from "@/types/menu-types";
 
 function MenuPage() {
-  const { data: items = [], isLoading } = useFetchMenus();
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5,
+  });
+
+  const [search, setSearch] = useState("");
+
+  const { data: menusResponse, isLoading: isMenuLoading } = useFetchMenus(
+    pagination.pageIndex + 1,
+    pagination.pageSize,
+    search,
+  );
+
+  const menus = menusResponse?.data ?? [];
+  const serverPagination = menusResponse?.pagination;
   const { mutateAsync: createMenu, isPending: isCreating } = useCreateMenu();
   const { mutateAsync: updateMenu, isPending: isUpdating } = useUpdateMenu();
   const { mutateAsync: deleteMenu } = useDeleteMenu();
@@ -113,13 +127,15 @@ function MenuPage() {
 
   const allCategory = categoryResponse?.data ?? [];
 
+  console.log(categoryResponse,"allCategory");
+  
+
   useEffect(() => {
     if (categoryError) {
       toast.error("Failed to load categories");
     }
   }, [categoryError]);
 
-  const [search, setSearch] = useState("");
   const [view, setView] = useState<"grid" | "table">("table");
   const [statusFilter, setStatusFilter] = useState<
     "all" | "available" | "unavailable"
@@ -130,13 +146,8 @@ function MenuPage() {
   const [editing, setEditing] = useState<FetchMenuResponse | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 5,
-  });
-
   const filtered = useMemo(() => {
-    return items
+    return menus
       .filter((m) =>
         statusFilter === "all"
           ? true
@@ -154,7 +165,7 @@ function MenuPage() {
           m.name.toLowerCase().includes(search.toLowerCase()) ||
           (m.description || "").toLowerCase().includes(search.toLowerCase()),
       );
-  }, [items, search, statusFilter, categoryFilter]);
+  }, [menus, search, statusFilter, categoryFilter]);
 
   useEffect(() => {
     setPagination((p) => ({ ...p, pageIndex: 0 }));
@@ -162,12 +173,12 @@ function MenuPage() {
 
   const stats = useMemo(
     () => ({
-      total: items.length,
-      available: items.filter((m) => m.available).length,
-      veg: items.filter((m) => m.menuType === "Veg").length,
-      nonVeg: items.filter((m) => m.menuType === "NonVeg").length,
+      total: menus.length,
+      available: menus.filter((m) => m.available).length,
+      veg: menus.filter((m) => m.menuType === "Veg").length,
+      nonVeg: menus.filter((m) => m.menuType === "NonVeg").length,
     }),
-    [items],
+    [menus],
   );
 
   const columns = useMemo<ColumnDef<FetchMenuResponse>[]>(
@@ -315,22 +326,32 @@ function MenuPage() {
   );
 
   const table = useReactTable({
-    data: filtered,
+    data: menus,
     columns,
-    state: { pagination },
+
+    state: {
+      pagination,
+    },
+
     onPaginationChange: setPagination,
+
+    manualPagination: true,
+
+    pageCount: serverPagination?.totalPages ?? 0,
+
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    autoResetPageIndex: true,
+
+    autoResetPageIndex: false,
   });
 
-  const pageCount = table.getPageCount();
-  const pageIndex = table.getState().pagination.pageIndex;
-  const pageSize = table.getState().pagination.pageSize;
-  const startIndex = pageIndex * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, filtered.length);
+  const pageCount = serverPagination?.totalPages ?? 0;
+  const pageIndex = pagination.pageIndex;
+  const pageSize = pagination.pageSize;
+  const totalItems = serverPagination?.total ?? 0;
+
+  const startIndex = totalItems === 0 ? 0 : pageIndex * pageSize + 1;
+
+  const endIndex = Math.min((pageIndex + 1) * pageSize, totalItems);
 
   function openCreate() {
     setEditing(null);
@@ -560,7 +581,7 @@ function MenuPage() {
       {filtered.length === 0 ? (
         <Card className="mt-6 border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            {isLoading ? (
+            {isMenuLoading ? (
               <>
                 <div className="h-14 w-14 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
                 <h3 className="mt-4 text-lg font-semibold">
@@ -639,10 +660,10 @@ function MenuPage() {
               <span>
                 Showing{" "}
                 <strong className="text-foreground">
-                  {filtered.length === 0 ? 0 : startIndex + 1}
+                  {totalItems === 0 ? 0 : startIndex}
                 </strong>
                 –<strong className="text-foreground">{endIndex}</strong> of{" "}
-                <strong className="text-foreground">{filtered.length}</strong>
+                <strong className="text-foreground">{totalItems}</strong>
               </span>
               <Select
                 value={String(pageSize)}

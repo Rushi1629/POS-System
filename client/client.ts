@@ -8,10 +8,7 @@ export const clearAuthCookies = () => {
   });
 };
 
-export const fetcher = async (
-  endpoint: string,
-  options: RequestInit = {},
-) => {
+export const fetcher = async (endpoint: string, options: RequestInit = {}) => {
   const isFormData = options.body instanceof FormData;
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
@@ -27,12 +24,20 @@ export const fetcher = async (
       clearAuthCookies();
     }
 
-    let message = "Something went wrong";
+    let errorMessage = "Something went wrong";
     try {
       const err = await res.json();
-      message = err.message;
-    } catch {}
-    throw new Error(message);
+      errorMessage =
+        err?.message ||
+        err?.error?.message ||
+        (typeof err?.error === "string" ? err.error : null) ||
+        err?.errors?.[0]?.message ||
+        (typeof err?.errors?.[0] === "string" ? err.errors[0] : null) ||
+        errorMessage;
+    } catch {
+       errorMessage = res.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
   }
 
   return res.json();

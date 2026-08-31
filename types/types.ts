@@ -279,7 +279,7 @@ export interface FetchCategoriesParams {
   page: number;
   limit: number;
   search?: string;
-  status?: "all" | "active" | "inactive";
+  status?: string;
 }
 
 // Sidebar navigation items start here
