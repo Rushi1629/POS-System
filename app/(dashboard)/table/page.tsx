@@ -102,7 +102,7 @@ function Tables() {
   const { data: tablesResponse, isLoading: isTableLoading } = useFetchTables(
     pagination.pageIndex + 1,
     pagination.pageSize,
-    statusFilter,
+    // statusFilter,
   );
   const tables = tablesResponse?.data ?? [];
   const serverPagination = tablesResponse?.pagination;

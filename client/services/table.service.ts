@@ -18,13 +18,16 @@ export const createTable = (data: CreateTablePayload) =>
 export const fetchAllTables = async ({
   page,
   limit,
-  status = "all",
+  status,
 }: FetchTablesParams): Promise<FetchTablesResponse> => {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
-    status,
   });
+
+  if (status && status === "all") {
+    params.set("status", status);
+  }
 
   const res = await fetcher(`/table?${params.toString()}`);
 
@@ -112,7 +115,7 @@ export const getTableLiveCharge = async (
     }
 
     // If response has data property, use it
-    if (res.data && typeof res.data === 'object') {
+    if (res.data && typeof res.data === "object") {
       return {
         totalMinutes: res.data.totalMinutes ?? 0,
         currentCharge: res.data.currentCharge ?? 0,
@@ -159,4 +162,3 @@ export const fetchTableByToken = async (token: any) => {
     isActive: u.isActive,
   };
 };
-

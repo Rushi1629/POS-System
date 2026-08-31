@@ -32,7 +32,7 @@ export const useCreateTable = () => {
 export const useFetchTables = (
   page: number,
   limit: number,
-  status: string = "all",
+  status?: string,
 ) => {
   return useQuery({
     queryKey: ["tables", page, limit, status],
