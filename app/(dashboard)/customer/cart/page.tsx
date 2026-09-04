@@ -46,14 +46,13 @@ const mapOrdersToCart = (orders: any): Record<string, CartItem> => {
               quantity: e.quantity,
             })) || [];
 
-        const cartKey = getCartKey(
-          item.menuItem.id,
-          // extras,
-          // item.menuItem.menuType,
-        );
+        const menuItemId = item.menuItem?.id ?? item.menuItem?.menuItemId;
+        if (!menuItemId) return;
+
+        const cartKey = getCartKey(String(menuItemId));
 
         cartItems[cartKey] = {
-          id: item.menuItem.id,
+          id: String(menuItemId),
           name: item.menuItem.name,
           description: "",
           price: Number(
@@ -145,7 +144,7 @@ const CartView = () => {
       const orderItemsPayload = items
         .filter((item) => {
           const isCancelled = item.quantity === 0;
-          const isExisting = typeof item.orderItemId === "number";
+          const isExisting = item.orderItemId !== undefined && item.orderItemId !== null;
           const qtyChanged =
             typeof item.originalQuantity === "number" &&
             item.quantity !== item.originalQuantity;
@@ -154,11 +153,13 @@ const CartView = () => {
         })
         .map((item) => {
           const isCancelled = item.quantity === 0;
+          const isExisting =
+            item.orderItemId !== undefined && item.orderItemId !== null;
 
           return {
-            menuItemId: Number(item.id),
+            menuItemId: item.id,
             quantity: isCancelled ? item.originalQuantity || 1 : item.quantity,
-            ...(typeof item.orderItemId === "number" &&
+            ...(isExisting &&
             ((typeof item.originalQuantity === "number" &&
               item.quantity !== item.originalQuantity) ||
               isCancelled ||

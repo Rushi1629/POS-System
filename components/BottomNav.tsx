@@ -34,16 +34,6 @@ export default function BottomNav() {
       href: withToken("/customer-order"),
       icon: ClipboardList,
     },
-    {
-      name: "Kitchen",
-      href: withToken("/admin/chef"),
-      icon: ChefHat,
-    },
-    {
-      name: "Users",
-      href: withToken("/admin/customers"),
-      icon: Users,
-    },
   ];
 
   return (

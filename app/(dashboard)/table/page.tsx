@@ -88,6 +88,7 @@ import Image from "next/image";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -716,9 +717,12 @@ function Tables() {
 
       {qrModal && (
         <Dialog open={!!qrModal} onOpenChange={setQrModal}>
-          <DialogContent className="sm:max-w-md max-h-[80vh] flex flex-col items-center">
+          <DialogContent  aria-describedby="qr-description" className="sm:max-w-md max-h-[80vh] flex flex-col items-center">
             <DialogHeader>
               <DialogTitle>QR Code</DialogTitle>
+              <DialogDescription>
+                Scan or download the QR code for this table.
+              </DialogDescription>
             </DialogHeader>
 
             <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center no-scrollbar">

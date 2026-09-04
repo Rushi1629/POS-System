@@ -77,12 +77,12 @@ const OrderCardCustomer = ({ order }: { order: Order }) => {
               {Number(order.timeChargeAmount ?? 0) > 0
                 ? Number(order.timeChargeAmount).toFixed(2)
                 : "0"}
-              {order.orderType === "DINE_IN" && (
+              {/* {order.orderType === "DINE_IN" && (
                 <>
                   <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
                   <MapPin className="h-3 w-3" /> Table #{order.tableId}
                 </>
-              )}
+              )} */}
             </p>
           </div>
         </div>
@@ -165,9 +165,9 @@ const OrderCardCustomer = ({ order }: { order: Order }) => {
                     ₹{parseFloat(it.totalPrice).toFixed(2)}
                   </p>
                 </div>
-                {it.subMenuItems?.map((extra: any) => (
+                {it.subMenuItems?.map((extra: any,index) => (
                   <p
-                    key={extra.id}
+                    key={index}
                     className="mt-0.5 text-[11px] text-muted-foreground"
                   >
                     + {extra.name} (₹{extra.price.toFixed(2)})

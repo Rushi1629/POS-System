@@ -12,7 +12,7 @@ export type CartItem = {
   imageUrl: string;
   isCancelled?: boolean;
   notes?: string;
-  orderItemId?: number; // ⚠️ not in original type, but needed for mapping orders to cart
+  orderItemId?: string; // Existing order item identifier
   extras?: {
     id: string;
     name: string;
@@ -92,11 +92,11 @@ export const normalizeCartItems = (
   return normalized;
 };
 export type OrderItemPayload = {
-  menuItemId: number;
+  menuItemId: string;
   quantity: number;
   notes?: string;
   subMenuItemId: {
-    subMenuItemId: number;
+    subMenuItemId: string;
     quantity: number;
   }[];
 };

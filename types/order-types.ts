@@ -1,13 +1,19 @@
 export interface CreateOrderRequest {
-  tableId: number;
+  tableId: string;
   notes?: string;
   orderItems: OrderItem[];
 }
 
 export interface OrderItem {
-  menuItemId: number;
+  menuItemId: string;
   quantity: number;
   notes?: string;
+  orderItemId?: string | number;
+  isCancelled?: boolean;
+  orderSubMenuItems?: {
+    subMenuItemId: string;
+    quantity: number;
+  }[];
 }
 
 export type MenuItem = {

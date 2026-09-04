@@ -129,7 +129,7 @@ export default function CustomerDashboard() {
   console.log(menuMap, "menuMap");
 
   const addToCart = useCallback(
-    (itemId: number) => {
+    (itemId: string) => {
       const item = menuMap[itemId];
       if (!item) return;
 
@@ -202,7 +202,7 @@ export default function CustomerDashboard() {
     (id: string, menuType?: string) => {
       const cartKey = [...Object.values(cart)]
         .reverse()
-        .find((item) => item.id === id && item.menuType === menuType)?.cartKey;
+        .find((item) => String(item.id) === String(id) && item.menuType === menuType)?.cartKey;
       if (cartKey) {
         dispatch(removeItemAction(cartKey));
       }
@@ -484,14 +484,14 @@ export default function CustomerDashboard() {
     <>
       <div className="sticky top-0 z-30 bg-(--background) border-b border-border/30 -mt-6">
         {/* 🔍 SEARCH + RESET */}
-        <div className="flex items-center gap-2 px-4 py-3">
+        <div className="flex items-center gap-2 px-0 py-3">
           <div className="relative flex-1 min-w-65 max-w-2xl">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search food, drinks..."
-              className="h-12 rounded-full border-border bg-card pl-9 pr-4 text-sm shadow-sm"
+              className="h-10 rounded-full border-border bg-card pl-9 pr-4 text-sm shadow-sm"
             />
           </div>
 
@@ -507,7 +507,7 @@ export default function CustomerDashboard() {
                 setIsRotating(false);
               }, 500);
             }}
-            className="h-12 w-12 rounded-full bg-card flex items-center justify-center shadow-sm cursor-pointer"
+            className="h-10 w-10 rounded-full bg-card flex items-center justify-center shadow-sm cursor-pointer"
           >
             <RotateCcw className="h-4 w-4" />
           </motion.div>
@@ -517,7 +517,7 @@ export default function CustomerDashboard() {
         {!searchQuery && (
           <div
             ref={categoryScrollRef}
-            className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide"
+            className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide pl-0 mb-2"
           >
             {categories.map((cat) => (
               <CategoryPill
@@ -578,7 +578,7 @@ export default function CustomerDashboard() {
                       quantity={Object.values(cart)
                         .filter(
                           (cartItem) =>
-                            cartItem.id === item.id &&
+                            String(cartItem.id) === String(item.id) &&
                             cartItem.menuType === item.menuType,
                         )
                         .reduce((sum, cartItem) => sum + cartItem.quantity, 0)}

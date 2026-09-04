@@ -1,13 +1,13 @@
 import { CheckCheck, ChefHat, Receipt, ShoppingBag, Sparkles, Truck, Utensils } from "lucide-react";
 
 export type MenuItem = {
-  id: number;
+  id: string;
   name: string;
   price: string;
   menuType: string;
 };
 export type OrderItem = {
-  id: number;
+  id: string;
   quantity: number;
   unitPrice: string;
   totalPrice: string;
@@ -29,8 +29,8 @@ export type OrderItem = {
   }[];
 };
 export type Order = {
-  id: number;
-  tableId: number;
+  id: string;
+  tableId: string;
   orderStatus:
     | "PENDING"
     | "ACCEPTED"
