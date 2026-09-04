@@ -433,14 +433,6 @@ export const navItems: NavItem[] = [
     roles: ["Super Admin"],
   },
   {
-    id: "nav-reports",
-    label: "Reports",
-    icon: BarChart3,
-    href: "/reports",
-    group: "Management",
-    roles: ["Super Admin"],
-  },
-  {
     id: "nav-user-management",
     label: "User Management",
     icon: Users,
