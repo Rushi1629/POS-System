@@ -1,12 +1,14 @@
 {
-  "name": "Secret_cafe",
-  "short_name": "Secret_cafe",
-  "description": "",
+  "name": "Secret Cafe POS",
+  "short_name": "Secret Cafe",
+  "description": "Secret Cafe point of sale and operations app.",
   "display": "standalone",
   "start_url": "/",
   "scope": "/",
+  "id": "/",
+  "theme_color": "#e66b19",
+  "background_color": "#fffaf5",
   "orientation": "any",
-  "id": "",
   "lang": "en",
   "dir": "auto",
   "icons": [
