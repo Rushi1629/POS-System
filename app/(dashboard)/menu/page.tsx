@@ -127,9 +127,6 @@ function MenuPage() {
 
   const allCategory = categoryResponse?.data ?? [];
 
-  console.log(categoryResponse,"allCategory");
-  
-
   useEffect(() => {
     if (categoryError) {
       toast.error("Failed to load categories");

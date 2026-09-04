@@ -24,12 +24,11 @@ export const fetchAllCategories = async ({
     search,
   });
 
-  if (status && status === "all") {
+  if (status) {
     params.set("status", status);
   }
 
   const res = await fetcher(`/category?${params.toString()}`);
-
 
   console.log("🔥 CATEGORY RAW RESPONSE:", res);
   console.log("🔥 CATEGORY DATA:", res?.data);
@@ -39,7 +38,7 @@ export const fetchAllCategories = async ({
     status: res.status,
     message: res.message,
 
-    data: res.data.map(
+    data: (res.data ?? []).map(
       (u: any): Category => ({
         id: String(u.id),
         name: u.name,
@@ -50,12 +49,19 @@ export const fetchAllCategories = async ({
       }),
     ),
 
-    pagination: {
-      page: res.pagination.page,
-      limit: res.pagination.limit,
-      total: res.pagination.total,
-      totalPages: res.pagination.totalPages,
-    },
+    pagination: res.pagination
+      ? {
+          page: res.pagination.page,
+          limit: res.pagination.limit,
+          total: res.pagination.total,
+          totalPages: res.pagination.totalPages,
+        }
+      : {
+          page,
+          limit,
+          total: res.data?.length ?? 0,
+          totalPages: 1,
+        },
   };
 };
 
