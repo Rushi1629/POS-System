@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createOrder, fetchAllOrders, fetchAllOrdersTableWise, updateOrderItemStatus, updateOrderStatus } from "../services/order.service";
+import { FetchTableWiseOrdersParams, GetOrdersResponseAdminChef } from "@/types/order-types";
 
 export const useCreateOrder = () => {
   const queryClient = useQueryClient();
@@ -26,10 +27,16 @@ export const useFetchActiveOrders = () => {
   });
 };
 
-export const useFetchOrdersTableWise = () => {
-  return useQuery({
-    queryKey: ["orders-table-wise"],
-    queryFn: fetchAllOrdersTableWise,
+export const useFetchOrdersTableWise = (
+  page = 1,
+  limit = 20,
+  search = "",
+) => {
+  const params: FetchTableWiseOrdersParams = { page, limit, search };
+
+  return useQuery<GetOrdersResponseAdminChef>({
+    queryKey: ["orders-table-wise", params],
+    queryFn: () => fetchAllOrdersTableWise(params),
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

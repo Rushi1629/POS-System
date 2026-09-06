@@ -54,7 +54,6 @@ import {
   useGenerateBill,
   usePayBill,
 } from "@/client/hooks/useBilling";
-import { useFetchOrdersTableWise } from "@/client/hooks/useOrder";
 import { OrderAdminChef } from "@/types/order-types";
 import { useFetchTables } from "@/client/hooks/useTable";
 import { useFetchDiscounts } from "@/client/hooks/useDiscount";
@@ -84,7 +83,6 @@ export default function BillingPage() {
     1,
     billsResponse?.pagination?.totalPages ?? 1,
   );
-  // const { data: tableWiseData } = useFetchOrdersTableWise();
   const [pagination, setPagination] = useState<PaginationState>({
       pageIndex: 0,
       pageSize: 5,

@@ -10,8 +10,10 @@ import {
   Clock,
   Receipt,
   Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/input";
 import {
   Select,
@@ -34,12 +36,23 @@ const page = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [detail, setDetail] = useState<OrderAdminChef | null>(null);
+  const [orderPage, setOrderPage] = useState(1);
+  const [orderPageSize, setOrderPageSize] = useState(20);
 
   const {
     data: tableWiseData,
     isLoading: isTableWiseLoading,
     isError: isTableWiseError,
-  } = useFetchOrdersTableWise();
+  } = useFetchOrdersTableWise(orderPage, orderPageSize, query);
+
+  const orderTotalPages = Math.max(
+    1,
+    tableWiseData?.pagination?.totalPages ?? 1,
+  );
+
+  useEffect(() => {
+    setOrderPage(1);
+  }, [query]);
 
   const orders = useMemo<OrderAdminChef[]>(() => {
     if (!tableWiseData?.data) return [];
@@ -197,6 +210,51 @@ const page = () => {
             ))
           )}
         </div>
+
+        {tableWiseData && orderTotalPages > 1 && (
+          <div className="mt-6 flex items-center justify-center gap-3 text-sm text-muted-foreground">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setOrderPage((page) => Math.max(1, page - 1))}
+              disabled={orderPage === 1 || isTableWiseLoading}
+              aria-label="Previous orders page"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span>
+              Page {orderPage} of {orderTotalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                setOrderPage((page) =>
+                  Math.min(orderTotalPages, page + 1),
+                )
+              }
+              disabled={orderPage >= orderTotalPages || isTableWiseLoading}
+              aria-label="Next orders page"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <select
+              value={orderPageSize}
+              onChange={(event) => {
+                setOrderPageSize(Number(event.target.value));
+                setOrderPage(1);
+              }}
+              className="h-8 rounded-md border border-border bg-background px-2 text-foreground"
+              aria-label="Orders per page"
+            >
+              {[10, 20, 50].map((size) => (
+                <option key={size} value={size}>
+                  {size} / page
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <OrderDetailDialog

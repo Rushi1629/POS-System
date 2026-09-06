@@ -7,6 +7,8 @@ import {
   CheckCheck,
   Search,
   RotateCcw,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -55,12 +57,15 @@ function transformOrders(data: any[]): KOrder[] {
 }
 
 export default function page() {
+  const [query, setQuery] = useState("");
+  const [orderPage, setOrderPage] = useState(1);
+  const [orderPageSize, setOrderPageSize] = useState(20);
   const {
     data: TableWiseOrders,
     isLoading: isTableWiseLoading,
     isError: isTableWiseError,
     refetch,
-  } = useFetchOrdersTableWise();
+  } = useFetchOrdersTableWise(orderPage, orderPageSize, query);
   const {
     mutate: updateStatus,
     isPending,
@@ -93,8 +98,17 @@ export default function page() {
       setOrders(formatted);
     }
   }, [TableWiseOrders]);
-  const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | OrderStatus>("all");
+
+  const orderTotal = TableWiseOrders?.pagination?.total ?? 0;
+  const orderTotalPages = Math.max(
+    1,
+    TableWiseOrders?.pagination?.totalPages ?? 1,
+  );
+
+  useEffect(() => {
+    setOrderPage(1);
+  }, [query]);
 
   const filtered = useMemo(() => {
     return orders.filter((o) => {
@@ -425,6 +439,49 @@ export default function page() {
               </p>
             </>
           )}
+        </div>
+      )}
+
+      {TableWiseOrders && orderTotalPages > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-3 text-sm text-muted-foreground">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setOrderPage((page) => Math.max(1, page - 1))}
+            disabled={orderPage === 1 || isTableWiseLoading}
+            aria-label="Previous orders page"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span>
+            Page {orderPage} of {orderTotalPages} ({orderTotal} tables)
+          </span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              setOrderPage((page) => Math.min(orderTotalPages, page + 1))
+            }
+            disabled={orderPage >= orderTotalPages || isTableWiseLoading}
+            aria-label="Next orders page"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <select
+            value={orderPageSize}
+            onChange={(event) => {
+              setOrderPageSize(Number(event.target.value));
+              setOrderPage(1);
+            }}
+            className="h-8 rounded-md border border-border bg-background px-2 text-foreground"
+            aria-label="Orders per page"
+          >
+            {[10, 20, 50].map((size) => (
+              <option key={size} value={size}>
+                {size} / page
+              </option>
+            ))}
+          </select>
         </div>
       )}
     </div>

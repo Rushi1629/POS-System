@@ -32,7 +32,7 @@ const OrderDetailDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Receipt className="h-5 w-5 text-primary" />
-            Order #{order.orderId}
+            {order.orderNumber}
             <Badge
               variant="outline"
               className={cn("ml-2 rounded-full border", status?.cls)}
@@ -40,14 +40,11 @@ const OrderDetailDialog = ({
               {status.label}
             </Badge>
           </DialogTitle>
-          <DialogDescription className="text-xs">
-            {order.orderNumber}
-          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-3 sm:grid-cols-3">
           <InfoTile label="Type" value={order.orderType.replace("_", " ")} />
-          <InfoTile label="Table" value={`#${order.tableId}`} />
+          <InfoTile label="Table" value={`${order.tableName}`} />
           <InfoTile label="Payment" value={order.paymentStatus} />
         </div>
 

@@ -1,6 +1,7 @@
 import {
   CreateOrderRequest,
   CustomerOrder,
+  FetchTableWiseOrdersParams,
   GetOrdersResponseAdminChef,
 } from "@/types/order-types";
 import { fetcher } from "../client";
@@ -36,11 +37,29 @@ export const fetchAllOrders = async (): Promise<CustomerOrder[]> => {
 };
 
 export const fetchAllOrdersTableWise =
-  async (): Promise<GetOrdersResponseAdminChef> => {
-    const res = await fetcher("/order/table-orders");
-    console.log("API response new:", res);
+  async ({
+    page,
+    limit,
+    search = "",
+  }: FetchTableWiseOrdersParams): Promise<GetOrdersResponseAdminChef> => {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+      search,
+    });
+    const res: GetOrdersResponseAdminChef = await fetcher(
+      `/order/table-orders?${params.toString()}`,
+    );
 
-    return res;
+    return {
+      ...res,
+      pagination: res.pagination ?? {
+        page,
+        limit,
+        total: res.data?.length ?? 0,
+        totalPages: 1,
+      },
+    };
   };
 
 export const updateOrderItemStatus = async ({

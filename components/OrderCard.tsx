@@ -51,12 +51,11 @@ function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => voi
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
-              <Hash className="h-3 w-3" />
-              <span className="truncate">{order.orderNumber}</span>
+              {/* <Hash className="h-3 w-3" /> */}
+              {/* <span className="truncate">{order.orderNumber}</span> */}
             </div>
-            <p className="mt-0.5 text-base font-bold">Order #{order.orderId}</p>
+            <p className="mt-0.5 text-base font-bold">{order.orderNumber}</p>
             <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-              <Table2 className="h-3 w-3" /> Table {order.tableId}
               <Table2 className="h-3 w-3" /> Table Name {order.tableName}
             </div>
           </div>
@@ -120,14 +119,14 @@ function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => voi
             >
               <Eye className="h-4 w-4" />
             </Button>
-            <Button
+            {/* <Button
               size="icon"
               variant="ghost"
               className="h-9 w-9 rounded-lg"
               title="Print"
             >
               <Printer className="h-4 w-4" />
-            </Button>
+            </Button> */}
             <CollapsibleTrigger asChild>
               <Button
                 size="icon"

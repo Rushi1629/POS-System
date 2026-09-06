@@ -117,6 +117,18 @@ export interface GetOrdersResponseAdminChef {
   status: boolean;
   message: string;
   data: TableOrders[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface FetchTableWiseOrdersParams {
+  page: number;
+  limit: number;
+  search?: string;
 }
 
 export interface TableOrders {
