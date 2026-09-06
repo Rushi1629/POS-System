@@ -33,7 +33,7 @@ export default function AuthInitializer({ children }: Props) {
   });
 
   const getDefaultRouteByRole = (roleName?: string) => {
-    if (roleName === "Super Admin") return "/user-management";
+    if (roleName === "Super Admin") return "/dashboard";
     if (roleName === "Chef" || roleName === "Waiter") {
       return "/order-item-status-management";
     }

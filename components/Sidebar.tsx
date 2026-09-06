@@ -63,7 +63,7 @@ export default function Sidebar() {
       queryClient.clear();
       queryClient.removeQueries({ queryKey: ["me"] });
       dispatch(clearUser());
-      router.replace("/login");
+      router.replace("/");
     } catch (error) {
       console.error("Logout failed");
     }
