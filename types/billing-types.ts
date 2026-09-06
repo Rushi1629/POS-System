@@ -11,18 +11,18 @@ export type TableType = "FAMILY" | "COUPLE" | "HALL" | "OUTDOOR" | "PRIVATE";
 
 // ---------- Shared sub-shapes ----------
 export interface BillSession {
-  id: number;
+  id?: string;
   tableId: string;
   tableName: string;
   tableType: TableType;
   guestCount: number;
-  startedAt: string;
+  startedAt?: string;
   endedAt?: string | null;
 }
 
 export interface BillSubMenuItem {
-  id: number;
-  subMenuItemId: number;
+  id?: string;
+  subMenuItemId?: string;
   subMenuItemName: string;
   unitPrice: string;
   quantity: number;
@@ -31,8 +31,9 @@ export interface BillSubMenuItem {
 }
 
 export interface BillOrderItem {
-  id: number;
-  menuItemId: number;
+  id?: string;
+  orderItemId?: string;
+  menuItemId?: string;
   menuItemName: string;
   unitPrice: string;
   quantity: number;
@@ -42,7 +43,8 @@ export interface BillOrderItem {
 }
 
 export interface BillOrder {
-  id: number;
+  id?: string;
+  orderId?: string;
   orderNumber: string;
   items: BillOrderItem[];
 }
@@ -74,10 +76,10 @@ export interface GenerateBillRequest {
 }
 
 export interface GenerateBillData {
-  id: number;
+  id: string;
   billNumber: string;
-  sessionId: number;
-  orderId: number;
+  sessionId: string;
+  orderId: string;
   subtotal: string;
   taxAmount: string;
   discountAmount: string;
@@ -103,7 +105,7 @@ export interface GenerateBillResponse {
 // 2) Pay Bill API   →  POST /bills/pay
 // ============================================================
 export interface PayBillRequest {
-  billingId: number;
+  billingId: string;
   paymentMethod: PaymentMethod;
   notes: string;
   cashAmount?: number;
@@ -111,10 +113,10 @@ export interface PayBillRequest {
 }
 
 export interface PayBillData {
-  id: number;
+  id: string;
   billNumber: string;
-  sessionId: number;
-  orderId: number;
+  sessionId: string;
+  orderId: string;
   subtotal: string;
   taxAmount: string;
   discountAmount: string;
@@ -128,7 +130,7 @@ export interface PayBillData {
   createdAt: string;
   session: BillSession;
   order: {
-    id: number;
+    id: string;
     orderNumber: string;
     items: BillOrderItem[];
   };
@@ -144,15 +146,16 @@ export interface PayBillResponse {
 // 3) Get All Bills API   →  GET /bills
 // ============================================================
 export interface BillListItem {
-  billingId: number;
+  billingId: string;
   billNumber: string;
-  sessionId: number;
-  orderId: number | null;
+  tableId: string;
+  sessionId?: string;
+  orderId: string | null;
   subtotal: string;
   taxAmount: string;
   discountAmount: string;
   serviceCharge: string;
-  timeChargeAmount: string;
+  timeChargeAmount: string | null;
   totalAmount: string;
   paymentStatus: PaymentStatus;
   paymentMethod: PaymentMethod | null;
@@ -160,6 +163,15 @@ export interface BillListItem {
   mobileNumber: string;
   notes: string | null;
   createdAt: string;
+  totalDiscount?: string;
+  discounts?: {
+    discountId: string;
+    discountName: string;
+    discountType: "AMOUNT" | "PERCENTAGE";
+    discountValue: string;
+    discountAmount: string;
+    sequence: number;
+  }[];
   session: BillSession;
   order: BillOrder | null;
 }
@@ -168,6 +180,12 @@ export interface GetAllBillsResponse {
   status: boolean;
   message: string;
   data: BillListItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export const STATUS_STYLES: Record<PaymentStatus, string> = {

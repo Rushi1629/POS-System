@@ -1,4 +1,4 @@
-import { BillListItem } from "@/types/billing-types";
+import { GetAllBillsResponse } from "@/types/billing-types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchAllBills,
@@ -6,10 +6,10 @@ import {
   payBill,
 } from "../services/billing.service";
 
-export const useFetchAllBills = () => {
-  return useQuery<BillListItem[]>({
-    queryKey: ["bills"],
-    queryFn: fetchAllBills,
+export const useFetchAllBills = (page = 1, limit = 10) => {
+  return useQuery<GetAllBillsResponse>({
+    queryKey: ["bills", page, limit],
+    queryFn: () => fetchAllBills(page, limit),
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

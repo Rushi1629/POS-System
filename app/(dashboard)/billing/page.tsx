@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Receipt,
   Search,
+  ChevronLeft,
+  ChevronRight,
   IndianRupee,
   FileText,
   Users,
@@ -62,6 +64,8 @@ import { TableStatus } from "@/types/table-types";
 /* ---------- Page ---------- */
 export default function BillingPage() {
   const [bills, setBills] = useState<BillListItem[]>([]);
+  const [billPage, setBillPage] = useState(1);
+  const [billPageSize, setBillPageSize] = useState(10);
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<"ALL" | PaymentStatus>("ALL");
   const [openGenerate, setOpenGenerate] = useState(false);
@@ -69,11 +73,17 @@ export default function BillingPage() {
   const [viewTarget, setViewTarget] = useState<BillListItem | null>(null);
 
   const {
-    data: allBills,
+    data: billsResponse,
     isLoading: isLoadingBills,
     error,
     refetch: refetchBills,
-  } = useFetchAllBills();
+  } = useFetchAllBills(billPage, billPageSize);
+  const allBills = billsResponse?.data;
+  const billTotal = billsResponse?.pagination?.total ?? allBills?.length ?? 0;
+  const billTotalPages = Math.max(
+    1,
+    billsResponse?.pagination?.totalPages ?? 1,
+  );
   // const { data: tableWiseData } = useFetchOrdersTableWise();
   const [pagination, setPagination] = useState<PaginationState>({
       pageIndex: 0,
@@ -98,7 +108,7 @@ export default function BillingPage() {
   const discounts = discountsResponse?.data ?? [];
 
   useEffect(() => {
-    if (!allBills || !Array.isArray(allBills)) return;
+    if (!allBills) return;
 
     setBills(allBills);
   }, [allBills]);
@@ -308,7 +318,7 @@ export default function BillingPage() {
                 All Bills
               </CardTitle>
               <CardDescription>
-                Showing {filtered.length} of {bills.length} bills
+                Showing {filtered.length} of {billTotal} bills
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
@@ -437,6 +447,48 @@ export default function BillingPage() {
                     })}
                   </TableBody>
                 </Table>
+              </div>
+              <div className="flex items-center justify-between border-t border-border/60 px-4 py-3 text-sm text-muted-foreground">
+                <span>
+                  Page {billPage} of {billTotalPages}
+                </span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setBillPage((current) => current - 1)}
+                    disabled={billPage === 1 || isLoadingBills}
+                    aria-label="Previous bills page"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setBillPage((current) => current + 1)}
+                    disabled={billPage >= billTotalPages || isLoadingBills}
+                    aria-label="Next bills page"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                  <select
+                    value={billPageSize}
+                    onChange={(event) => {
+                      setBillPageSize(Number(event.target.value));
+                      setBillPage(1);
+                    }}
+                    className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                    aria-label="Bills per page"
+                  >
+                    {[10, 20, 50].map((size) => (
+                      <option key={size} value={size}>
+                        {size} / page
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </CardContent>
           </Card>

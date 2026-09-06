@@ -66,6 +66,9 @@ const GenerateBillDialog = ({
   });
 
   const selectedTableId = watch("tableId");
+  const occupiedTables = tables.filter(
+    (table) => table.tableStatus === "OCCUPIED",
+  );
 
   // set default tableId
   // useEffect(() => {
@@ -127,8 +130,10 @@ const GenerateBillDialog = ({
         <div className="grid gap-2">
           <Label>Table ID</Label>
 
-          {tables.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No tables available</p>
+          {occupiedTables.length === 0 ? (
+            <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+              No occupied tables available for billing.
+            </p>
           ) : (
             <Controller
               name="tableId"
@@ -136,16 +141,15 @@ const GenerateBillDialog = ({
               render={({ field }) => (
                 <Select
                   value={field.value ? String(field.value) : undefined}
-                  onValueChange={(val) => field.onChange(Number(val))}
+                  onValueChange={(val) => field.onChange(val)}
+                  disabled={occupiedTables.length === 0}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select table id" />
+                    <SelectValue placeholder="Select an occupied table" />
                   </SelectTrigger>
 
                   <SelectContent>
-                    {tables
-                      .filter((t) => t.tableStatus === "OCCUPIED")
-                      .map((table) => (
+                    {occupiedTables.map((table) => (
                         <SelectItem key={table.id} value={String(table.id)}>
                           {table.name}
                         </SelectItem>
@@ -300,7 +304,7 @@ const GenerateBillDialog = ({
 
           <Button
             type="submit"
-            disabled={isGenerating || tables.length === 0}
+            disabled={isGenerating || occupiedTables.length === 0}
             className="gap-1"
           >
             <Plus className="h-4 w-4" />
