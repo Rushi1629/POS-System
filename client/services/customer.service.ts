@@ -1,22 +1,59 @@
-import { FetchMenuResponse, FetchMenusApiResponse } from "@/types/menu-types";
+import {
+  FetchMenuResponse,
+  FetchMenusApiResponse,
+  FetchMenusParams,
+  FetchMenusResponse,
+} from "@/types/menu-types";
 import { fetcher } from "../client";
-import { Category, CustomerCategoryParams, FetchCategoriesResponse } from "@/types/types";
+import {
+  Category,
+  CustomerCategoryParams,
+  FetchCategoriesResponse,
+} from "@/types/types";
 import { EditTableSessionPayload } from "@/types/table-types";
 
-export const fetchAllMenusCustomer = async (): Promise<FetchMenuResponse[]> => {
-  const res: FetchMenusApiResponse = await fetcher("/customer/menu");
+export const fetchAllMenusCustomer = async ({
+  page,
+  limit,
+  search = "",
+  status = "all",
+}: FetchMenusParams): Promise<FetchMenusResponse> => {
+  const params = new URLSearchParams({ search, status });
 
-  return res.data.map((u) => ({
-    id: u.id,
-    name: u.name,
-    price: Number(u.price),
-    menuType: u.menuType,
-    available: u.available,
-    description: u.description,
-    imageUrl: u.imageUrl || "",
-    category: u.category,
-    subMenuItems: u.subMenuItems || [],
-  }));
+  if (status !== "all") {
+    params.set("page", String(page));
+    params.set("limit", String(limit));
+  }
+
+  const res: FetchMenusApiResponse = await fetcher(
+    `/customer/menu?${params.toString()}`,
+  );
+
+  return {
+    data: (res.data ?? []).map((u) => ({
+      id: String(u.id),
+      name: u.name,
+      price: Number(u.price),
+      menuType: u.menuType,
+      available: u.available,
+      description: u.description,
+      imageUrl: u.imageUrl || "",
+      category: u.category
+        ? { ...u.category, id: String(u.category.id) }
+        : u.category,
+      subMenuItems: (u.subMenuItems || []).map((item) => ({
+        ...item,
+        id: String(item.id),
+        price: Number(item.price),
+      })),
+    })),
+    pagination: {
+      page: Number(res.pagination?.page ?? page),
+      limit: Number(res.pagination?.limit ?? limit),
+      total: Number(res.pagination?.total ?? res.data?.length ?? 0),
+      totalPages: Number(res.pagination?.totalPages ?? 1),
+    },
+  };
 };
 
 export const fetchAllCategoriesCustomer = async (

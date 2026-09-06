@@ -109,13 +109,18 @@ export default function CustomerDashboard() {
     return allCategory.filter((category) => category.isActive);
   }, [allCategory]);
 
-  const { data: menuItems = [], isLoading } = useFetchMenusCustomer();
-
-  console.log(menuItems, "menuItems");
+  const { data: menusResponse, isLoading } = useFetchMenusCustomer(
+    1,
+    20,
+    "",
+    "all",
+  );
+  const menuItems = menusResponse?.data ?? [];
 
   useEffect(() => {
     console.log("✅ categories updated:", allCategory);
   }, [allCategory]);
+
 
   // ✅ redux state
   const dispatch = useDispatch();
@@ -650,7 +655,7 @@ export default function CustomerDashboard() {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="px-6 py-2 overflow-y-auto px-2 no-scrollbar">
+              <div className="px-6 py-2 overflow-y-auto no-scrollbar">
                 {selectedItem.subMenuItems?.map((extra: any) => {
                   const checked = selectedExtras.some((e) => e.id === extra.id);
 

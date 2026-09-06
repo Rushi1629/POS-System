@@ -6,11 +6,19 @@ import {
   fetchTableByTokenCustomer,
 } from "../services/customer.service";
 import { Category, CustomerCategoryParams } from "@/types/types";
+import { FetchMenusParams, FetchMenusResponse } from "@/types/menu-types";
 
-export const useFetchMenusCustomer = () => {
-  return useQuery({
-    queryKey: ["menus"],
-    queryFn: fetchAllMenusCustomer,
+export const useFetchMenusCustomer = (
+  page = 1,
+  limit = 20,
+  search = "",
+  status = "all",
+) => {
+  const params: FetchMenusParams = { page, limit, search, status };
+
+  return useQuery<FetchMenusResponse>({
+    queryKey: ["customer-menus", params],
+    queryFn: () => fetchAllMenusCustomer(params),
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

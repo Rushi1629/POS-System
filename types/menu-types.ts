@@ -53,12 +53,6 @@ export interface FetchMenuResponse {
   subMenuItems: SubMenuItem[];
 }
 
-export interface FetchMenusApiResponse {
-  status: boolean;
-  message: string;
-  data: FetchMenuResponse[];
-}
-
 export type MenuFormValues = {
   name: string;
   price: number;
