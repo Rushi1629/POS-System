@@ -102,6 +102,12 @@ export interface userProps {
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onCreate?: () => void;
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
 }
 
 export const roleStyles: Record<UserRole, string> = {
@@ -120,7 +126,20 @@ export type UsersResponse = {
   status: boolean;
   message: string;
   data: User[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 };
+
+export interface FetchUsersParams {
+  page: number;
+  limit: number;
+  search?: string;
+  status?: string;
+}
 
 export interface User {
   userId: string;

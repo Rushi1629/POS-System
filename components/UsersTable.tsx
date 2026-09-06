@@ -3,7 +3,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
@@ -68,7 +67,18 @@ function formatDate(iso: string) {
   });
 }
 
-export function UsersTable({ users, onEdit, onDelete, roles }: userProps) {
+export function UsersTable({
+  users,
+  onEdit,
+  onDelete,
+  roles,
+  page,
+  limit,
+  total,
+  totalPages,
+  onPageChange,
+  onLimitChange,
+}: userProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [filter, setFilter] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
@@ -229,8 +239,6 @@ export function UsersTable({ users, onEdit, onDelete, roles }: userProps) {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 8 } },
   });
 
   return (
@@ -249,7 +257,7 @@ export function UsersTable({ users, onEdit, onDelete, roles }: userProps) {
           value={roleFilter}
           onValueChange={(value) => setRoleFilter(value)}
         >
-          <SelectTrigger className="w-full sm:w-[180px]">
+          <SelectTrigger className="w-full sm:w-45">
             <SelectValue placeholder="Filter by role" />
           </SelectTrigger>
 
@@ -309,11 +317,11 @@ export function UsersTable({ users, onEdit, onDelete, roles }: userProps) {
         <p className="text-xs text-muted-foreground">
           Showing{" "}
           <span className="font-medium text-foreground">
-            {table.getRowModel().rows.length}
+            {filteredData.length}
           </span>{" "}
           of{" "}
           <span className="font-medium text-foreground">
-            {filteredData.length}
+            {total}
           </span>{" "}
           users
         </p>
@@ -321,29 +329,44 @@ export function UsersTable({ users, onEdit, onDelete, roles }: userProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => onPageChange(Math.max(1, page - 1))}
+            disabled={page === 1}
           >
             <ChevronLeft className="h-4 w-4" /> Previous
           </Button>
           <span className="px-2 text-xs text-muted-foreground">
             Page{" "}
             <span className="font-medium text-foreground">
-              {table.getState().pagination.pageIndex + 1}
+              {page}
             </span>{" "}
             of{" "}
             <span className="font-medium text-foreground">
-              {table.getPageCount() || 1}
+              {totalPages}
             </span>
           </span>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+            disabled={page >= totalPages}
           >
             Next <ChevronRight className="h-4 w-4" />
           </Button>
+          <Select
+            value={String(limit)}
+            onValueChange={(value) => onLimitChange(Number(value))}
+          >
+            <SelectTrigger className="w-30">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[5, 10, 20, 50].map((size) => (
+                <SelectItem key={size} value={String(size)}>
+                  {size} / page
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>

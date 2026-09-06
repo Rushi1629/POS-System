@@ -6,7 +6,7 @@ import {
   fetchAllUsers,
   fetchRoles,
 } from "../services/user.service";
-import { Role, User } from "@/types/types";
+import { Role, User, UsersResponse } from "@/types/types";
 
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
@@ -23,10 +23,10 @@ export const useCreateUser = () => {
   });
 };
 
-export const useFetchUsers = () => {
-  return useQuery<User[]>({
-    queryKey: ["users"],
-    queryFn: fetchAllUsers,
+export const useFetchUsers = (page = 1, limit = 10) => {
+  return useQuery<UsersResponse>({
+    queryKey: ["users", page, limit],
+    queryFn: () => fetchAllUsers({ page, limit }),
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

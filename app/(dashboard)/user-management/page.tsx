@@ -47,10 +47,14 @@ export default function UsersPage() {
   const [loadingForm, setLoadingForm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   const { mutateAsync: createUserMutation } = useCreateUser();
 
-  const { data: users = [], isLoading: isFetchingUsers, error } = useFetchUsers();
+  const { data: usersResponse, isLoading: isFetchingUsers, error } =
+    useFetchUsers(page, limit);
+  const users = usersResponse?.data ?? [];
 
   const { data: roles = [] } = useFetchRoles();
 
@@ -66,8 +70,12 @@ export default function UsersPage() {
         Date.now() - new Date(u.createdAt).getTime() < 1000 * 60 * 60 * 24 * 7,
     ).length;
 
-    return { total: users.length, admins, recent };
-  }, [users]);
+    return {
+      total: usersResponse?.pagination?.total ?? users.length,
+      admins,
+      recent,
+    };
+  }, [users, usersResponse?.pagination?.total]);
 
   // console.log(users, "users in page");
 
@@ -266,6 +274,15 @@ export default function UsersPage() {
               onEdit={openEdit}
               onDelete={(u) => setDeleteTarget(u)}
               onCreate={openCreate}
+              page={page}
+              limit={limit}
+              total={usersResponse?.pagination?.total ?? users.length}
+              totalPages={usersResponse?.pagination?.totalPages ?? 1}
+              onPageChange={setPage}
+              onLimitChange={(nextLimit) => {
+                setLimit(nextLimit);
+                setPage(1);
+              }}
             />
           </CardContent>
         </Card>

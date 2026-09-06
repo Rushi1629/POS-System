@@ -1,4 +1,10 @@
-import { CreateUserPayload, Role, User } from "@/types/types";
+import {
+  CreateUserPayload,
+  FetchUsersParams,
+  Role,
+  User,
+  UsersResponse,
+} from "@/types/types";
 import { fetcher } from "../client";
 
 export const createUser = (data: CreateUserPayload) =>
@@ -7,15 +13,37 @@ export const createUser = (data: CreateUserPayload) =>
     body: JSON.stringify(data),
   });
 
-export const fetchAllUsers = async (): Promise<User[]> => {
-  const res = await fetcher("/users");
+export const fetchAllUsers = async ({
+  page,
+  limit,
+  search = "",
+  status,
+}: FetchUsersParams): Promise<UsersResponse> => {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    search,
+  });
 
-  return res.data.map((u: any) => ({
-    ...u,
-    userId: u.userId,
-    roleId: u.role.roleId,
-    role: u.role.name,
-  }));
+  if (status) params.set("status", status);
+
+  const res: UsersResponse = await fetcher(`/users?${params.toString()}`);
+
+  return {
+    ...res,
+    data: (res.data ?? []).map((u: any) => ({
+      ...u,
+      userId: String(u.userId),
+      roleId: String(u.role?.roleId),
+      role: u.role?.name,
+    })),
+    pagination: res.pagination ?? {
+      page,
+      limit,
+      total: res.data?.length ?? 0,
+      totalPages: 1,
+    },
+  };
 };
 
 export const fetchRoles = async (): Promise<Role[]> => {
