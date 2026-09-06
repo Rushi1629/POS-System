@@ -113,6 +113,7 @@ export default function Sidebar() {
             width={80}
             height={50}
             className="mx-auto"
+            style={{ width: "auto", height: "auto" }}
             priority
           />
           {/* {!collapsed && (
