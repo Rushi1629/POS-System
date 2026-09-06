@@ -5,7 +5,11 @@ import {
   editDiscountById,
   fetchAllDiscounts,
 } from "../services/discount.service";
-import { CreateDiscountRequest, Discount } from "@/types/discount-types";
+import {
+  CreateDiscountRequest,
+  DiscountStatus,
+  GetAllDiscountsResponse,
+} from "@/types/discount-types";
 
 export const useCreateDiscount = () => {
   const queryClient = useQueryClient();
@@ -22,10 +26,15 @@ export const useCreateDiscount = () => {
   });
 };
 
-export const useFetchDiscounts = () => {
-  return useQuery<Discount[]>({
-    queryKey: ["Discounts"],
-    queryFn: fetchAllDiscounts,
+export const useFetchDiscounts = (
+  page = 1,
+  limit = 20,
+  search = "",
+  status?: DiscountStatus,
+) => {
+  return useQuery<GetAllDiscountsResponse>({
+    queryKey: ["Discounts", page, limit, search, status],
+    queryFn: () => fetchAllDiscounts({ page, limit, search, status }),
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,
@@ -36,7 +45,7 @@ export const useDeleteDiscount = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => deleteDiscountById(id),
+    mutationFn: (id: string) => deleteDiscountById(id),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["Discounts"],
@@ -56,7 +65,7 @@ export const useEditDiscount = () => {
       id,
       data,
     }: {
-      id: number;
+      id: string;
       data: Partial<CreateDiscountRequest>;
     }) => editDiscountById(id, data),
 

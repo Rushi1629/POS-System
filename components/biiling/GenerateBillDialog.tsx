@@ -189,7 +189,7 @@ const GenerateBillDialog = ({
             render={({ field }) => {
               const selectedDiscounts = field.value ?? [];
 
-              const toggleDiscount = (discountId: number) => {
+              const toggleDiscount = (discountId: string) => {
                 const exists = selectedDiscounts.some(
                   (item) => item.discountId === discountId,
                 );

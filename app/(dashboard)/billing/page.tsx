@@ -89,9 +89,13 @@ export default function BillingPage() {
   const { mutateAsync: payBill, isPending: isPaying } = usePayBill();
   const { mutateAsync: generateBill, isPending: isGenerating } =
     useGenerateBill();
-  const { data: discounts = [], isLoading } = useFetchDiscounts();
-
-  console.log(discounts, "hvhvhhf");
+  const { data: discountsResponse, isLoading } = useFetchDiscounts(
+    1,
+    100,
+    "",
+    "all",
+  );
+  const discounts = discountsResponse?.data ?? [];
 
   useEffect(() => {
     if (!allBills || !Array.isArray(allBills)) return;
@@ -121,7 +125,7 @@ export default function BillingPage() {
     tableId: string;
     mobileNumber: string;
     discounts: {
-      discountId: number;
+      discountId: string;
       sequence: number;
     }[];
     notes: string;

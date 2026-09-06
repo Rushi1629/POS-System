@@ -52,7 +52,7 @@ export interface BillOrder {
 // ============================================================
 
 export interface Discount {
-  id: number;
+  id: string;
   name: string;
   description: string;
   type: "AMOUNT" | "PERCENTAGE";
@@ -63,7 +63,7 @@ export interface Discount {
 }
 
 export interface SelectedDiscount {
-  discountId: number;
+  discountId: string;
   sequence: number;
 }
 export interface GenerateBillRequest {

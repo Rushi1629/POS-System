@@ -20,6 +20,7 @@ import {
   User2,
   Receipt,
   ChefHat,
+  Tag,
 } from "lucide-react";
 
 export type TableStatus = "available" | "occupied" | "reserved" | "cleaning";
@@ -421,6 +422,14 @@ export const navItems: NavItem[] = [
     label: "Billing",
     icon: CreditCard,
     href: "/billing",
+    group: "Finance",
+    roles: ["Super Admin"],
+  },
+  {
+    id: "nav-discounts",
+    label: "Discounts",
+    icon: Tag,
+    href: "/discounts",
     group: "Finance",
     roles: ["Super Admin"],
   },

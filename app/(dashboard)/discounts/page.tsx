@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   BadgePercent,
@@ -46,6 +45,7 @@ import { cn } from "@/lib/utils";
 import {
   CreateDiscountRequest,
   Discount,
+  DiscountStatus,
   formatDiscountValue,
 } from "@/types/discount-types";
 import DiscountDialog from "@/components/discounts/discountDialog";
@@ -55,7 +55,16 @@ import {
   useEditDiscount,
   useFetchDiscounts,
 } from "@/client/hooks/useDiscount";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function DiscountsPage() {
   const [query, setQuery] = useState("");
@@ -64,9 +73,13 @@ export default function DiscountsPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
   const [editingDiscount, setEditingDiscount] = useState<Discount | null>(null);
-  const queryClient = useQueryClient();
 
-  const { data: discounts = [], isLoading } = useFetchDiscounts();
+  const { data: discountsResponse, isLoading } = useFetchDiscounts(
+    page,
+    pageSize,
+    query,
+  );
+  const discounts = discountsResponse?.data ?? [];
   const { mutateAsync: createDiscount, isPending: isCreating } =
     useCreateDiscount();
   const { mutateAsync: updateDiscount, isPending: isUpdating } =
@@ -85,50 +98,23 @@ export default function DiscountsPage() {
     };
   }, [discounts]);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return discounts.filter((d) => {
-      const matchesTab =
-        tab === "ALL" || (tab === "ACTIVE" ? d.isActive : !d.isActive);
-      const matchesQuery =
-        !q ||
-        d.name.toLowerCase().includes(q) ||
-        d.description.toLowerCase().includes(q);
-      return matchesTab && matchesQuery;
-    });
-  }, [discounts, query, tab]);
+  const total = discountsResponse?.pagination?.total ?? 0;
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const totalPages = Math.max(
+    1,
+    discountsResponse?.pagination?.totalPages ?? Math.ceil(total / pageSize),
+  );
 
   useEffect(() => {
     setPage(1);
   }, [query, tab]);
 
-  useEffect(() => {
-    if (page > totalPages) {
-      setPage(totalPages);
-    }
-  }, [page, totalPages]);
+  const startIndex = total === 0 ? 0 : (page - 1) * pageSize + 1;
 
-  const paginatedDiscounts = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filtered.slice(start, start + pageSize);
-  }, [filtered, page, pageSize]);
-
-  const startIndex = (page - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, filtered.length);
+  const endIndex = Math.min(page * pageSize, total);
 
   async function handleToggle(discount: Discount) {
     const next = !discount.isActive;
-    const previous = discounts;
-
-    queryClient.setQueryData<Discount[]>(["Discounts"], (current = []) =>
-      current.map((d) =>
-        d.id === discount.id
-          ? { ...d, isActive: next, updatedAt: new Date().toISOString() }
-          : d,
-      ),
-    );
 
     try {
       await updateDiscount({ id: discount.id, data: { isActive: next } });
@@ -136,7 +122,6 @@ export default function DiscountsPage() {
         `"${discount.name}" is now ${next ? "active" : "inactive"}`,
       );
     } catch {
-      queryClient.setQueryData<Discount[]>(["Discounts"], previous);
       toast.error("Could not update the discount");
     }
   }
@@ -269,7 +254,13 @@ export default function DiscountsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.length === 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="py-14 text-center">
+                    Loading discounts...
+                  </TableCell>
+                </TableRow>
+              ) : discounts.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="py-14 text-center">
                     <BadgePercent className="mx-auto h-8 w-8 text-muted-foreground/60" />
@@ -282,7 +273,7 @@ export default function DiscountsPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedDiscounts.map((d) => (
+                discounts.map((d) => (
                   <TableRow key={d.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -381,11 +372,9 @@ export default function DiscountsPage() {
             <div className="flex items-center gap-3">
               <span>
                 Showing{" "}
-                <strong className="text-foreground">
-                  {filtered.length === 0 ? 0 : startIndex + 1}
-                </strong>
-                –<strong className="text-foreground">{endIndex}</strong> of{" "}
-                <strong className="text-foreground">{filtered.length}</strong>
+                <strong className="text-foreground">{startIndex}</strong>–
+                <strong className="text-foreground">{endIndex}</strong> of{" "}
+                <strong className="text-foreground">{total}</strong>
               </span>
               <Select
                 value={String(pageSize)}
@@ -428,7 +417,9 @@ export default function DiscountsPage() {
                     variant="outline"
                     size="icon"
                     className="h-8 w-8 rounded-full"
-                    onClick={() => setPage((current) => Math.max(1, current - 1))}
+                    onClick={() =>
+                      setPage((current) => Math.max(1, current - 1))
+                    }
                     disabled={page === 1}
                     aria-label="Previous page"
                   >
@@ -438,7 +429,9 @@ export default function DiscountsPage() {
                     variant="outline"
                     size="icon"
                     className="h-8 w-8 rounded-full"
-                    onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+                    onClick={() =>
+                      setPage((current) => Math.min(totalPages, current + 1))
+                    }
                     disabled={page === totalPages}
                     aria-label="Next page"
                   >
