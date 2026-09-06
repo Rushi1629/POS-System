@@ -170,12 +170,12 @@ function MenuPage() {
 
   const stats = useMemo(
     () => ({
-      total: menus.length,
+      total: serverPagination?.total ?? menus.length,
       available: menus.filter((m) => m.available).length,
       veg: menus.filter((m) => m.menuType === "Veg").length,
       nonVeg: menus.filter((m) => m.menuType === "NonVeg").length,
     }),
-    [menus],
+    [menus, serverPagination?.total],
   );
 
   const columns = useMemo<ColumnDef<FetchMenuResponse>[]>(

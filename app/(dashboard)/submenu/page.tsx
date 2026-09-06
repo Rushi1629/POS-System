@@ -158,12 +158,12 @@ function SubmenuPage() {
 
   const stats = useMemo(
     () => ({
-      total: items.length,
+      total: submenuResponse?.pagination?.total ?? items.length,
       available: items.filter((m) => m.available).length,
       // veg: items.filter((m) => m.menuType === "Veg").length,
       // nonVeg: items.filter((m) => m.menuType === "NonVeg").length,
     }),
-    [items],
+    [items, submenuResponse?.pagination?.total],
   );
 
   // ✅ TABLE COLUMNS

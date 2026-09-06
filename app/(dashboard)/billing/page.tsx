@@ -196,13 +196,13 @@ export default function BillingPage() {
     const revenue = paid.reduce((s, b) => s + Number(b.totalAmount), 0);
     const outstanding = unpaid.reduce((s, b) => s + Number(b.totalAmount), 0);
     return {
-      total: bills.length,
+      total: billTotal,
       paid: paid.length,
       unpaid: unpaid.length,
       revenue,
       outstanding,
     };
-  }, [bills]);
+  }, [bills, billTotal]);
 
   return (
     <div className="">

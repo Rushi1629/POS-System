@@ -118,12 +118,12 @@ export default function InventoryPage() {
 
   const stats = useMemo(() => {
     return {
-      total: items.length,
+      total: pagination.total ?? items.length,
       active: items.filter((i) => i.isActive).length,
       low: items.filter((i) => stockState(i) === "LOW").length,
       out: items.filter((i) => stockState(i) === "OUT").length,
     };
-  }, [items]);
+  }, [items, pagination.total]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -455,7 +455,7 @@ export default function InventoryPage() {
                   value={String(limit)}
                   onValueChange={(v) => setLimit(Number(v))}
                 >
-                  <SelectTrigger className="h-8 w-[72px]">
+                  <SelectTrigger className="h-8 w-18">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

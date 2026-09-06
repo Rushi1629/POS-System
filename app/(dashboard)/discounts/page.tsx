@@ -91,12 +91,12 @@ export default function DiscountsPage() {
   const stats = useMemo(() => {
     const active = discounts.filter((d) => d.isActive).length;
     return {
-      total: discounts.length,
+      total: discountsResponse?.pagination?.total ?? discounts.length,
       active,
       amount: discounts.filter((d) => d.type === "AMOUNT").length,
       percentage: discounts.filter((d) => d.type === "PERCENTAGE").length,
     };
-  }, [discounts]);
+  }, [discounts, discountsResponse?.pagination?.total]);
 
   const total = discountsResponse?.pagination?.total ?? 0;
 
