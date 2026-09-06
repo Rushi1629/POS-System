@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Eye,
@@ -15,7 +15,7 @@ import {
 import { toast } from "sonner";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useLogin, useProfile } from "@/client/hooks/useAuth";
+import { useLogin } from "@/client/hooks/useAuth";
 import SecretCafeLoader from "@/components/SecretCafeLoader";
 import { useForm } from "react-hook-form";
 
@@ -29,18 +29,11 @@ export default function LoginForm() {
   // =========================
   const loginMutation = useLogin();
 
-  const { data: user } = useProfile({
-    enabled: false,
-  });
-
-  useEffect(() => {
-    if (user) {
-      router.replace("/user-management");
-    }
-  }, [user, router]);
-
   const getDefaultRouteByRole = (roleName?: string) => {
     if (roleName === "Super Admin") return "/user-management";
+    if (roleName === "Chef" || roleName === "Waiter") {
+      return "/order-item-status-management";
+    }
 
     return "/dashboard";
   };
@@ -54,7 +47,7 @@ export default function LoginForm() {
       const res = await loginMutation.mutateAsync(data);
 
       const roleName =
-        res?.user?.role?.name ?? res?.data?.role?.name ?? user?.role?.name;
+        res?.user?.role?.name ?? res?.data?.role?.name;
 
       toast.success("Login successful 🎉");
 

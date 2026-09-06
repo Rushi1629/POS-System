@@ -16,6 +16,7 @@ export default function AuthInitializer({ children }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const [authorizedPath, setAuthorizedPath] = useState<string | null>(null);
 
   // Disable profile fetch for public customer routes (QR-based sessions)
   // Profile is only needed for authenticated staff routes
@@ -25,22 +26,44 @@ export default function AuthInitializer({ children }: Props) {
     data: user,
     isLoading,
     isError,
-    refetch,
   } = useProfile({
     enabled:
       !isPublicCustomerRoute &&
-      pathname !== "/login" &&
       pathname !== "/register",
   });
 
+  const getDefaultRouteByRole = (roleName?: string) => {
+    if (roleName === "Super Admin") return "/user-management";
+    if (roleName === "Chef" || roleName === "Waiter") {
+      return "/order-item-status-management";
+    }
+    return "/dashboard";
+  };
+
   useEffect(() => {
-    // Public routes that should NOT trigger profile fetch or redirects
-    const publicPaths = ["/", "/customer", "/login", "/register"];
-    if (
-      publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))
-    ) {
+    // Public customer/register routes never redirect based on staff profile.
+    const publicPaths = ["/customer", "/register"];
+    if (publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+      setAuthorizedPath(pathname);
       return;
     }
+
+    // Home and login are auth entry points: keep them public when signed out,
+    // but send an existing session to its role-appropriate landing page.
+    if (pathname === "/" || pathname === "/login") {
+      if (isLoading) return;
+
+      if (user) {
+        dispatch(setUser(user));
+        router.replace(getDefaultRouteByRole(user.role?.name));
+        return;
+      }
+
+      setAuthorizedPath(pathname);
+      return;
+    }
+
+    setAuthorizedPath(null);
 
     // Trigger the profile fetch when on protected routes.
     // refetch();
@@ -80,17 +103,22 @@ export default function AuthInitializer({ children }: Props) {
       user?.role?.name &&
       !findNavItem.roles.includes(user.role.name)
     ) {
-      router.push("/unauthorized");
-    }
-
-    // ✅ Redirect logged-in user away from login page
-    if (user && pathname === "/login") {
-      router.replace("/user-management");
+      router.replace("/unauthorized");
       return;
     }
+
+    setAuthorizedPath(pathname);
+
   }, [pathname, user, isLoading, isError, router]);
 
-  if (isLoading) {
+  const publicPaths = ["/customer", "/login", "/register"];
+  const isPublicRoute =
+    pathname === "/" ||
+    publicPaths.some(
+      (path) => pathname === path || pathname.startsWith(path + "/"),
+    );
+
+  if (isLoading || (!isPublicRoute && authorizedPath !== pathname)) {
     return <ApiLoader message="Loading your profile..." />;
   }
 

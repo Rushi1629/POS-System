@@ -142,6 +142,9 @@ export default function Sidebar() {
             const items = navItems.filter(
               (n) => n.group === group && hasAccess(n.roles),
             );
+
+            if (items.length === 0) return null;
+
             return (
               <div key={`group-${group}`} className="mb-4">
                 {!collapsed && (
