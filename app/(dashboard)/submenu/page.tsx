@@ -1,14 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
-  PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -45,7 +42,6 @@ import { Badge } from "@/components/ui/badge";
 
 import SubmenuDialog from "@/components/submenu/SubmenuDialog";
 import { toast } from "sonner";
-import { createSubmenu } from "@/client/services/submenu.service";
 import { FetchSubmenuItem, SubmenuItemPayload } from "@/types/submenu-types";
 import {
   useCreateSubmenu,
@@ -77,35 +73,31 @@ import SubMenuCard from "@/components/submenu/submenuCard";
 function SubmenuPage() {
   const { mutateAsync: createSubmenu, isPending: isCreatingSubmenu } =
     useCreateSubmenu();
-  const { data: items = [], isLoading } = useFetchSubMenus();
+  const [search, setSearch] = useState("");
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const { data: submenuResponse, isLoading } = useFetchSubMenus(
+    pagination.pageIndex + 1,
+    pagination.pageSize,
+    search,
+  );
+  const items = submenuResponse?.data ?? [];
   const { mutateAsync: updateSubmenu, isPending: isUpdating } =
     useUpdateSubMenu();
   const { mutateAsync: deleteSubmenu } = useDeleteSubMenu();
 
   const [view, setView] = useState<"grid" | "table">("table");
-  const [search, setSearch] = useState("");
   const [submenuDialogOpen, setSubmenuDialogOpen] = useState(false);
   const [submenuEditing, setSubmenuEditing] = useState<FetchSubmenuItem | null>(
     null,
   );
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "available" | "unavailable"
-  >("all");
+  const filtered = items;
 
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 5,
-  });
-
-  // ✅ FILTER
-  const filtered = useMemo(() => {
-    return items.filter(
-      (i) =>
-        i.name.toLowerCase().includes(search.toLowerCase()) ||
-        i.description?.toLowerCase().includes(search.toLowerCase()),
+  useEffect(() => {
+    setPagination((current) =>
+      current.pageIndex === 0 ? current : { ...current, pageIndex: 0 },
     );
-  }, [items, search]);
+  }, [search]);
 
   function openCreateSubmenu() {
     setSubmenuEditing(null);
@@ -237,20 +229,15 @@ function SubmenuPage() {
   const table = useReactTable({
     data: filtered,
     columns,
-    state: { pagination },
-    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    autoResetPageIndex: true,
   });
 
-  const pageCount = table.getPageCount();
-  const pageIndex = table.getState().pagination.pageIndex;
-  const pageSize = table.getState().pagination.pageSize;
+  const pageIndex = pagination.pageIndex;
+  const pageSize = pagination.pageSize;
+  const pageCount = submenuResponse?.pagination?.totalPages ?? 1;
   const startIndex = pageIndex * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, filtered.length);
+  const endIndex = Math.min(startIndex + filtered.length, submenuResponse?.pagination?.total ?? 0);
 
   return (
     <div className="">
@@ -419,11 +406,15 @@ function SubmenuPage() {
                   {filtered.length === 0 ? 0 : startIndex + 1}
                 </strong>
                 –<strong className="text-foreground">{endIndex}</strong> of{" "}
-                <strong className="text-foreground">{filtered.length}</strong>
+                <strong className="text-foreground">
+                  {submenuResponse?.pagination?.total ?? 0}
+                </strong>
               </span>
               <Select
                 value={String(pageSize)}
-                onValueChange={(v) => table.setPageSize(Number(v))}
+                onValueChange={(v) =>
+                  setPagination({ pageIndex: 0, pageSize: Number(v) })
+                }
               >
                 <SelectTrigger className="h-8 w-27.5 rounded-full">
                   <SelectValue />
@@ -451,8 +442,10 @@ function SubmenuPage() {
                   variant="outline"
                   size="icon"
                   className="h-8 w-8 rounded-full"
-                  onClick={() => table.setPageIndex(0)}
-                  disabled={!table.getCanPreviousPage()}
+                  onClick={() =>
+                    setPagination((current) => ({ ...current, pageIndex: 0 }))
+                  }
+                  disabled={pageIndex === 0 || isLoading}
                   aria-label="First page"
                 >
                   <ChevronsLeft className="h-4 w-4" />
@@ -461,8 +454,13 @@ function SubmenuPage() {
                   variant="outline"
                   size="icon"
                   className="h-8 w-8 rounded-full"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
+                  onClick={() =>
+                    setPagination((current) => ({
+                      ...current,
+                      pageIndex: Math.max(0, current.pageIndex - 1),
+                    }))
+                  }
+                  disabled={pageIndex === 0 || isLoading}
                   aria-label="Previous page"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -471,8 +469,13 @@ function SubmenuPage() {
                   variant="outline"
                   size="icon"
                   className="h-8 w-8 rounded-full"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
+                  onClick={() =>
+                    setPagination((current) => ({
+                      ...current,
+                      pageIndex: Math.min(pageCount - 1, current.pageIndex + 1),
+                    }))
+                  }
+                  disabled={pageIndex >= pageCount - 1 || isLoading}
                   aria-label="Next page"
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -481,8 +484,13 @@ function SubmenuPage() {
                   variant="outline"
                   size="icon"
                   className="h-8 w-8 rounded-full"
-                  onClick={() => table.setPageIndex(pageCount - 1)}
-                  disabled={!table.getCanNextPage()}
+                  onClick={() =>
+                    setPagination((current) => ({
+                      ...current,
+                      pageIndex: Math.max(0, pageCount - 1),
+                    }))
+                  }
+                  disabled={pageIndex >= pageCount - 1 || isLoading}
                   aria-label="Last page"
                 >
                   <ChevronsRight className="h-4 w-4" />

@@ -5,6 +5,10 @@ import {
   editSubmenuById,
   fetchAllSubmenuItems,
 } from "../services/submenu.service";
+import {
+  FetchSubmenuParams,
+  FetchSubmenuResponse,
+} from "@/types/submenu-types";
 
 export const useCreateSubmenu = () => {
   const queryClient = useQueryClient();
@@ -21,10 +25,17 @@ export const useCreateSubmenu = () => {
   });
 };
 
-export const useFetchSubMenus = () => {
-  return useQuery({
-    queryKey: ["submenus"],
-    queryFn: fetchAllSubmenuItems,
+export const useFetchSubMenus = (
+  page = 1,
+  limit = 10,
+  search = "",
+  status?: string,
+) => {
+  const params: FetchSubmenuParams = { page, limit, search, status };
+
+  return useQuery<FetchSubmenuResponse>({
+    queryKey: ["submenus", params],
+    queryFn: () => fetchAllSubmenuItems(params),
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

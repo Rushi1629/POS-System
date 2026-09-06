@@ -69,7 +69,8 @@ function MenuDialog({
   });
 
   const [submenu, setSubmenu] = useState<SubFormRow[]>([]);
-  const { data: submenuOptions = [] } = useFetchSubMenus();
+  const { data: submenuResponse } = useFetchSubMenus(1, 100, "", "all");
+  const submenuOptions = submenuResponse?.data ?? [];
 
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);

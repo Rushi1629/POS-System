@@ -22,8 +22,23 @@ export type FetchSubmenuItem = {
   imageUrl: string | null;
 };
 
+export type FetchSubmenuParams = {
+  page: number;
+  limit: number;
+  search?: string;
+  status?: string;
+};
+
+export type SubmenuPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
 export type FetchSubmenuResponse = {
   status: boolean;
   message: string;
   data: FetchSubmenuItem[];
+  pagination: SubmenuPagination;
 };
