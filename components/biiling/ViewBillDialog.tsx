@@ -82,7 +82,10 @@ const ViewBillDialog = ({ bill }: { bill: BillListItem }) => {
 
         <div className="rounded-xl border border-border/60 bg-muted/30 p-4 space-y-2 text-sm">
           <Row label="Subtotal" value={inr(bill.subtotal)} />
-          <Row label="Time Charge Amount" value={inr(bill.timeChargeAmount)} />
+          <Row
+            label="Time Charge Amount"
+            value={inr(bill.timeChargeAmount ?? 0)}
+          />
           <Row label="Tax" value={inr(bill.taxAmount)} />
           <Row label="Discount" value={`- ${inr(bill.discountAmount)}`} />
           <Row label="Service Charge" value={inr(bill.serviceCharge)} />

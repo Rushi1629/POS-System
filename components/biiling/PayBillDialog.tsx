@@ -118,7 +118,10 @@ const PayBillDialog = ({
             value={`${bill.session?.tableName} · ${bill.session?.guestCount} guests`}
           />
           <Row label="Subtotal" value={inr(bill.subtotal)} />
-          <Row label="Time Charge Amount" value={inr(bill.timeChargeAmount)} />
+          <Row
+            label="Time Charge Amount"
+            value={inr(bill.timeChargeAmount ?? 0)}
+          />
           <Row label="Tax" value={inr(bill.taxAmount)} />
           <Row label="Discount" value={`- ${inr(bill.discountAmount)}`} />
           <Row label="Service" value={inr(bill.serviceCharge)} />
