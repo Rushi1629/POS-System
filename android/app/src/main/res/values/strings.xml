@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Secret Cafe POS</string>
+    <string name="title_activity_main">Secret Cafe POS</string>
+    <string name="package_name">secretcafe.in</string>
+    <string name="custom_url_scheme">secretcafe.in</string>
+</resources>
