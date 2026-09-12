@@ -389,7 +389,7 @@ export default function HomePage() {
                 <div>
                   <p className="font-semibold">Address</p>
                   <p className="text-sm text-espresso-foreground/70">
-                    12, Lakeview Lane, Sector 5, Salt Lake, Kolkata 700091
+                    shop no 6, BALAJI ENCLAVE, Plot no.-14, Sector 21, Kamothe, Panvel, Maharashtra 410209
                   </p>
                 </div>
               </div>
@@ -398,7 +398,7 @@ export default function HomePage() {
                 <div>
                   <p className="font-semibold">Hours</p>
                   <p className="text-sm text-espresso-foreground/70">
-                    Mon – Sun · 8:00 AM – 10:00 PM
+                    Mon – Sun · 10:30 AM – 12:00 PM
                   </p>
                 </div>
               </div>
