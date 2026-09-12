@@ -46,6 +46,7 @@ export const fetchAllTables = async ({
       isActive: Boolean(u.isActive),
       guestCount: Number(u.guestCount ?? 0),
       rushMode: Boolean(u.rushMode),
+      tableToken: u.tableToken ?? null,
     })),
 
     pagination: {

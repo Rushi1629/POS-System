@@ -48,6 +48,7 @@ export interface FetchTableResponse {
   guestCount: number;
   rushMode: boolean;
   qrCodeImageUrl?: string;
+  tableToken?: string | null;
   // startTime?: string;
 }
 

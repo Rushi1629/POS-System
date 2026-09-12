@@ -59,6 +59,7 @@ import { useFetchTables } from "@/client/hooks/useTable";
 import { useFetchDiscounts } from "@/client/hooks/useDiscount";
 import { PaginationState } from "@tanstack/react-table";
 import { TableStatus } from "@/types/table-types";
+import { clearCartDB } from "@/lib/db";
 
 /* ---------- Page ---------- */
 export default function BillingPage() {
@@ -174,6 +175,14 @@ export default function BillingPage() {
       }
 
       const updated = await payBill(paymentRequest);
+
+      const paidTable = tables.find(
+        (table) => table.id === bill.session.tableId,
+      );
+
+      if (paidTable?.tableToken) {
+        await clearCartDB(paidTable.tableToken);
+      }
 
       setBills((prev) =>
         prev.map((item) =>
