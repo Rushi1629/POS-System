@@ -57,8 +57,10 @@ export default function DashboardLayout({
 
         <main
           className={cn(
-            "flex-1 overflow-y-auto pb-20 bg-(--background) scrollbar-orange",
-            pathname.startsWith("/customer") ? "pt-0 pr-6 pl-6 pb-24 lg:pr-8 lg:pl-8 lg:pb-8" : "p-6 lg:p-8",
+            "flex-1 overflow-y-auto bg-(--background) scrollbar-orange",
+            pathname.startsWith("/customer")
+              ? "pt-0 pr-6 pl-6 pb-24 lg:pr-8 lg:pl-8 lg:pb-8"
+              : "p-6 pb-24 lg:p-8 lg:pb-24",
           )}
         >
           <Suspense
