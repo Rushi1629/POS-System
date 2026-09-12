@@ -10,6 +10,7 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["192.168.0.100"],
+  output: 'export',
   images: {
     remotePatterns: [
       {

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#FFFFFF</color>
-    <string name="app_name">Secret Cafe POS</string>
-    <string name="custom_url_scheme">secretcafe.in</string>
-    <string name="package_name">secretcafe.in</string>
-    <string name="title_activity_main">Secret Cafe POS</string>
+    <string name="app_name">4secretcafe</string>
+    <string name="custom_url_scheme">com.example.app</string>
+    <string name="package_name">com.example.app</string>
+    <string name="title_activity_main">4secretcafe</string>
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         
         <item name="colorPrimary">@color/colorPrimary</item>
