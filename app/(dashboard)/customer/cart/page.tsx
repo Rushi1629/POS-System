@@ -198,7 +198,7 @@ const CartView = () => {
 
   // ✅ Derived values (memoized)
   const { subtotal, totalQty } = useMemo(() => {
-    debugger;
+    
     return items.reduce(
       (acc, item) => {
         const baseTotal = Number(item.price) * item.quantity;

@@ -156,7 +156,7 @@ export default function CustomerDashboard() {
   );
 
   const handleAdd = (item: any) => {
-    debugger;
+    
     if (!item.subMenuItems || item.subMenuItems.length === 0) {
       addToCart(item.id);
       return;
@@ -167,7 +167,7 @@ export default function CustomerDashboard() {
   };
 
   const handleConfirmAdd = useCallback(() => {
-    debugger;
+    
     if (!selectedItem) return;
 
     dispatch(
@@ -286,7 +286,7 @@ export default function CustomerDashboard() {
   };
 
   const handleExtraClick = (extra: any) => {
-    debugger;
+    
     setSelectedExtras((prev) => {
       const existing = prev.find((e) => e.id === extra.id);
 

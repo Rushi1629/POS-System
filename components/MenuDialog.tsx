@@ -204,7 +204,7 @@ function MenuDialog({
 
   // ✅ Submit handler → convert to FormData
   const onSubmit = async (values: FormValues) => {
-    debugger;
+    
     console.log("🔥 SUBMIT CALLED");
     try {
       if (!values.categoryId) {

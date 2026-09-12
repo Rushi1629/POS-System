@@ -161,7 +161,7 @@ export default function BillingPage() {
     notes: string,
     splitPaymentData?: { cashAmount: number; onlineAmount: number },
   ) => {
-    debugger;
+    
     try {
       const paymentRequest: any = {
         billingId: bill.billingId,

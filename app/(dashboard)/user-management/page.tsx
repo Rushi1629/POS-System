@@ -101,7 +101,7 @@ export default function UsersPage() {
   }
 
   const handleCreate = async (values: UserFormValues) => {
-    debugger;
+    
     try {
       const role = roles.find((r) => r.name === values.role);
 
