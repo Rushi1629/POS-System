@@ -203,7 +203,7 @@ function Tables() {
           if (!qrUrl) {
             return (
               <div
-                className="flex h-[50px] w-[50px] items-center justify-center rounded-md border bg-muted/50 text-xs font-semibold text-muted-foreground"
+                className="flex h-12.5 w-12.5 items-center justify-center rounded-md border bg-muted/50 text-xs font-semibold text-muted-foreground"
                 title={`QR not available for ${tableName}`}
               >
                 {tableName}
