@@ -104,7 +104,7 @@ const page = () => {
             Live overview of your cafe&apos;s sales, operations, and performance
           </p>
         </div>
-        <div className="flex items-end gap-2">
+        <div className="flex items-end gap-2 flex-wrap">
           <DatePickerField
             label="Start date"
             value={startDate}
