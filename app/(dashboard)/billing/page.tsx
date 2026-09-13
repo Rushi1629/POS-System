@@ -194,7 +194,7 @@ export default function BillingPage() {
       if (tokenToClear) {
         await clearCartDB(tokenToClear);
       } else {
-        await clearCartDB();
+        console.warn("Skipping cart DB cleanup: bill/session tableToken missing");
       }
 
       setBills((prev) =>

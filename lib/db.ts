@@ -84,13 +84,11 @@ export const clearCartDB = async (tableToken?: string) => {
   const db = await getDB();
   const key = getCartDBKey(tableToken);
 
-  if (key) {
-    await db.delete(STORE_NAME, key);
-    console.log("CLEARED CART DB KEY:", key);
+  if (!key) {
+    console.warn("Skipping cart delete from IndexedDB: missing valid tableToken");
     return;
   }
 
-  // fallback: clear all cart entries only when the caller deliberately chose no table token.
-  await db.clear(STORE_NAME);
-  console.log("CLEARED ENTIRE CART STORE");
+  await db.delete(STORE_NAME, key);
+  console.log("CLEARED CART DB KEY:", key);
 };
