@@ -24,10 +24,9 @@ export const fetchAllTables = async ({
 }: FetchTablesParams): Promise<FetchTablesResponse> => {
   const params = new URLSearchParams({
     page: String(page),
-    limit: String(limit),
   });
 
-  if (status && status !== "all") {
+  if (status) {
     params.set("status", status);
   }
 
@@ -37,6 +36,10 @@ export const fetchAllTables = async ({
 
   if (tableStatus && tableStatus !== "all") {
     params.set("tableStatus", tableStatus);
+  }
+
+  if (status !== "all") {
+    params.set("limit", String(limit));
   }
 
   const res = await fetcher(`/table?${params.toString()}`);

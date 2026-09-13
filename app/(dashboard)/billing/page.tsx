@@ -99,7 +99,7 @@ export default function BillingPage() {
     pagination.pageIndex + 1,
     pagination.pageSize,
     {
-      status: statusFilter === "all" ? undefined : statusFilter,
+      status: statusFilter,
     },
   );
   const tables = tablesResponse?.data ?? [];

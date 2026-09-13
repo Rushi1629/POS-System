@@ -19,12 +19,15 @@ export const fetchAllDiscounts = async ({
 }: FetchDiscountsParams): Promise<GetAllDiscountsResponse> => {
   const params = new URLSearchParams({
     page: String(page),
-    limit: String(limit),
     search,
   });
 
-  if (status && status !== "all") {
+  if (status) {
     params.set("status", status);
+  }
+
+  if (status !== "all") {
+    params.set("limit", String(limit));
   }
 
   const res: GetAllDiscountsResponse = await fetcher(
