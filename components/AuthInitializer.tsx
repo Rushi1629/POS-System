@@ -40,6 +40,9 @@ export default function AuthInitializer({ children }: Props) {
     return "/dashboard";
   };
 
+  const isChefOrWaiter = (roleName?: string) =>
+    roleName === "Chef" || roleName === "Waiter";
+
   useEffect(() => {
     // Public customer/register routes never redirect based on staff profile.
     const publicPaths = ["/customer", "/register"];
@@ -103,6 +106,11 @@ export default function AuthInitializer({ children }: Props) {
       user?.role?.name &&
       !findNavItem.roles.includes(user.role.name)
     ) {
+      if (isChefOrWaiter(user.role.name)) {
+        router.replace("/order-item-status-management");
+        return;
+      }
+
       router.replace("/unauthorized");
       return;
     }
