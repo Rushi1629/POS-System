@@ -97,5 +97,5 @@ export const generateBill = async (
     body: JSON.stringify(data),
   });
 
-  return res.data as GenerateBillData;
+  return (res?.data ?? res) as GenerateBillData;
 };

@@ -85,7 +85,7 @@ const GenerateBillDialog = ({
 
     try {
       const data = await onSubmit({
-        tableId: values.tableId, // ✅ FIX
+        tableId: values.tableId,
         mobileNumber: values.mobileNumber.trim(),
         discounts: (values.discounts ?? []).map((discount, index) => ({
           discountId: discount.discountId,
@@ -94,7 +94,12 @@ const GenerateBillDialog = ({
         notes: values.notes.trim() || "n/a",
       });
 
-      toast.success(`Bill ${data.billNumber} generated`);
+      if (data?.billNumber) {
+        toast.success(`Bill ${data.billNumber} generated`);
+      } else {
+        toast.success("Bill generated successfully");
+      }
+
       onClose();
 
       reset({
