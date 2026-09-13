@@ -34,6 +34,13 @@ import { useSearchParams } from "next/navigation";
 import { UserRole } from "@/types/types";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function transformOrders(data: any[]): KOrder[] {
   return data.map((table) => ({
@@ -60,12 +67,19 @@ export default function page() {
   const [query, setQuery] = useState("");
   const [orderPage, setOrderPage] = useState(1);
   const [orderPageSize, setOrderPageSize] = useState(20);
+  const [typeFilter, setTypeFilter] = useState<"all" | "DINE_IN" | "TAKEAWAY" | "DELIVERY">("all");
+  const [serverStatusFilter, setServerStatusFilter] = useState<
+    "all" | OrderStatus
+  >("all");
   const {
     data: TableWiseOrders,
     isLoading: isTableWiseLoading,
     isError: isTableWiseError,
     refetch,
-  } = useFetchOrdersTableWise(orderPage, orderPageSize, query);
+  } = useFetchOrdersTableWise(orderPage, orderPageSize, query, {
+    status: serverStatusFilter === "all" ? undefined : serverStatusFilter,
+    orderType: typeFilter === "all" ? undefined : typeFilter,
+  });
   const {
     mutate: updateStatus,
     isPending,
@@ -374,35 +388,59 @@ export default function page() {
               className="h-10 rounded-full border-border bg-card pl-9"
             />
           </div>
-          <div className="flex gap-1 rounded-full border border-border bg-card p-1">
-            {(
-              ["all", "PENDING", "ACCEPTED", "PREPARING", "READY"] as const
-            ).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={cn(
-                  "rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
-                  filter === f
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {f === "all" ? "All" : STATUS_STYLES[f as ItemStatus].label}
-              </button>
-            ))}
-          </div>
+
+          <Select
+            value={typeFilter}
+            onValueChange={(value) =>
+              setTypeFilter(value as typeof typeFilter)
+            }
+          >
+            <SelectTrigger className="h-10 w-37.5 rounded-full border-border bg-card px-3 text-xs text-muted-foreground">
+              <SelectValue placeholder="All types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All types</SelectItem>
+              <SelectItem value="DINE_IN">Dine In</SelectItem>
+              <SelectItem value="TAKEAWAY">Takeaway</SelectItem>
+              <SelectItem value="DELIVERY">Delivery</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={serverStatusFilter}
+            onValueChange={(value) =>
+              setServerStatusFilter(value as typeof serverStatusFilter)
+            }
+          >
+            <SelectTrigger className="h-10 w-40 rounded-full border-border bg-card px-3 text-xs text-muted-foreground">
+              <SelectValue placeholder="All statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="PENDING">Pending</SelectItem>
+              <SelectItem value="ACCEPTED">Accepted</SelectItem>
+              <SelectItem value="PREPARING">Preparing</SelectItem>
+              <SelectItem value="READY">Ready</SelectItem>
+              <SelectItem value="SERVED">Served</SelectItem>
+              <SelectItem value="COMPLETED">Completed</SelectItem>
+              <SelectItem value="CANCELLED">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+
           <Button
             variant="outline"
-            size="icon"
-            onClick={() => refetch()}
-            disabled={isTableWiseLoading}
-            className="rounded-full"
+            className="h-10 rounded-full px-4 text-xs"
+            onClick={() => {
+              setQuery("");
+              setTypeFilter("all");
+              setServerStatusFilter("all");
+              setFilter("all");
+              setOrderPage(1);
+            }}
           >
-            <RotateCcw
-              className={cn("h-4 w-4", isTableWiseLoading && "animate-spin")}
-            />
+            Reset
           </Button>
+
         </CardContent>
       </Card>
 
