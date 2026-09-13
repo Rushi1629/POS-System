@@ -188,8 +188,13 @@ export default function BillingPage() {
         (table) => table.id === bill.session.tableId,
       );
 
-      if (paidTable?.tableToken) {
-        await clearCartDB(paidTable.tableToken);
+      const tokenToClear =
+        bill.session?.tableToken ?? paidTable?.tableToken ?? undefined;
+
+      if (tokenToClear) {
+        await clearCartDB(tokenToClear);
+      } else {
+        await clearCartDB();
       }
 
       setBills((prev) =>

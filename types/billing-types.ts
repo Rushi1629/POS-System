@@ -13,6 +13,7 @@ export type TableType = "FAMILY" | "COUPLE" | "HALL" | "OUTDOOR" | "PRIVATE";
 export interface BillSession {
   id?: string;
   tableId: string;
+  tableToken?: string | null;
   tableName: string;
   tableType: TableType;
   guestCount: number;
