@@ -61,6 +61,7 @@ import {
   apiUpdateInventory,
   CreateInventoryRequest,
   InventoryItem,
+  InventoryStatusFilter,
   MOCK_INVENTORY,
   stockState,
 } from "@/types/inventory-types";
@@ -95,9 +96,19 @@ export default function InventoryPage() {
   const [viewing, setViewing] = useState<InventoryItem | null>(null);
   const [deleting, setDeleting] = useState<InventoryItem | null>(null);
 
+  const inventoryStatus: InventoryStatusFilter | undefined =
+    tab === "ALL"
+      ? undefined
+      : tab === "LOW"
+        ? "low"
+        : tab === "OUT"
+          ? "out"
+          : "inactive";
+
   const { data, isLoading, isError, refetch } = useFetchAllInventory(
     page,
     limit,
+    inventoryStatus,
   );
 
   const { mutateAsync: createInventory, isPending: isCreating } =

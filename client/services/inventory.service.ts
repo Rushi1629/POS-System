@@ -3,6 +3,7 @@ import {
   CreateInventoryResponse,
   DeleteInventoryResponse,
   GetAllInventoryResponse,
+  InventoryStatusFilter,
   UpdateInventoryRequest,
   UpdateInventoryResponse,
 } from "@/types/inventory-types";
@@ -11,8 +12,22 @@ import { fetcher } from "../client";
 export const fetchAllInventory = async (
   page = 1,
   limit = 10,
+  status?: InventoryStatusFilter,
 ): Promise<GetAllInventoryResponse> => {
-  return fetcher(`/inventory?page=${page}&limit=${limit}`);
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+
+  if (status && status !== "all") {
+    params.set("status", status);
+  }
+
+  if (status === "all") {
+    params.delete("limit");
+  }
+
+  return fetcher(`/inventory?${params.toString()}`);
 };
 
 export const createInventory = async (

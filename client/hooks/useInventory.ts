@@ -7,13 +7,18 @@ import {
 } from "../services/inventory.service";
 import {
   CreateInventoryRequest,
+  InventoryStatusFilter,
   UpdateInventoryRequest,
 } from "@/types/inventory-types";
 
-export const useFetchAllInventory = (page = 1, limit = 10) => {
+export const useFetchAllInventory = (
+  page = 1,
+  limit = 10,
+  status?: InventoryStatusFilter,
+) => {
   return useQuery({
-    queryKey: ["inventory", page, limit],
-    queryFn: () => fetchAllInventory(page, limit),
+    queryKey: ["inventory", page, limit, status],
+    queryFn: () => fetchAllInventory(page, limit, status),
   });
 };
 

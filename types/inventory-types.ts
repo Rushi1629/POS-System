@@ -1,3 +1,5 @@
+export type InventoryStatusFilter = "all" | "low" | "out" | "inactive";
+
 /** POST /inventory — request body */
 export interface CreateInventoryRequest {
   name: string;
