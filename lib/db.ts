@@ -20,15 +20,29 @@ export const getDB = () => {
   return dbPromise;
 };
 
+const normalizeTableToken = (tableToken?: string | null) => {
+  const token = tableToken?.trim();
+  return token && token !== "undefined" && token !== "null" ? token : "";
+};
+
+const getCartDBKey = (tableToken?: string | null) => {
+  const token = normalizeTableToken(tableToken);
+  return token ? `cartItems:${token}` : null;
+};
+
 // ✅ Save full cart
 export const saveCartToDB = async (
   items: Record<string, CartItem>,
   tableToken?: string,
 ): Promise<void> => {
   try {
-    const db = await getDB();
-    const key = tableToken ? `cartItems:${tableToken}` : `cartItems:${tableToken}`;
+    const key = getCartDBKey(tableToken);
+    if (!key) {
+      console.warn("Skipping cart save to IndexedDB: missing tableToken");
+      return;
+    }
 
+    const db = await getDB();
     await db.put(STORE_NAME, items, key);
 
     console.log("✅ Saved to DB:", key, items);
@@ -45,9 +59,13 @@ export const loadCartFromDB = async (
   if (typeof window === "undefined") return {};
 
   try {
-    const db = await getDB();
-    const key = tableToken ? `cartItems:${tableToken}` : `cartItems:${tableToken}`;
+    const key = getCartDBKey(tableToken);
+    if (!key) {
+      console.warn("Skipping cart load from IndexedDB: missing tableToken");
+      return {};
+    }
 
+    const db = await getDB();
     const items = await db.get(STORE_NAME, key);
 
     console.log("LOADED FROM DB:", key, items);
@@ -64,13 +82,15 @@ export const clearCartDB = async (tableToken?: string) => {
   if (typeof window === "undefined") return;
 
   const db = await getDB();
-  if (tableToken) {
-    const key = `cartItems:${tableToken}`;
+  const key = getCartDBKey(tableToken);
+
+  if (key) {
     await db.delete(STORE_NAME, key);
     console.log("CLEARED CART DB KEY:", key);
-  } else {
-    // fallback: clear all cart entries
-    await db.clear(STORE_NAME);
-    console.log("CLEARED ENTIRE CART STORE");
+    return;
   }
+
+  // fallback: clear all cart entries only when the caller deliberately chose no table token.
+  await db.clear(STORE_NAME);
+  console.log("CLEARED ENTIRE CART STORE");
 };

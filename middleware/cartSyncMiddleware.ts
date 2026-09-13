@@ -30,6 +30,11 @@ export const cartSyncMiddleware: Middleware =
         // ignore
       }
 
+      if (!tableToken || tableToken === "undefined" || tableToken === "null") {
+        console.warn("Skipping cart sync: missing tableToken");
+        return;
+      }
+
       console.log("SYNCING CART (token):", tableToken, items);
 
       saveCartToDB(items, tableToken).catch(console.error);
