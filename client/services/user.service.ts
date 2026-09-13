@@ -18,6 +18,7 @@ export const fetchAllUsers = async ({
   limit,
   search = "",
   status,
+  roleId,
 }: FetchUsersParams): Promise<UsersResponse> => {
   const params = new URLSearchParams({
     page: String(page),
@@ -25,7 +26,13 @@ export const fetchAllUsers = async ({
     search,
   });
 
-  if (status) params.set("status", status);
+  if (status && status !== "all") {
+    params.set("status", status);
+  }
+
+  if (roleId && roleId !== "all") {
+    params.set("roleId", roleId);
+  }
 
   const res: UsersResponse = await fetcher(`/users?${params.toString()}`);
 

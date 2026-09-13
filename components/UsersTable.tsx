@@ -78,14 +78,17 @@ export function UsersTable({
   totalPages,
   onPageChange,
   onLimitChange,
+  roleFilter = "all",
+  onRoleFilterChange,
 }: userProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [filter, setFilter] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("all");
 
   const filteredData = useMemo(
     () =>
-      roleFilter === "all" ? users : users.filter((u) => u.role === roleFilter),
+      roleFilter === "all"
+        ? users
+        : users.filter((u) => u.roleId === roleFilter),
     [users, roleFilter],
   );
 
@@ -255,7 +258,7 @@ export function UsersTable({
         </div>
         <Select
           value={roleFilter}
-          onValueChange={(value) => setRoleFilter(value)}
+          onValueChange={(value) => onRoleFilterChange?.(value)}
         >
           <SelectTrigger className="w-full sm:w-45">
             <SelectValue placeholder="Filter by role" />
@@ -264,7 +267,7 @@ export function UsersTable({
           <SelectContent>
             <SelectItem value="all">All roles</SelectItem>
             {roles.map((role) => (
-              <SelectItem key={role.roleId} value={role.name}>
+              <SelectItem key={role.roleId} value={role.roleId}>
                 {role.name}
               </SelectItem>
             ))}

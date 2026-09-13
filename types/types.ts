@@ -108,6 +108,8 @@ export interface userProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onLimitChange: (limit: number) => void;
+  roleFilter?: string;
+  onRoleFilterChange?: (role: string) => void;
 }
 
 export const roleStyles: Record<UserRole, string> = {
@@ -139,6 +141,7 @@ export interface FetchUsersParams {
   limit: number;
   search?: string;
   status?: string;
+  roleId?: string;
 }
 
 export interface User {

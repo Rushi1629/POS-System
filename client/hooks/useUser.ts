@@ -23,10 +23,14 @@ export const useCreateUser = () => {
   });
 };
 
-export const useFetchUsers = (page = 1, limit = 10) => {
+export const useFetchUsers = (
+  page = 1,
+  limit = 10,
+  roleId?: string,
+) => {
   return useQuery<UsersResponse>({
-    queryKey: ["users", page, limit],
-    queryFn: () => fetchAllUsers({ page, limit }),
+    queryKey: ["users", page, limit, roleId],
+    queryFn: () => fetchAllUsers({ page, limit, roleId }),
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

@@ -49,14 +49,15 @@ export default function UsersPage() {
   const [deleting, setDeleting] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [roleFilter, setRoleFilter] = useState<string>("all");
 
   const { mutateAsync: createUserMutation } = useCreateUser();
 
-  const { data: usersResponse, isLoading: isFetchingUsers, error } =
-    useFetchUsers(page, limit);
-  const users = usersResponse?.data ?? [];
-
   const { data: roles = [] } = useFetchRoles();
+
+  const { data: usersResponse, isLoading: isFetchingUsers, error } =
+    useFetchUsers(page, limit, roleFilter === "all" ? undefined : roleFilter);
+  const users = usersResponse?.data ?? [];
 
   const { mutate: deleteUser } = useDeleteUser();
 
@@ -281,6 +282,11 @@ export default function UsersPage() {
               onPageChange={setPage}
               onLimitChange={(nextLimit) => {
                 setLimit(nextLimit);
+                setPage(1);
+              }}
+              roleFilter={roleFilter}
+              onRoleFilterChange={(nextRole) => {
+                setRoleFilter(nextRole);
                 setPage(1);
               }}
             />
