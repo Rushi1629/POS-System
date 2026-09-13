@@ -153,14 +153,14 @@ const OrderSummary = (props: OrderSummaryProps) => {
           </div>
         )}
 
-        <div className="flex justify-between text-muted-foreground">
+        {/* <div className="flex justify-between text-muted-foreground">
           <span>GST ({gstRate}%)</span>
           <span className="text-foreground font-medium">₹{gst}</span>
-        </div>
+        </div> */}
       </div>
 
       {/* Coupon Section */}
-      {!appliedCoupon && (
+      {/* {!appliedCoupon && (
         <>
           {!showCoupon ? (
             <button
@@ -173,7 +173,6 @@ const OrderSummary = (props: OrderSummaryProps) => {
             </button>
           ) : (
             <div className="mt-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
-              {/* Input */}
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -203,7 +202,6 @@ const OrderSummary = (props: OrderSummaryProps) => {
                 <p className="text-xs text-destructive font-medium">{error}</p>
               )}
 
-              {/* Available coupons */}
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Available Coupons
@@ -247,7 +245,7 @@ const OrderSummary = (props: OrderSummaryProps) => {
             </div>
           )}
         </>
-      )}
+      )} */}
 
       <Separator className="my-4" />
 
