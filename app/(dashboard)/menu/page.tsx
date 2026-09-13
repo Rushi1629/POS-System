@@ -106,10 +106,19 @@ function MenuPage() {
 
   const [search, setSearch] = useState("");
 
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "available" | "unavailable"
+  >("all");
+  const [categoryFilter, setCategoryFilter] = useState<"all" | string>(
+    "all",
+  );
+
   const { data: menusResponse, isLoading: isMenuLoading } = useFetchMenus(
     pagination.pageIndex + 1,
     pagination.pageSize,
     search,
+    statusFilter === "all" ? undefined : statusFilter,
+    categoryFilter === "all" ? undefined : categoryFilter,
   );
 
   const menus = menusResponse?.data ?? [];
@@ -134,10 +143,6 @@ function MenuPage() {
   }, [categoryError]);
 
   const [view, setView] = useState<"grid" | "table">("table");
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "available" | "unavailable"
-  >("all");
-  const [categoryFilter, setCategoryFilter] = useState<"all" | string>("all");
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<FetchMenuResponse | null>(null);

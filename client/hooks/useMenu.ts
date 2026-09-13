@@ -27,9 +27,10 @@ export const useFetchMenus = (
   limit: number,
   search: string = "",
   status?: string,
+  categoryId?: string,
 ) => {
   return useQuery({
-    queryKey: ["menus", page, limit, search, status],
+    queryKey: ["menus", page, limit, search, status, categoryId],
 
     queryFn: () =>
       fetchAllMenus({
@@ -37,6 +38,7 @@ export const useFetchMenus = (
         limit,
         search,
         status,
+        categoryId,
       }),
 
     refetchOnWindowFocus: false,

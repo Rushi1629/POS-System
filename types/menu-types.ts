@@ -6,6 +6,7 @@ export interface FetchMenusParams {
   limit: number;
   search?: string;
   status?: string;
+  categoryId?: string;
 }
 
 export interface MenuPagination {

@@ -1,4 +1,9 @@
-import { FetchMenuResponse, FetchMenusApiResponse, FetchMenusParams, FetchMenusResponse } from "@/types/menu-types";
+import {
+  FetchMenuResponse,
+  FetchMenusApiResponse,
+  FetchMenusParams,
+  FetchMenusResponse,
+} from "@/types/menu-types";
 import { fetcher } from "../client";
 
 export const createMenu = (data: FormData) =>
@@ -12,16 +17,30 @@ export const fetchAllMenus = async ({
   limit,
   search = "",
   status,
+  categoryId,
 }: FetchMenusParams): Promise<FetchMenusResponse> => {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
-    search,
   });
 
-  // Only send status when provided
-  if (status) {
-    params.set("status", status);
+  if (search && search.trim() !== "") {
+    params.set("search", search);
+  }
+
+  const normalizedStatus =
+    status === "available"
+      ? "active"
+      : status === "unavailable"
+        ? "inactive"
+        : status;
+
+  if (normalizedStatus && normalizedStatus !== "all") {
+    params.set("status", normalizedStatus);
+  }
+
+  if (categoryId && categoryId !== "all") {
+    params.set("categoryId", categoryId);
   }
 
   const res: FetchMenusApiResponse = await fetcher(
