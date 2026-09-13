@@ -77,7 +77,11 @@ export default function BillingPage() {
     isLoading: isLoadingBills,
     error,
     refetch: refetchBills,
-  } = useFetchAllBills(billPage, billPageSize);
+  } = useFetchAllBills(
+    billPage,
+    billPageSize,
+    tab === "ALL" ? undefined : tab,
+  );
   const allBills = billsResponse?.data;
   const billTotal = billsResponse?.pagination?.total ?? allBills?.length ?? 0;
   const billTotalPages = Math.max(

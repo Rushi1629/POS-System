@@ -3,15 +3,29 @@ import {
   GenerateBillRequest,
   GetAllBillsResponse,
   PayBillRequest,
+  PaymentStatus,
 } from "@/types/billing-types";
 import { fetcher } from "../client";
 
 export const fetchAllBills = async (
   page: number,
   limit: number,
+  status?: "ALL" | PaymentStatus,
 ): Promise<GetAllBillsResponse> => {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+
+  const normalizedStatus =
+    status && typeof status === "string" ? status.toUpperCase() : status;
+
+  if (normalizedStatus && normalizedStatus !== "ALL") {
+    params.set("status", normalizedStatus);
+  }
+
   const res: GetAllBillsResponse = await fetcher(
-    `/billing?page=${page}&limit=${limit}`,
+    `/billing?${params.toString()}`,
   );
 
   return {
