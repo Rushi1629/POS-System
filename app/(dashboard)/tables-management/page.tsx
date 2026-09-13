@@ -21,18 +21,20 @@ import { PaginationState } from "@tanstack/react-table";
 export default function TablesManagement() {
   const [filter, setFilter] = useState<TableType | "ALL">("ALL");
 
-    const [pagination, setPagination] = useState<PaginationState>({
-      pageIndex: 0,
-      pageSize: 5,
-    });
-    const [statusFilter, setStatusFilter] = useState<"all" | TableStatus>("all");
-    const { data: tablesResponse, isLoading: isTableLoading } = useFetchTables(
-      pagination.pageIndex + 1,
-      pagination.pageSize,
-      statusFilter,
-    );
-    const tables = tablesResponse?.data ?? [];
-    const serverPagination = tablesResponse?.pagination;
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5,
+  });
+
+  const { data: tablesResponse, isLoading: isTableLoading } = useFetchTables(
+    pagination.pageIndex + 1,
+    pagination.pageSize,
+    {
+      status: "all",
+    },
+  );
+  const tables = tablesResponse?.data ?? [];
+  const serverPagination = tablesResponse?.pagination;
 
   const [guestMap, setGuestMap] = useState<Record<string, number>>({});
 
