@@ -89,14 +89,18 @@ export default function BillingPage() {
     billsResponse?.pagination?.totalPages ?? 1,
   );
   const [pagination, setPagination] = useState<PaginationState>({
-      pageIndex: 0,
-      pageSize: 5,
-    });
-    const [statusFilter, setStatusFilter] = useState<"all" | TableStatus>("all");
+    pageIndex: 0,
+    pageSize: 5,
+  });
+  const [statusFilter, setStatusFilter] = useState<"all" | TableStatus>(
+    "all",
+  );
   const { data: tablesResponse, isLoading: isTableLoading } = useFetchTables(
     pagination.pageIndex + 1,
     pagination.pageSize,
-    statusFilter,
+    {
+      status: statusFilter === "all" ? undefined : statusFilter,
+    },
   );
   const tables = tablesResponse?.data ?? [];
   const { mutateAsync: payBill, isPending: isPaying } = usePayBill();
