@@ -1,5 +1,6 @@
 import {
   BillListItem,
+  GenerateBillData,
   GenerateBillRequest,
   GetAllBillsResponse,
   PayBillRequest,
@@ -88,11 +89,13 @@ export const payBill = async (data: PayBillRequest) => {
   return res.data;
 };
 
-export const generateBill = async (data: GenerateBillRequest) => {
+export const generateBill = async (
+  data: GenerateBillRequest,
+): Promise<GenerateBillData> => {
   const res = await fetcher("/billing/generate", {
     method: "POST",
     body: JSON.stringify(data),
   });
 
-  return res;
+  return res.data as GenerateBillData;
 };

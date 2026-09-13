@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  BillListItem,
   Discount,
+  GenerateBillData,
   GenerateBillRequest,
 } from "@/types/billing-types";
 import { OrderAdminChef } from "@/types/order-types";
@@ -46,7 +46,7 @@ const GenerateBillDialog = ({
   discounts: Discount[];
   isGenerating: boolean;
   onClose: () => void;
-  onSubmit: (payload: GenerateBillRequest) => Promise<BillListItem>;
+  onSubmit: (payload: GenerateBillRequest) => Promise<GenerateBillData>;
 }) => {
   const {
     register,
