@@ -63,6 +63,8 @@ export interface FetchTablesParams {
   page: number;
   limit: number;
   status?: string;
+  type?: string;
+  tableStatus?: string;
 }
 
 export interface FetchTablesResponse {

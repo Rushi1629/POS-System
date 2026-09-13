@@ -100,10 +100,14 @@ function Tables() {
     pageSize: 5,
   });
   const [statusFilter, setStatusFilter] = useState<"all" | TableStatus>("all");
+  const [typeFilter, setTypeFilter] = useState<"all" | TableType>("all");
   const { data: tablesResponse, isLoading: isTableLoading } = useFetchTables(
     pagination.pageIndex + 1,
     pagination.pageSize,
-    // statusFilter,
+    {
+      type: typeFilter === "all" ? undefined : typeFilter,
+      tableStatus: statusFilter === "all" ? undefined : statusFilter,
+    },
   );
   const tables = tablesResponse?.data ?? [];
   const serverPagination = tablesResponse?.pagination;
@@ -117,7 +121,6 @@ function Tables() {
   // const [items, setItems] = useState<FetchTableResponse[]>(seed);
   const items = tables;
   const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState<"all" | TableType>("all");
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<FetchTableResponse | null>(null);

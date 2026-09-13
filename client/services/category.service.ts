@@ -24,7 +24,7 @@ export const fetchAllCategories = async ({
     search,
   });
 
-  if (status) {
+  if (status && status !== "all") {
     params.set("status", status);
   }
 

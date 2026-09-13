@@ -32,15 +32,17 @@ export const useCreateTable = () => {
 export const useFetchTables = (
   page: number,
   limit: number,
-  status?: string,
+  filters?: { status?: string; type?: string; tableStatus?: string },
 ) => {
   return useQuery({
-    queryKey: ["tables", page, limit, status],
+    queryKey: ["tables", page, limit, filters?.status, filters?.type, filters?.tableStatus],
     queryFn: () =>
       fetchAllTables({
         page,
         limit,
-        status,
+        status: filters?.status,
+        type: filters?.type,
+        tableStatus: filters?.tableStatus,
       }),
     refetchOnWindowFocus: false,
     retry: false,

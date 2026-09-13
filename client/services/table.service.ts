@@ -19,14 +19,24 @@ export const fetchAllTables = async ({
   page,
   limit,
   status,
+  type,
+  tableStatus,
 }: FetchTablesParams): Promise<FetchTablesResponse> => {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
   });
 
-  if (status && status === "all") {
+  if (status && status !== "all") {
     params.set("status", status);
+  }
+
+  if (type && type !== "all") {
+    params.set("type", type);
+  }
+
+  if (tableStatus && tableStatus !== "all") {
+    params.set("tableStatus", tableStatus);
   }
 
   const res = await fetcher(`/table?${params.toString()}`);
