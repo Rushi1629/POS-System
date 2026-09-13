@@ -74,10 +74,14 @@ export default function DiscountsPage() {
   const [pageSize, setPageSize] = useState(8);
   const [editingDiscount, setEditingDiscount] = useState<Discount | null>(null);
 
+  const discountStatus: DiscountStatus | undefined =
+    tab === "ALL" ? undefined : tab === "ACTIVE" ? "active" : "inactive";
+
   const { data: discountsResponse, isLoading } = useFetchDiscounts(
     page,
     pageSize,
     query,
+    discountStatus,
   );
   const discounts = discountsResponse?.data ?? [];
   const { mutateAsync: createDiscount, isPending: isCreating } =

@@ -23,7 +23,7 @@ export const fetchAllDiscounts = async ({
     search,
   });
 
-  if (status) {
+  if (status && status !== "all") {
     params.set("status", status);
   }
 
