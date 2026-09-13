@@ -31,11 +31,25 @@ export const useFetchOrdersTableWise = (
   page = 1,
   limit = 20,
   search = "",
+  filters?: { status?: string; orderType?: string },
 ) => {
-  const params: FetchTableWiseOrdersParams = { page, limit, search };
+  const params: FetchTableWiseOrdersParams = {
+    page,
+    limit,
+    search,
+    status: filters?.status,
+    orderType: filters?.orderType,
+  };
 
   return useQuery<GetOrdersResponseAdminChef>({
-    queryKey: ["orders-table-wise", params],
+    queryKey: [
+      "orders-table-wise",
+      params.page,
+      params.limit,
+      params.search,
+      params.status,
+      params.orderType,
+    ],
     queryFn: () => fetchAllOrdersTableWise(params),
     refetchOnWindowFocus: false,
     retry: false,

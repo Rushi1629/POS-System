@@ -36,31 +36,41 @@ export const fetchAllOrders = async (): Promise<CustomerOrder[]> => {
   }));
 };
 
-export const fetchAllOrdersTableWise =
-  async ({
-    page,
-    limit,
-    search = "",
-  }: FetchTableWiseOrdersParams): Promise<GetOrdersResponseAdminChef> => {
-    const params = new URLSearchParams({
-      page: String(page),
-      limit: String(limit),
-      search,
-    });
-    const res: GetOrdersResponseAdminChef = await fetcher(
-      `/order/table-orders?${params.toString()}`,
-    );
+export const fetchAllOrdersTableWise = async ({
+  page,
+  limit,
+  search = "",
+  status,
+  orderType,
+}: FetchTableWiseOrdersParams): Promise<GetOrdersResponseAdminChef> => {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    search,
+  });
 
-    return {
-      ...res,
-      pagination: res.pagination ?? {
-        page,
-        limit,
-        total: res.data?.length ?? 0,
-        totalPages: 1,
-      },
-    };
+  if (status && status !== "all") {
+    params.set("status", status);
+  }
+
+  if (orderType && orderType !== "all") {
+    params.set("orderType", orderType);
+  }
+
+  const res: GetOrdersResponseAdminChef = await fetcher(
+    `/order/table-orders?${params.toString()}`,
+  );
+
+  return {
+    ...res,
+    pagination: res.pagination ?? {
+      page,
+      limit,
+      total: res.data?.length ?? 0,
+      totalPages: 1,
+    },
   };
+};
 
 export const updateOrderItemStatus = async ({
   orderItemId,

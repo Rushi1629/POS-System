@@ -43,7 +43,10 @@ const page = () => {
     data: tableWiseData,
     isLoading: isTableWiseLoading,
     isError: isTableWiseError,
-  } = useFetchOrdersTableWise(orderPage, orderPageSize, query);
+  } = useFetchOrdersTableWise(orderPage, orderPageSize, query, {
+    status: statusFilter === "all" ? undefined : statusFilter,
+    orderType: typeFilter === "all" ? undefined : typeFilter,
+  });
 
   const orderTotalPages = Math.max(
     1,

@@ -129,6 +129,8 @@ export interface FetchTableWiseOrdersParams {
   page: number;
   limit: number;
   search?: string;
+  status?: string;
+  orderType?: string;
 }
 
 export interface TableOrders {
