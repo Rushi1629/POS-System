@@ -87,6 +87,7 @@ export type KItem = {
 
 export type KOrder = {
   id: number;
+  orderId: string | number;
   table: string;
   orderNumber: string;
   placedAt: string;

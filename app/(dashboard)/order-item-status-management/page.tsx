@@ -26,6 +26,7 @@ import ChefCard from "@/components/ChefCard";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   useFetchOrdersTableWise,
+  useUpdateOrderStatus,
   useUpdateItemOrderStatus,
 } from "@/client/hooks/useOrder";
 import { getNextStatus } from "@/utils/utils";
@@ -45,6 +46,7 @@ import {
 function transformOrders(data: any[]): KOrder[] {
   return data.map((table) => ({
     id: table.tableId,
+    orderId: table.orders?.[0]?.orderId,
     table: table.tableName,
     orderNumber: table.orders?.[0]?.orderNumber || "",
     placedAt: table.orders?.[0]?.createdAt || "",
@@ -67,7 +69,9 @@ export default function page() {
   const [query, setQuery] = useState("");
   const [orderPage, setOrderPage] = useState(1);
   const [orderPageSize, setOrderPageSize] = useState(20);
-  const [typeFilter, setTypeFilter] = useState<"all" | "DINE_IN" | "TAKEAWAY" | "DELIVERY">("all");
+  const [typeFilter, setTypeFilter] = useState<
+    "all" | "DINE_IN" | "TAKEAWAY" | "DELIVERY"
+  >("all");
   const [serverStatusFilter, setServerStatusFilter] = useState<
     "all" | OrderStatus
   >("all");
@@ -86,6 +90,8 @@ export default function page() {
     isPending,
     isError,
   } = useUpdateItemOrderStatus();
+  const { mutateAsync: updateOrderStatus } = useUpdateOrderStatus();
+  const [bumpingTableId, setBumpingTableId] = useState<number | null>(null);
   const searchParams = useSearchParams();
 
   const tableToken = searchParams?.get("tableToken");
@@ -273,45 +279,52 @@ export default function page() {
     }
   };
 
-  // const bumpAll = (orderId: number) => {
-  //   setOrders((prev) =>
-  //     prev.map((o) => {
-  //       if (o.id !== orderId) return o;
+  const bumpAll = (tableId: number) => {
+    const order = orders.find((item) => item.id === tableId);
+    if (!order) {
+      toast.error("Order not found");
+      return;
+    }
 
-  //       const items = o.items.map((i) => {
-  //         // 🚫 CORRECT CHECK (use isCancelled)
-  //         if (i.isCancelled) {
-  //           return i;
-  //         }
+    const next = getNextStatus(order.status, role);
+    if (!next) {
+      toast.error(
+        `${role} cannot move this order forward from ${order.status}`,
+      );
+      return;
+    }
 
-  //         const next = getNextStatus(i.status, role);
-
-  //         if (!next) {
-  //           return i;
-  //         }
-
-  //         updateStatus(
-  //           {
-  //             orderItemId: i.id,
-  //             status: next,
-  //           },
-  //           {
-  //             onSuccess: () => {
-  //               toast.success(`${i.name} moved to ${next}`);
-  //             },
-  //             onError: () => {
-  //               toast.error(`Failed to update ${i.name}`);
-  //             },
-  //           },
-  //         );
-
-  //         return { ...i, status: next };
-  //       });
-
-  //       return { ...o, items };
-  //     }),
-  //   );
-  // };
+    setBumpingTableId(tableId);
+    updateOrderStatus({
+      orderId: order.orderId,
+      status: next,
+      isItemsUpdate: true,
+    })
+      .then(() => {
+        setOrders((prev) =>
+          prev.map((item) =>
+            item.id === tableId
+              ? {
+                  ...item,
+                  status: next,
+                  items: item.items.map((orderItem) =>
+                    orderItem.isCancelled
+                      ? orderItem
+                      : { ...orderItem, status: next },
+                  ),
+                }
+              : item,
+          ),
+        );
+        toast.success(`Order moved to ${next}`);
+      })
+      .catch(() => {
+        toast.error("Failed to update order items");
+      })
+      .finally(() => {
+        setBumpingTableId(null);
+      });
+  };
 
   return (
     <div className="">
@@ -374,9 +387,7 @@ export default function page() {
 
           <Select
             value={typeFilter}
-            onValueChange={(value) =>
-              setTypeFilter(value as typeof typeFilter)
-            }
+            onValueChange={(value) => setTypeFilter(value as typeof typeFilter)}
           >
             <SelectTrigger className="h-10 w-37.5 rounded-full border-border bg-card px-3 text-xs text-muted-foreground">
               <SelectValue placeholder="All types" />
@@ -423,7 +434,6 @@ export default function page() {
           >
             Reset
           </Button>
-
         </CardContent>
       </Card>
 
@@ -435,7 +445,8 @@ export default function page() {
             onAdvance={(itemId) => advanceItem(o.id, itemId)}
             onCancel={handleCancel}
             loadingItems={loadingItems}
-            // onBumpAll={() => bumpAll(o.id)}
+            isBumpAllPending={bumpingTableId === o.id}
+            onBumpAll={() => bumpAll(o.id)}
           />
         ))}
       </div>

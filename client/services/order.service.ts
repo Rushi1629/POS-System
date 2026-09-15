@@ -97,15 +97,18 @@ export const updateOrderItemStatus = async ({
 export const updateOrderStatus = async ({
   orderId,
   status,
+  isItemsUpdate,
 }: {
-  orderId: number;
+  orderId: string | number;
   status: string;
+  isItemsUpdate?: boolean;
 }) => {
   const res = await fetcher(`/order/order-status`, {
     method: "PATCH",
     body: JSON.stringify({
       orderId,
       status,
+      ...(isItemsUpdate !== undefined && { isItemsUpdate }),
     }),
   });
 

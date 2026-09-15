@@ -9,15 +9,17 @@ import { Button } from "./ui/button";
 const ChefCard = ({
   order,
   onAdvance,
-  // onBumpAll,
+  onBumpAll,
   onCancel,
   loadingItems,
+  isBumpAllPending,
 }: {
   order: KOrder;
   onAdvance: (itemId: number) => void;
   onCancel: (itemId: number) => void;
   loadingItems: { [key: number]: "advance" | "cancel" };
-  // onBumpAll: () => void;
+  isBumpAllPending: boolean;
+  onBumpAll: (orderId: number) => void;
 }) => {
   const allServed = order.items.every((i) => i.status === "SERVED");
   const headerTone = STATUS_STYLES[order.status as ItemStatus];
@@ -165,16 +167,22 @@ const ChefCard = ({
         <p className="text-xs text-muted-foreground">
           {order.items.length} items
         </p>
-        {/* <Button
+        <Button
           size="sm"
           variant={allServed ? "outline" : "default"}
-          disabled={allServed}
-          onClick={onBumpAll}
+          disabled={allServed || isBumpAllPending}
+          onClick={() => onBumpAll(order.id)}
           className="h-8 rounded-full"
         >
-          {allServed ? "Completed" : "Bump all"}
-          {!allServed && <ArrowRight className="ml-1 h-3.5 w-3.5" />}
-        </Button> */}
+          {isBumpAllPending ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <>
+              {allServed ? "Completed" : "Bump all"}
+              {!allServed && <ArrowRight className="ml-1 h-3.5 w-3.5" />}
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );
