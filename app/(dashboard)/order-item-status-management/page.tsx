@@ -79,6 +79,7 @@ export default function page() {
   } = useFetchOrdersTableWise(orderPage, orderPageSize, query, {
     status: serverStatusFilter === "all" ? undefined : serverStatusFilter,
     orderType: typeFilter === "all" ? undefined : typeFilter,
+    latestOrder: true,
   });
   const {
     mutateAsync: updateStatus,

@@ -31,7 +31,7 @@ export const useFetchOrdersTableWise = (
   page = 1,
   limit = 20,
   search = "",
-  filters?: { status?: string; orderType?: string },
+  filters?: { status?: string; orderType?: string; latestOrder?: boolean },
 ) => {
   const params: FetchTableWiseOrdersParams = {
     page,
@@ -39,6 +39,7 @@ export const useFetchOrdersTableWise = (
     search,
     status: filters?.status,
     orderType: filters?.orderType,
+    latestOrder: filters?.latestOrder,
   };
 
   return useQuery<GetOrdersResponseAdminChef>({
@@ -49,6 +50,7 @@ export const useFetchOrdersTableWise = (
       params.search,
       params.status,
       params.orderType,
+      params.latestOrder,
     ],
     queryFn: () => fetchAllOrdersTableWise(params),
     refetchOnWindowFocus: false,

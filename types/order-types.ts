@@ -131,6 +131,7 @@ export interface FetchTableWiseOrdersParams {
   search?: string;
   status?: string;
   orderType?: string;
+  latestOrder?: boolean;
 }
 
 export interface TableOrders {

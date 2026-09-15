@@ -42,6 +42,7 @@ export const fetchAllOrdersTableWise = async ({
   search = "",
   status,
   orderType,
+  latestOrder,
 }: FetchTableWiseOrdersParams): Promise<GetOrdersResponseAdminChef> => {
   const params = new URLSearchParams({
     page: String(page),
@@ -51,6 +52,10 @@ export const fetchAllOrdersTableWise = async ({
 
   if (status && status !== "all") {
     params.set("status", status);
+  }
+  
+  if (latestOrder) {
+    params.set("latestOrder", String(latestOrder));
   }
 
   if (orderType && orderType !== "all") {
