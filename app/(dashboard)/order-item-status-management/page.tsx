@@ -107,11 +107,9 @@ export default function page() {
   const role = profile?.role?.name as UserRole | undefined;
 
   if (!role) {
-    console.warn("Role not loaded yet");
+    toast.info("Role not loaded yet, some actions may be disabled");
     return;
   }
-
-  console.log(role, "role");
 
   useEffect(() => {
     if (TableWiseOrders) {

@@ -138,7 +138,6 @@ function SubmenuPage() {
       setSubmenuDialogOpen(false);
       setSubmenuEditing(null);
     } catch (err) {
-      console.error(err);
       toast.error("Operation failed ❌");
     }
   }

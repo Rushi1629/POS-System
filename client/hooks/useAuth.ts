@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchUserProfile, login, logout } from "../services/auth.service";
 import { clearAuthCookies } from "../client";
+import { toast } from "sonner";
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -16,6 +17,9 @@ export const useLogin = () => {
         queryKey: ["me"], 
         queryFn: fetchUserProfile,
       });
+    },
+    onError: (err) => {
+      toast.error("Login failed. Please check your credentials and try again.");
     },
   });
 };
@@ -33,7 +37,7 @@ export const useLogout = () => {
     onError: (err) => {
       clearAuthCookies();
       queryClient.clear();
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to logout. Please try again.");
     },
   });
 };

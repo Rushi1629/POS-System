@@ -5,7 +5,7 @@ import {
   editMenuById,
   fetchAllMenus,
 } from "../services/menu.service";
-import { FetchMenuResponse } from "@/types/menu-types";
+import { toast } from "sonner";
 
 export const useCreateMenu = () => {
   const queryClient = useQueryClient();
@@ -17,7 +17,7 @@ export const useCreateMenu = () => {
       queryClient.invalidateQueries({ queryKey: ["menus"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to create menu. Please try again.");
     },
   });
 };
@@ -59,7 +59,7 @@ export const useUpdateMenu = () => {
       queryClient.invalidateQueries({ queryKey: ["menus"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to update menu. Please try again.");
     },
   });
 };
@@ -75,7 +75,7 @@ export const useDeleteMenu = () => {
       });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to delete menu. Please try again.");
     },
   });
 };

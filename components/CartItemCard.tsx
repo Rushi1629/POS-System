@@ -32,10 +32,6 @@ const CartItemCard = ({
 
   const total = basePrice * quantity + extrasTotal;
 
-  console.log(item, "item");
-  console.log(extrasTotal, "extrasTotal");
-  console.log(total, "total");
-
   return (
     <div className="group relative rounded-xl border border-border bg-card p-5 transition-all hover:shadow-md hover:border-primary/20">
       <div className="flex items-start gap-4">

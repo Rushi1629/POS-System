@@ -9,6 +9,7 @@ import {
   FetchSubmenuParams,
   FetchSubmenuResponse,
 } from "@/types/submenu-types";
+import { toast } from "sonner";
 
 export const useCreateSubmenu = () => {
   const queryClient = useQueryClient();
@@ -20,7 +21,7 @@ export const useCreateSubmenu = () => {
       queryClient.invalidateQueries({ queryKey: ["submenus"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to create submenu. Please try again.");
     },
   });
 };
@@ -54,7 +55,7 @@ export const useUpdateSubMenu = () => {
       queryClient.invalidateQueries({ queryKey: ["submenus"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to update submenu. Please try again.");
     },
   });
 };
@@ -70,7 +71,7 @@ export const useDeleteSubMenu = () => {
       });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to delete submenu. Please try again.");
     },
   });
 };

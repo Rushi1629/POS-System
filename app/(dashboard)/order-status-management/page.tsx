@@ -127,9 +127,6 @@ export default function page() {
     );
   }
 
-  console.log("ROLE:", role);
-  console.log("ALLOWED:", getAllowedTransitions(target?.orderStatus!, role));
-
   async function confirmUpdate() {
     if (!target || !pendingStatus) return;
 

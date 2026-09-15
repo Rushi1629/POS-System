@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { navItems } from "@/types/types";
+import { toast } from "sonner";
 
 const groups = ["Operations", "Finance", "Management"];
 
@@ -50,12 +51,7 @@ export default function Sidebar() {
       pathname !== "/register",
   });
 
-  console.log(user,"user sidebar");
-
   const profileIcon = user?.name[0]?.toUpperCase();
-
-  console.log("Sidebar user profile:", profileIcon);
-  
 
   const handleLogout = async () => {
     try {
@@ -65,11 +61,9 @@ export default function Sidebar() {
       dispatch(clearUser());
       router.replace("/");
     } catch (error) {
-      console.error("Logout failed");
+      toast.error("Logout failed. Please try again.");
     }
   };
-
-  // console.log("Current user in sidebar:", user);
 
   const ROLE_PRIORITY: Record<string, number> = {
     superadmin: 5,
@@ -85,7 +79,6 @@ export default function Sidebar() {
   };
 
   const role = normalizeRole(user?.role?.name);
-  console.log("Normalized user role:", role);
 
   const hasAccess = (allowedRoles: string[]) => {
     if (!role) return false;

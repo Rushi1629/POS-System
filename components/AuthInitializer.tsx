@@ -83,7 +83,6 @@ export default function AuthInitializer({ children }: Props) {
       return;
     }
 
-    console.log("AuthInitializer user:", user);
 
     // ❌ No user → redirect (only when not on login/register)
     // if (!user) {

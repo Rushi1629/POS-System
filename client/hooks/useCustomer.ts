@@ -7,6 +7,7 @@ import {
 } from "../services/customer.service";
 import { Category, CustomerCategoryParams } from "@/types/types";
 import { FetchMenusParams, FetchMenusResponse } from "@/types/menu-types";
+import { toast } from "sonner";
 
 export const useFetchMenusCustomer = (
   page = 1,
@@ -55,7 +56,7 @@ export const useEditTableSessionCustomer = () => {
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to edit table session. Please try again.");
     },
   });
 };

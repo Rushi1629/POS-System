@@ -1,5 +1,6 @@
 import { Middleware } from "@reduxjs/toolkit";
 import { saveCartToDB } from "@/lib/db";
+import { toast } from "sonner";
 
 let timeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -31,11 +32,9 @@ export const cartSyncMiddleware: Middleware =
       }
 
       if (!tableToken || tableToken === "undefined" || tableToken === "null") {
-        console.warn("Skipping cart sync: missing tableToken");
+        toast.warning("Skipping cart sync: missing tableToken");
         return;
       }
-
-      console.log("SYNCING CART (token):", tableToken, items);
 
       saveCartToDB(items, tableToken).catch(console.error);
     }, 300); // 300ms debounce

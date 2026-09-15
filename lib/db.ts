@@ -1,5 +1,6 @@
 import { IDBPDatabase, openDB } from "idb";
 import { CartItem } from "@/types/cart-types";
+import { toast } from "sonner";
 
 const DB_NAME = "pos-db";
 const STORE_NAME = "cart";
@@ -38,18 +39,16 @@ export const saveCartToDB = async (
   try {
     const key = getCartDBKey(tableToken);
     if (!key) {
-      console.warn("Skipping cart save to IndexedDB: missing tableToken");
+      toast.warning("Skipping cart save to IndexedDB: missing tableToken");
       return;
     }
 
     const db = await getDB();
     await db.put(STORE_NAME, items, key);
 
-    console.log("✅ Saved to DB:", key, items);
     const check = await db.get(STORE_NAME, key);
-    console.log("AFTER SAVE READ:", check);
   } catch (err) {
-    console.error("DB ERROR:", err);
+    toast.error("Failed to save cart to local storage. Please try again.");
   }
 };
 
@@ -61,18 +60,16 @@ export const loadCartFromDB = async (
   try {
     const key = getCartDBKey(tableToken);
     if (!key) {
-      console.warn("Skipping cart load from IndexedDB: missing tableToken");
+      toast.warning("Skipping cart load from IndexedDB: missing tableToken");
       return {};
     }
 
     const db = await getDB();
     const items = await db.get(STORE_NAME, key);
 
-    console.log("LOADED FROM DB:", key, items);
-
     return items || {};
   } catch (err) {
-    console.error("LOAD ERROR:", err);
+    toast.error("Failed to load cart. Please try again.");
     return {};
   }
 };
@@ -85,10 +82,9 @@ export const clearCartDB = async (tableToken?: string) => {
   const key = getCartDBKey(tableToken);
 
   if (!key) {
-    console.warn("Skipping cart delete from IndexedDB: missing valid tableToken");
+    toast.warning("Skipping cart delete from IndexedDB: missing tableToken");
     return;
   }
 
   await db.delete(STORE_NAME, key);
-  console.log("CLEARED CART DB KEY:", key);
 };

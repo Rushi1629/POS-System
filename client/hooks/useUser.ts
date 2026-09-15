@@ -7,6 +7,7 @@ import {
   fetchRoles,
 } from "../services/user.service";
 import { Role, User, UsersResponse } from "@/types/types";
+import { toast } from "sonner";
 
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
@@ -18,7 +19,7 @@ export const useCreateUser = () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to create user. Please try again.");
     },
   });
 };
@@ -58,7 +59,7 @@ export const useDeleteUser = () => {
       });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to delete user. Please try again.");
     },
   });
 };
@@ -74,7 +75,7 @@ export const useEditUser = () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to edit user. Please try again.");
     },
   });
 };

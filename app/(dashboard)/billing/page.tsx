@@ -60,6 +60,7 @@ import { useFetchDiscounts } from "@/client/hooks/useDiscount";
 import { PaginationState } from "@tanstack/react-table";
 import { TableStatus } from "@/types/table-types";
 import { clearCartDB } from "@/lib/db";
+import { toast } from "sonner";
 
 /* ---------- Page ---------- */
 export default function BillingPage() {
@@ -194,7 +195,7 @@ export default function BillingPage() {
       if (tokenToClear) {
         await clearCartDB(tokenToClear);
       } else {
-        console.warn("Skipping cart DB cleanup: bill/session tableToken missing");
+        toast.info("Skipping cart DB cleanup: bill/session tableToken missing");
       }
 
       setBills((prev) =>

@@ -205,7 +205,6 @@ function MenuDialog({
   // ✅ Submit handler → convert to FormData
   const onSubmit = async (values: FormValues) => {
     
-    console.log("🔥 SUBMIT CALLED");
     try {
       if (!values.categoryId) {
         toast.error("Please select a category");
@@ -243,13 +242,9 @@ function MenuDialog({
         formData.append("imageFile", values.imageFile); // ✅ FIX
       }
 
-      for (let pair of formData.entries()) {
-        console.log("FORMDATA:", pair[0], pair[1]);
-      }
       await onSave(formData);
-      console.log("Form saved successfully");
+      toast.success("Menu item saved successfully");
     } catch (error) {
-      console.error("Form submission error:", error);
       toast.error("Failed to save menu item");
     }
   };

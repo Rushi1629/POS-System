@@ -97,22 +97,14 @@ const CartView = () => {
     dispatch(setCartAction(mappedCart));
   }, [ActiveOrders]);
 
-  console.log(ActiveOrders, "ActiveOrders");
-
   const tableId = tableData?.id;
 
-  console.log(tableId, "datatable");
-
   const cart = useSelector((state: RootState) => state.cart?.items ?? {});
-
-  console.log(cart, "cart");
 
   // ✅ Convert cart → UI items (optimized)
   const items = useMemo(() => {
     return Object.values(cart);
   }, [cart]);
-
-  console.log(items, "items");
 
   const [orderError, setOrderError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState("");
@@ -193,8 +185,6 @@ const CartView = () => {
       setOrderSuccess("");
     }
   }, [items, placeOrder, tableId, router, orderNotes]);
-
-  console.log(items, "items");
 
   // ✅ Derived values (memoized)
   const { subtotal, totalQty } = useMemo(() => {

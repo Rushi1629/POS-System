@@ -6,6 +6,7 @@ import {
   fetchAllCategories,
 } from "../services/category.service";
 import { Category, FetchCategoriesResponse } from "@/types/types";
+import { toast } from "sonner";
 
 export const useCreateCategory = () => {
   const queryClient = useQueryClient();
@@ -17,7 +18,7 @@ export const useCreateCategory = () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to create category. Please try again.");
     },
   });
 };
@@ -56,7 +57,7 @@ export const useEditCategory = () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to edit category. Please try again.");
     },
   });
 };
@@ -72,7 +73,7 @@ export const useDeleteCategory = () => {
       });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to delete category. Please try again.");
     },
   });
 };

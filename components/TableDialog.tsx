@@ -71,8 +71,6 @@ function TableDialog({
   useEffect(() => {
     if (!open) return;
 
-    console.log("TableDialog opened with initial:", initial);
-
     if (initial) {
       reset({
         name: initial.name,

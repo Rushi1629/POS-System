@@ -16,12 +16,10 @@ function MenuCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-
-  console.log(item,"item");
   
   return (
     <Card className="group overflow-hidden border-border/70 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg">
-      <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-primary/10 to-accent">
+      <div className="relative aspect-16/10 overflow-hidden bg-linear-to-br from-primary/10 to-accent">
         {item.imageUrl ? (
           <img
             src={item.imageUrl}

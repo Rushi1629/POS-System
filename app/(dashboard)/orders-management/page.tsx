@@ -68,8 +68,6 @@ const page = () => {
     );
   }, [tableWiseData]);
 
-  console.log(orders, "orders");
-
   const filtered = useMemo(() => {
     return orders.filter((o) => {
       if (statusFilter !== "all" && o.orderStatus !== statusFilter)

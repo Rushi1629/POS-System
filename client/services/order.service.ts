@@ -14,7 +14,6 @@ export const createOrder = (data: CreateOrderRequest) =>
 
 export const fetchAllOrders = async (): Promise<CustomerOrder[]> => {
   const res: any = await fetcher("/order");
-  console.log("API response:", res);
 
   const arr: any[] = Array.isArray(res) ? res : (res?.data ?? []);
 

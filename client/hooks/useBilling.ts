@@ -8,6 +8,7 @@ import {
   generateBill,
   payBill,
 } from "../services/billing.service";
+import { toast } from "sonner";
 
 export const useFetchAllBills = (
   page = 1,
@@ -32,7 +33,7 @@ export const usePayBill = () => {
       queryClient.invalidateQueries({ queryKey: ["bills"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to pay bill. Please try again.");
     },
   });
 };
@@ -46,7 +47,7 @@ export const useGenerateBill = () => {
       queryClient.invalidateQueries({ queryKey: ["bills"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to generate bill. Please try again.");
     },
   });
 };

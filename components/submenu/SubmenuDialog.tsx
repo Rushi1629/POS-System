@@ -77,7 +77,6 @@ function SubmenuDialog({
         price: String(parsed.price), // ✅ match backend
       });
     } catch (err) {
-      console.error(err);
       toast.error("Failed to save submenu");
     }
   };

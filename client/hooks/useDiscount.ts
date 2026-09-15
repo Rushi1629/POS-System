@@ -10,6 +10,7 @@ import {
   DiscountStatus,
   GetAllDiscountsResponse,
 } from "@/types/discount-types";
+import { toast } from "sonner";
 
 export const useCreateDiscount = () => {
   const queryClient = useQueryClient();
@@ -21,7 +22,7 @@ export const useCreateDiscount = () => {
       queryClient.invalidateQueries({ queryKey: ["Discounts"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to create discount. Please try again.");
     },
   });
 };
@@ -52,7 +53,7 @@ export const useDeleteDiscount = () => {
       });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to delete discount. Please try again.");
     },
   });
 };
@@ -73,7 +74,7 @@ export const useEditDiscount = () => {
       queryClient.invalidateQueries({ queryKey: ["Discounts"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to edit discount. Please try again.");
     },
   });
 };

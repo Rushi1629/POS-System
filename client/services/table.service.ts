@@ -8,6 +8,7 @@ import {
   FetchTablesResponse,
 } from "@/types/table-types";
 import { fetcher } from "../client";
+import { toast } from "sonner";
 
 export const createTable = (data: CreateTablePayload) =>
   fetcher("/table", {
@@ -118,8 +119,6 @@ export const getTableLiveCharge = async (
       method: "GET",
     });
 
-    console.log("🔥 API Response for live-charge:", res);
-
     // Handle different response formats from API
     if (!res) {
       return {
@@ -149,7 +148,7 @@ export const getTableLiveCharge = async (
       currentCharge: 0,
     };
   } catch (error) {
-    console.error("❌ Error fetching live charge:", error);
+    toast.error("Failed to fetch live charge. Please try again.");
     return {
       totalMinutes: 0,
       currentCharge: 0,

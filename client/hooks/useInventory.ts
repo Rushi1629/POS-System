@@ -10,6 +10,7 @@ import {
   InventoryStatusFilter,
   UpdateInventoryRequest,
 } from "@/types/inventory-types";
+import { toast } from "sonner";
 
 export const useFetchAllInventory = (
   page = 1,
@@ -33,6 +34,9 @@ export const useCreateInventory = () => {
         queryKey: ["inventory"],
       });
     },
+    onError: (err) => {
+      toast.error("Failed to create inventory. Please try again.");
+    }
   });
 };
 
@@ -48,6 +52,9 @@ export const useUpdateInventory = () => {
         queryKey: ["inventory"],
       });
     },
+    onError: (err) => {
+      toast.error("Failed to update inventory. Please try again.");
+    }
   });
 };
 
@@ -62,5 +69,8 @@ export const useDeleteInventory = () => {
         queryKey: ["inventory"],
       });
     },
+    onError: (err) => {
+      toast.error("Failed to delete inventory. Please try again.");
+    }
   });
 };

@@ -106,8 +106,6 @@ export function UserFormDialog({
     }
   }, [open, mode, initialUser, reset]);
 
-  console.log(initialUser, "INITIAL USER");
-
   const onSubmitForm = async (data: UserFormValues) => {
     await onSubmit({
       ...data,

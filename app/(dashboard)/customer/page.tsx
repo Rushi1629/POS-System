@@ -40,6 +40,7 @@ import ApiLoader from "@/components/ApiLoader";
 import { useProfile } from "@/client/hooks/useAuth";
 import { getCartKey } from "@/types/cart-types";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function CustomerDashboard() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -66,16 +67,12 @@ export default function CustomerDashboard() {
   // Only fetch profile if NOT a public QR customer session
   const { data: profile } = useProfile({ enabled: !tableToken });
 
-  console.log(profile, "profile");
-
   const isAdmin =
     !tableToken &&
     profile?.role?.name &&
     ["Super Admin", "Admin"].includes(profile.role.name);
 
   const table = tableData;
-
-  console.log(table, "table");
 
   const isSessionStarted =
     table?.tableStatus === "OCCUPIED" && (table?.guestCount ?? 0) > 0;
@@ -91,8 +88,6 @@ export default function CustomerDashboard() {
 
   const { mutateAsync: updateTableSession, isPending: isUpdatingSession } =
     useEditTableSessionCustomer();
-
-  // console.log("tableToken:", tableToken, "tableData:", table);
 
   const {
     data: allCategory = [],
@@ -117,11 +112,6 @@ export default function CustomerDashboard() {
   );
   const menuItems = menusResponse?.data ?? [];
 
-  useEffect(() => {
-    console.log("✅ categories updated:", allCategory);
-  }, [allCategory]);
-
-
   // ✅ redux state
   const dispatch = useDispatch();
 
@@ -130,8 +120,6 @@ export default function CustomerDashboard() {
   const menuMap = useMemo(() => {
     return Object.fromEntries(menuItems.map((i) => [i.id, i]));
   }, [menuItems]);
-
-  console.log(menuMap, "menuMap");
 
   const addToCart = useCallback(
     (itemId: string) => {
@@ -250,8 +238,6 @@ export default function CustomerDashboard() {
       return matchesCategory;
     });
   }, [menuItems, activeCategory, searchQuery]);
-
-  console.log(filteredItems, "filter");
   
   const activeCategoryData = useMemo(() => {
     return categories.find((c) => c.id === activeCategory);
@@ -280,7 +266,7 @@ export default function CustomerDashboard() {
         setGuestCountDialog(false);
         setGuestInput("");
       } catch (error) {
-        console.error("Failed to update guest count:", error);
+        toast.error("Failed to update guest count. Please try again.");
       }
     }
   };
@@ -324,8 +310,6 @@ export default function CustomerDashboard() {
       return [...prev, { ...extra, quantity: 1 }];
     });
   };
-
-  console.log(selectedExtras, "SELECTED EXTRAS BEFORE ADD");
 
   const handleExtraDecrement = (extra: any) => {
     setSelectedExtras((prev) => {

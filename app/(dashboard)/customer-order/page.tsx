@@ -58,8 +58,6 @@ export default function CustomerOrdersPage() {
 
   const { data: profile } = useProfile({ enabled: !tableToken });
 
-  console.log(ActiveOrders, "orders");
-
   const getExtraPrice = (e: any) => {
     if (Number(e.unitPrice) > 0) return Number(e.unitPrice);
 
@@ -136,8 +134,6 @@ export default function CustomerOrdersPage() {
     [mappedOrders],
   );
   const list = tab === "active" ? active : past;
-
-  console.log(list, "list");
 
   const totalSpent = ActiveOrders?.filter(
     (o) => o.orderStatus === "COMPLETED",

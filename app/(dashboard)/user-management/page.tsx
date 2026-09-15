@@ -78,8 +78,6 @@ export default function UsersPage() {
     };
   }, [users, usersResponse?.pagination?.total]);
 
-  // console.log(users, "users in page");
-
   const openCreate = () => {
     setFormMode("create");
     setEditing(null);

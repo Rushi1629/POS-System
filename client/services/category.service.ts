@@ -33,10 +33,6 @@ export const fetchAllCategories = async ({
 
   const res = await fetcher(`/category?${params.toString()}`);
 
-  console.log("🔥 CATEGORY RAW RESPONSE:", res);
-  console.log("🔥 CATEGORY DATA:", res?.data);
-  console.log("🔥 CATEGORY PAGINATION:", res?.pagination);
-
   return {
     status: res.status,
     message: res.message,

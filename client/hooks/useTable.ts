@@ -9,10 +9,9 @@ import {
   getTableLiveCharge,
 } from "../services/table.service";
 import {
-  FetchTableResponse,
-  getTableLiveChargeResponse,
   EditTablePayload,
 } from "@/types/table-types";
+import { toast } from "sonner";
 
 export const useCreateTable = () => {
   const queryClient = useQueryClient();
@@ -24,7 +23,7 @@ export const useCreateTable = () => {
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to create table. Please try again.");
     },
   });
 };
@@ -61,7 +60,7 @@ export const useDeleteTable = () => {
       });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to delete table. Please try again.");
     },
   });
 };
@@ -77,7 +76,7 @@ export const useEditTable = () => {
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to update table. Please try again.");
     },
   });
 };
@@ -92,7 +91,7 @@ export const useEditTableSession = () => {
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to update table session. Please try again.");
     },
   });
 };
@@ -101,9 +100,8 @@ export const useFetchLiveCharge = (id?: string) => {
   return useQuery({
     queryKey: ["liveCharge", id],
     queryFn: async () => {
-      console.log("🔄 Fetching live charge for table:", id);
+      toast.info("🔄 Fetching live charge for table:");
       const res = await getTableLiveCharge(id as string);
-      console.log("📊 Live charge result:", res);
       return res ?? { totalMinutes: 0, currentCharge: 0 };
     },
     enabled: !!id, // 🔥 Only run when id is available

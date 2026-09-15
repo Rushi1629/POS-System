@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createOrder, fetchAllOrders, fetchAllOrdersTableWise, updateOrderItemStatus, updateOrderStatus } from "../services/order.service";
 import { FetchTableWiseOrdersParams, GetOrdersResponseAdminChef } from "@/types/order-types";
+import { toast } from "sonner";
 
 export const useCreateOrder = () => {
   const queryClient = useQueryClient();
@@ -12,7 +13,7 @@ export const useCreateOrder = () => {
       queryClient.invalidateQueries({ queryKey: ["Orders"] });
     },
     onError: (err) => {
-      console.log("❌ API ERROR", err);
+      toast.error("Failed to create order. Please try again.");
     },
   });
 };
@@ -71,7 +72,7 @@ export const useUpdateItemOrderStatus = () => {
     },
 
     onError: (error) => {
-      console.error("Update failed", error.message);
+      toast.error("Failed to update order item status. Please try again.");
     },
   });
 };
@@ -87,7 +88,7 @@ export const useUpdateOrderStatus = () => {
     },
 
     onError: (error) => {
-      console.error("Update failed", error);
+      toast.error("Failed to update order status. Please try again.");
     },
   });
 };

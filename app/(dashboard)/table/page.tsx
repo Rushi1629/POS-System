@@ -111,7 +111,6 @@ function Tables() {
   );
   const tables = tablesResponse?.data ?? [];
   const serverPagination = tablesResponse?.pagination;
-  console.log(tables, "tables");
 
   const { mutateAsync: createTable, isPending: isCreating } = useCreateTable();
 
@@ -403,7 +402,6 @@ function Tables() {
           return;
         }
 
-        console.log("Updating menu...");
         await updateTable({
           id: String(editing.id),
           data: data,
@@ -411,16 +409,13 @@ function Tables() {
 
         toast.success("Table updated 👍");
       } else {
-        console.log("Creating new table...");
         await createTable(data);
-        console.log("Table created successfully");
         toast.success("Table created 🥳");
       }
 
       setDialogOpen(false);
       setEditing(null);
     } catch (err) {
-      console.error("handleSave error:", err);
       toast.error("Something went wrong while saving ❌");
     }
   }

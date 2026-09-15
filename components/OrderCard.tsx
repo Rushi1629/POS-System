@@ -28,7 +28,6 @@ import BillRow from "./BillRow";
 function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => void }) {
   const [open, setOpen] = useState(false);
   const status = STATUS_META[order.orderStatus];
-  console.log(status,"stsatis");
   
   const totalQty = order.items.reduce((s, i) => s + i.quantity, 0);
 
