@@ -36,12 +36,14 @@ import { Checkbox } from "../ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 const GenerateBillDialog = ({
+  open,
   tables,
   discounts,
   isGenerating,
   onClose,
   onSubmit,
 }: {
+  open: boolean;
   tables: FetchTableResponse[];
   discounts: Discount[];
   isGenerating: boolean;
@@ -70,6 +72,16 @@ const GenerateBillDialog = ({
     (table) => table.tableStatus === "OCCUPIED",
   );
 
+  useEffect(() => {
+    if (!open) {
+      reset({
+        tableId: "0",
+        mobileNumber: "",
+        discounts: [],
+        notes: "",
+      });
+    }
+  }, [open, reset]);
   // set default tableId
   // useEffect(() => {
   //   if (tables?.length > 0) {
@@ -103,7 +115,7 @@ const GenerateBillDialog = ({
       onClose();
 
       reset({
-        tableId: tables[0]?.id ?? 0,
+        tableId: "0",
         mobileNumber: "",
         discounts: [],
         notes: "",
@@ -133,7 +145,7 @@ const GenerateBillDialog = ({
       >
         {/* Table ID */}
         <div className="grid gap-2">
-          <Label>Table ID</Label>
+          <Label>Table Name</Label>
 
           {occupiedTables.length === 0 ? (
             <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
@@ -145,7 +157,11 @@ const GenerateBillDialog = ({
               control={control}
               render={({ field }) => (
                 <Select
-                  value={field.value ? String(field.value) : undefined}
+                  value={
+                    field.value && String(field.value) !== "0"
+                      ? String(field.value)
+                      : undefined
+                  }
                   onValueChange={(val) => field.onChange(val)}
                   disabled={occupiedTables.length === 0}
                 >
@@ -155,10 +171,10 @@ const GenerateBillDialog = ({
 
                   <SelectContent>
                     {occupiedTables.map((table) => (
-                        <SelectItem key={table.id} value={String(table.id)}>
-                          {table.name}
-                        </SelectItem>
-                      ))}
+                      <SelectItem key={table.id} value={String(table.id)}>
+                        {table.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               )}
@@ -169,17 +185,12 @@ const GenerateBillDialog = ({
         {/* Mobile */}
         <div className="grid gap-2">
           <Label>Mobile Number</Label>
-          <Input
-            {...register("mobileNumber", {
-              required: "Mobile number is required",
-            })}
-            placeholder="9167939647"
-          />
-          {errors.mobileNumber && (
+          <Input {...register("mobileNumber", {})} placeholder="9167939647" />
+          {/* {errors.mobileNumber && (
             <p className="text-sm text-red-500">
               {errors.mobileNumber.message}
             </p>
-          )}
+          )} */}
         </div>
 
         {/* Notes */}

@@ -251,6 +251,7 @@ export default function BillingPage() {
               </Button>
             </DialogTrigger>
             <GenerateBillDialog
+              open={openGenerate}
               tables={tables ?? []}
               discounts={discounts ?? []}
               isGenerating={isGenerating}
