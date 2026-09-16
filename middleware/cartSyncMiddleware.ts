@@ -32,7 +32,7 @@ export const cartSyncMiddleware: Middleware =
       }
 
       if (!tableToken || tableToken === "undefined" || tableToken === "null") {
-        toast.warning("Skipping cart sync: missing tableToken");
+        // toast.warning("Skipping cart sync: missing tableToken");
         return;
       }
 
