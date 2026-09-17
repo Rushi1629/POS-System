@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createDiscount,
   deleteDiscountById,
@@ -37,6 +37,7 @@ export const useFetchDiscounts = (
     queryKey: ["Discounts", page, limit, search, status],
     queryFn: () => fetchAllDiscounts({ page, limit, search, status }),
     refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
     retry: false,
     staleTime: 0,
   });

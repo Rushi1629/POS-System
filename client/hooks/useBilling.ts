@@ -2,7 +2,7 @@ import {
   GetAllBillsResponse,
   PaymentStatus,
 } from "@/types/billing-types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchAllBills,
   generateBill,
@@ -19,6 +19,7 @@ export const useFetchAllBills = (
     queryKey: ["bills", page, limit, status],
     queryFn: () => fetchAllBills(page, limit, status),
     refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
     retry: false,
     staleTime: 0,
   });

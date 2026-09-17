@@ -12,7 +12,7 @@ export const logout = () =>
   });
 
 export const fetchUserProfile = async () => {
-  const res = await fetcher("/users/profile", {
+  const res = await fetcher("/auth/profile", {
     method: "GET",
   });
 

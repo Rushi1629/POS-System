@@ -111,10 +111,7 @@ const formatDashboardDate = (value: string): string =>
     year: "numeric",
   });
 
-const firstValue = (
-  item: Record<string, unknown>,
-  keys: string[],
-): unknown => {
+const firstValue = (item: Record<string, unknown>, keys: string[]): unknown => {
   for (const key of keys) {
     if (item[key] !== undefined && item[key] !== null) return item[key];
   }
@@ -128,6 +125,49 @@ const toRecordArray = (data: unknown): Record<string, unknown>[] => {
   }
   return [];
 };
+
+function methodTone(method: string) {
+  switch (method.toUpperCase()) {
+    case "GET":
+      return "bg-green-500/10 text-green-600 ring-green-500/20";
+
+    case "POST":
+      return "bg-[#2a75ba]/10 text-[#2a75ba] ring-[#2a75ba]/20";
+
+    case "PATCH":
+      return "bg-yellow-500/10 text-yellow-600 ring-yellow-500/20";
+
+    case "DELETE":
+      return "bg-red-500/10 text-red-600 ring-red-500/20";
+
+    default:
+      return "bg-secondary text-secondary-foreground ring-border";
+  }
+}
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+}
+
+function statusTone(code: number) {
+  if (code >= 500) {
+    return "bg-red-500/10 text-red-600 ring-red-500/20";
+  }
+
+  if (code >= 400) {
+    return "bg-yellow-500/10 text-yellow-600 ring-yellow-500/20";
+  }
+
+  return "bg-green-500/10 text-green-600 ring-green-500/20";
+}
 
 export {
   formatDuration,
@@ -146,4 +186,7 @@ export {
   formatDashboardDate,
   firstValue,
   toRecordArray,
+  methodTone,
+  formatDate,
+  statusTone,
 };

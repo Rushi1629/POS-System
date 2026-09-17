@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createUser,
   deleteUserById,
@@ -32,6 +32,7 @@ export const useFetchUsers = (
   return useQuery<UsersResponse>({
     queryKey: ["users", page, limit, roleId],
     queryFn: () => fetchAllUsers({ page, limit, roleId }),
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

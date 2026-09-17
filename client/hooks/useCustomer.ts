@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   editTableSessionCustomer,
   fetchAllCategoriesCustomer,
@@ -21,6 +21,7 @@ export const useFetchMenusCustomer = (
     queryKey: ["customer-menus", params],
     queryFn: () => fetchAllMenusCustomer(params),
     refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
     retry: false,
     staleTime: 0,
   });

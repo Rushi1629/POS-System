@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createCategory,
   deleteCategoryById,
@@ -41,6 +41,7 @@ export const useFetchCategories = (
       }),
 
     refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
     retry: false,
     staleTime: 0,
   });

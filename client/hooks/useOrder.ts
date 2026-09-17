@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createOrder, fetchAllOrders, fetchAllOrdersTableWise, updateOrderItemStatus, updateOrderStatus } from "../services/order.service";
 import { FetchTableWiseOrdersParams, GetOrdersResponseAdminChef } from "@/types/order-types";
 import { toast } from "sonner";
@@ -22,6 +22,7 @@ export const useFetchActiveOrders = () => {
   return useQuery({
     queryKey: ["active-orders"],
     queryFn: fetchAllOrders,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,
@@ -54,6 +55,7 @@ export const useFetchOrdersTableWise = (
       params.latestOrder,
     ],
     queryFn: () => fetchAllOrdersTableWise(params),
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

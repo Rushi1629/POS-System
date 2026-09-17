@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   createMenu,
   deleteMenuById,
@@ -41,6 +46,7 @@ export const useFetchMenus = (
         categoryId,
       }),
 
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

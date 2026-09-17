@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createSubmenu,
   deleteSubmenuById,
@@ -37,6 +37,7 @@ export const useFetchSubMenus = (
   return useQuery<FetchSubmenuResponse>({
     queryKey: ["submenus", params],
     queryFn: () => fetchAllSubmenuItems(params),
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,

@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   createTable,
   deleteTableById,
@@ -8,9 +13,7 @@ import {
   fetchTableByToken,
   getTableLiveCharge,
 } from "../services/table.service";
-import {
-  EditTablePayload,
-} from "@/types/table-types";
+import { EditTablePayload } from "@/types/table-types";
 import { toast } from "sonner";
 
 export const useCreateTable = () => {
@@ -34,7 +37,14 @@ export const useFetchTables = (
   filters?: { status?: string; type?: string; tableStatus?: string },
 ) => {
   return useQuery({
-    queryKey: ["tables", page, limit, filters?.status, filters?.type, filters?.tableStatus],
+    queryKey: [
+      "tables",
+      page,
+      limit,
+      filters?.status,
+      filters?.type,
+      filters?.tableStatus,
+    ],
     queryFn: () =>
       fetchAllTables({
         page,
@@ -43,6 +53,7 @@ export const useFetchTables = (
         type: filters?.type,
         tableStatus: filters?.tableStatus,
       }),
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 0,
