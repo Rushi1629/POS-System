@@ -28,9 +28,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import Field from "@/components/logs/Field";
-import Meta from "@/components/logs/Meta";
-import Json from "@/components/logs/Json";
+import Field from "@/components/applicationLogs/Field";
+import Meta from "@/components/applicationLogs/Meta";
+import Json from "@/components/applicationLogs/Json";
 import { formatDate, methodTone, statusTone } from "@/utils/utils";
 import {
   ALL,
