@@ -45,27 +45,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { roleStyles, userProps, type User, type UserRole } from "@/types/types";
-
-function initials(name?: string) {
-  if (!name) return "NA"; // fallback
-
-  return name
-    .split(" ")
-    .map((p) => p[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
+import { roleStyles, userProps, type User } from "@/types/types";
+import { initials, userFormatDate } from "@/utils/utils";
 
 export function UsersTable({
   users,
@@ -169,7 +150,7 @@ export function UsersTable({
         ),
         cell: ({ row }) => (
           <span className="text-xs text-muted-foreground">
-            {formatDate(row.original.createdAt)}
+            {userFormatDate(row.original.createdAt)}
           </span>
         ),
       },

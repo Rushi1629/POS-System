@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { z } from "zod";
+import { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,40 +24,7 @@ import { getUserFields } from "@/types/user/config/userFields";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-const baseSchema = {
-  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
-  username: z
-    .string()
-    .trim()
-    .min(3, "At least 3 characters")
-    .max(30)
-    .regex(/^[a-zA-Z0-9_]+$/, "Letters, numbers, underscores only"),
-  email: z.string().trim().email("Invalid email").max(255),
-  phoneNumber: z
-    .string()
-    .trim()
-    .regex(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"),
-  role: z.enum(["Super Admin", "Admin", "Chef", "Waiter", "Customer"]),
-  isActive: z.boolean(),
-};
-
-const createSchema = z.object({
-  ...baseSchema,
-  password: z.string().min(6, "Password must be at least 6 characters").max(72),
-});
-
-const editSchema = z.object({
-  ...baseSchema,
-  password: z
-    .string()
-    .max(72)
-    .optional()
-    .refine(
-      (v) => !v || v.length >= 6,
-      "Password must be at least 6 characters",
-    ),
-});
+import { createSchema, editSchema } from "@/Schema/userSchema";
 
 export function UserFormDialog({
   open,
@@ -69,10 +35,6 @@ export function UserFormDialog({
   loading,
   onSubmit,
 }: AddUserProps) {
-  // const [values, setValues] = useState<UserFormValues>(empty);
-  // const [errors, setErrors] = useState<
-  //   Partial<Record<keyof UserFormValues, string>>
-  // >({});
 
   const schema = mode === "create" ? createSchema : editSchema;
 
@@ -117,7 +79,7 @@ export function UserFormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-[560px] p-0 overflow-hidden max-h-[85vh] flex flex-col"
+        className="sm:max-w-140 p-0 overflow-hidden max-h-[85vh] flex flex-col"
         onInteractOutside={(e) => {
           e.preventDefault();
         }}

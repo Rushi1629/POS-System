@@ -1,5 +1,4 @@
-import React from "react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Clock,
   Drumstick,
@@ -13,7 +12,7 @@ import {
   StickyNote,
   XCircle,
 } from "lucide-react";
-import { Badge } from "./ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
   Order,
@@ -37,7 +36,6 @@ const OrderCardCustomer = ({ order }: { order: Order }) => {
             : "border-primary/30 ring-1 ring-primary/10",
       )}
     >
-      {/* Header band */}
       <div
         className={cn(
           "flex flex-wrap items-center justify-between gap-3 px-5 py-4",
@@ -77,12 +75,6 @@ const OrderCardCustomer = ({ order }: { order: Order }) => {
               {Number(order.timeChargeAmount ?? 0) > 0
                 ? Number(order.timeChargeAmount).toFixed(2)
                 : "0"}
-              {/* {order.orderType === "DINE_IN" && (
-                <>
-                  <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
-                  <MapPin className="h-3 w-3" /> Table #{order.tableId}
-                </>
-              )} */}
             </p>
           </div>
         </div>
@@ -104,7 +96,6 @@ const OrderCardCustomer = ({ order }: { order: Order }) => {
         </div>
       </div>
 
-      {/* Tracker */}
       {isCancelled ? (
         <div className="flex items-center gap-3 border-t border-destructive/20 bg-destructive/5 px-5 py-3 text-sm text-destructive">
           <XCircle className="h-4 w-4" /> Order cancelled · Refund issued
@@ -113,7 +104,6 @@ const OrderCardCustomer = ({ order }: { order: Order }) => {
         <Tracker status={order.orderStatus} />
       )}
 
-      {/* Items */}
       <div className="divide-y divide-border px-5">
         {order.items.map((it) => {
           const veg = it.menuItem.menuType === "Veg";
@@ -185,7 +175,6 @@ const OrderCardCustomer = ({ order }: { order: Order }) => {
         })}
       </div>
 
-      {/* Order note */}
       {order.notes && (
         <div className="mx-5 mb-4 rounded-xl border border-dashed border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
           <span className="font-semibold text-foreground">Order note:</span>{" "}
@@ -193,7 +182,6 @@ const OrderCardCustomer = ({ order }: { order: Order }) => {
         </div>
       )}
 
-      {/* Footer */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-muted/20 px-5 py-3">
         <div className="flex items-center gap-2 text-xs">
           <Badge

@@ -9,10 +9,8 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: login,
     onSuccess: async () => {
-      // 🔥 REMOVE OLD CACHE COMPLETELY
       queryClient.removeQueries({ queryKey: ["me"] });
 
-      // 🔥 FORCE FETCH NEW PROFILE
       await queryClient.fetchQuery({
         queryKey: ["me"], 
         queryFn: fetchUserProfile,

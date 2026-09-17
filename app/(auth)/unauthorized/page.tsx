@@ -29,10 +29,9 @@ export default function UnauthorizedPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
-      {/* ambient warm glow */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-40 left-1/2 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl"
+        className="pointer-events-none absolute -top-40 left-1/2 h-128 w-lg -translate-x-1/2 rounded-full bg-primary/15 blur-3xl"
       />
       <div
         aria-hidden

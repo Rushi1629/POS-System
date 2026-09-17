@@ -24,9 +24,6 @@ export default function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  // =========================
-  // Existing functionality
-  // =========================
   const loginMutation = useLogin();
 
   const getDefaultRouteByRole = (roleName?: string) => {
@@ -72,12 +69,8 @@ export default function LoginForm() {
   const isLoading = loginMutation.isPending;
   const loginError = (loginMutation.error as Error)?.message ?? null;
 
-  // =========================
-  // New design only
-  // =========================
   return (
     <>
-      {/* Existing loader */}
       {isLoading && (
         <SecretCafeLoader
           message="Authenticating..."
@@ -86,9 +79,7 @@ export default function LoginForm() {
       )}
 
       <div className="grid min-h-screen bg-background lg:grid-cols-2">
-        {/* =========================================
-            LEFT SIDE - LOGIN FORM
-        ========================================== */}
+
         <div className="flex flex-col justify-center px-6 py-12 sm:px-16">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -99,7 +90,6 @@ export default function LoginForm() {
             }}
             className="mx-auto w-full max-w-sm"
           >
-            {/* Back to Home */}
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
@@ -114,7 +104,6 @@ export default function LoginForm() {
               </a>
             </motion.div>
 
-            {/* Logo */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -130,7 +119,6 @@ export default function LoginForm() {
               </span>
             </motion.div>
 
-            {/* Heading */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -145,7 +133,6 @@ export default function LoginForm() {
               </p>
             </motion.div>
 
-            {/* Existing API Error */}
             {loginError && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
@@ -158,13 +145,11 @@ export default function LoginForm() {
               </motion.div>
             )}
 
-            {/* Login Form */}
             <form
               className="mt-8 space-y-5"
               autoComplete="off"
               onSubmit={handleSubmit(handleLogin)}
             >
-              {/* Email */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -204,7 +189,6 @@ export default function LoginForm() {
                 )}
               </motion.div>
 
-              {/* Password */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -259,7 +243,6 @@ export default function LoginForm() {
                 )}
               </motion.div>
 
-              {/* Remember Me */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -281,7 +264,6 @@ export default function LoginForm() {
                 </label>
               </motion.div>
 
-              {/* Submit */}
               <motion.button
                 whileTap={{ scale: 0.97 }}
                 whileHover={{ scale: isLoading ? 1 : 1.01 }}
@@ -324,9 +306,6 @@ export default function LoginForm() {
           </motion.div>
         </div>
 
-        {/* =========================================
-            RIGHT SIDE - HERO IMAGE
-        ========================================== */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -343,10 +322,8 @@ export default function LoginForm() {
             className="object-cover"
           />
 
-          {/* Dark overlay */}
           <div className="absolute inset-0 bg-espresso/45" />
 
-          {/* Quote */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

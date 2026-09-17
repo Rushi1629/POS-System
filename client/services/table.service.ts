@@ -119,7 +119,6 @@ export const getTableLiveCharge = async (
       method: "GET",
     });
 
-    // Handle different response formats from API
     if (!res) {
       return {
         totalMinutes: 0,
@@ -127,7 +126,6 @@ export const getTableLiveCharge = async (
       };
     }
 
-    // If response has data property, use it
     if (res.data && typeof res.data === "object") {
       return {
         totalMinutes: res.data.totalMinutes ?? 0,
@@ -135,7 +133,6 @@ export const getTableLiveCharge = async (
       };
     }
 
-    // If response is the data directly (has totalMinutes/currentCharge)
     if (res.totalMinutes !== undefined || res.currentCharge !== undefined) {
       return {
         totalMinutes: res.totalMinutes ?? 0,

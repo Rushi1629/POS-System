@@ -5,9 +5,6 @@ import {
   type PaginationState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import {
@@ -19,31 +16,12 @@ import {
   Pencil,
   Trash2,
   Search,
-  ImagePlus,
   LayoutGrid,
   List as ListIcon,
   CheckCircle2,
-  XCircle,
-  LayoutDashboard,
-  Tags,
   UtensilsCrossed,
-  Users,
-  Table2,
-  Receipt,
-  Package,
-  BarChart3,
-  Bell,
-  Settings,
-  Clock,
-  LogOut,
-  Coffee,
-  MoreHorizontal,
-  Type,
-  AlignLeft,
-  IndianRupee,
   Leaf,
   Drumstick,
-  X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -199,7 +177,6 @@ function MenuPage() {
                 <span className="font-semibold text-foreground">
                   {row.original.name}
                 </span>
-                {/* <VegBadge type={row.original.menuType} /> */}
                 <VegBadge isVeg={row.original.menuType === "Veg"} />
               </div>
               <p className="max-w-xs truncate text-xs text-muted-foreground">
@@ -452,7 +429,7 @@ function MenuPage() {
   }
 
   const mapCategoryToAllCategory = (c: Category): allCategory => ({
-    id: String(c.id), // ✅ UUID remains string
+    id: String(c.id),
     name: c.name,
   });
 

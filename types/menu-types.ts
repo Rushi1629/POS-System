@@ -71,7 +71,7 @@ export type menuDialogProps = {
   initial?: any;
   onSave: (formData: FormData) => Promise<void>;
   allCategory: allCategory[];
-  loading: boolean; // ✅ add loading prop
+  loading: boolean;
 };
 
 export type MenuPayload = {

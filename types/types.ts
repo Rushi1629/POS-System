@@ -52,7 +52,6 @@ export type Table = {
   timerStart?: string;
 };
 
-// 🧠 Labels
 export const categoryLabels: Record<string, string> = {
   family: "Family",
   pod: "POD Room",
@@ -66,7 +65,6 @@ export const statusLabels: Record<string, string> = {
   CLEANING: "Cleaning",
 };
 
-// 🎯 Categories
 export const categories: { label: string; value: TableCategory | "all" }[] = [
   { label: "All Tables", value: "all" },
   { label: "Family", value: "family" },
@@ -271,7 +269,7 @@ export type CategoryDialogProps = {
   onOpenChange: (o: boolean) => void;
   initial: Category | null;
   onSave: (formData: FormData, imageFile: File | null) => Promise<void>;
-  loading?: boolean; // ✅ ADD THIS
+  loading?: boolean;
 };
 
 export interface CreateCategoryPayload {
@@ -306,7 +304,6 @@ export interface FetchCategoriesParams {
   status?: string;
 }
 
-// Sidebar navigation items start here
 
 export interface NavItem {
   id: string;
@@ -416,14 +413,6 @@ export const navItems: NavItem[] = [
     group: "Management",
     roles: ["Super Admin", "Chef", "Waiter"],
   },
-  // {
-  //   id: "nav-order-status-management",
-  //   label: "order status Management",
-  //   icon: ChefHat,
-  //   href: "/order-status-management",
-  //   group: "Management",
-  //   roles: ["Super Admin","Chef","Waiter"],
-  // },
   {
     id: "nav-customer-management",
     label: "Customer-Order",
@@ -481,5 +470,3 @@ export const navItems: NavItem[] = [
     roles: ["Super Admin"],
   },
 ];
-
-// Sidebar navigation items end here

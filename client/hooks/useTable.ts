@@ -22,7 +22,6 @@ export const useCreateTable = () => {
   return useMutation({
     mutationFn: createTable,
     onSuccess: () => {
-      // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
     onError: (err) => {
@@ -98,7 +97,6 @@ export const useEditTableSession = () => {
   return useMutation({
     mutationFn: editTableSession,
     onSuccess: () => {
-      // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
     onError: (err) => {
@@ -115,11 +113,11 @@ export const useFetchLiveCharge = (id?: string) => {
       const res = await getTableLiveCharge(id as string);
       return res ?? { totalMinutes: 0, currentCharge: 0 };
     },
-    enabled: !!id, // 🔥 Only run when id is available
-    refetchInterval: 60000, // ✅ Fetch every 5 seconds for LIVE updates
-    staleTime: 4000, // Keep data fresh for 4 seconds before marking stale
-    refetchOnWindowFocus: true, // Refetch when window regains focus
-    retry: 1, // Retry once on failure
+    enabled: !!id,
+    refetchInterval: 60000,
+    staleTime: 4000,
+    refetchOnWindowFocus: true,
+    retry: 1,
   });
 };
 

@@ -17,7 +17,6 @@ export const useCreateSubmenu = () => {
   return useMutation({
     mutationFn: createSubmenu,
     onSuccess: () => {
-      // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["submenus"] });
     },
     onError: (err) => {
@@ -52,7 +51,6 @@ export const useUpdateSubMenu = () => {
       editSubmenuById(id, data),
 
     onSuccess: () => {
-      // 🔥 refresh submenus
       queryClient.invalidateQueries({ queryKey: ["submenus"] });
     },
     onError: (err) => {

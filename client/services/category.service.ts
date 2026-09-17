@@ -9,7 +9,7 @@ import { fetcher } from "../client";
 export const createCategory = (data: FormData) =>
   fetcher("/category", {
     method: "POST",
-    body: data, // ✅ send FormData directly
+    body: data,
   });
 
 export const fetchAllCategories = async ({
@@ -70,7 +70,7 @@ export const editCategoryById = async (
 ): Promise<Category> => {
   const res = await fetcher(`/category/${id}`, {
     method: "PATCH",
-    body: data, // ✅ FormData
+    body: data,
   });
 
   return res.data;

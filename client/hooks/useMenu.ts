@@ -18,7 +18,6 @@ export const useCreateMenu = () => {
   return useMutation({
     mutationFn: createMenu,
     onSuccess: () => {
-      // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["menus"] });
     },
     onError: (err) => {
@@ -61,7 +60,6 @@ export const useUpdateMenu = () => {
       editMenuById(id, formData),
 
     onSuccess: () => {
-      // 🔥 refresh menus
       queryClient.invalidateQueries({ queryKey: ["menus"] });
     },
     onError: (err) => {

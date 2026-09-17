@@ -2,13 +2,11 @@
 
 import OrderSummary from "@/components/OrderSummary";
 import CartItemCard from "@/components/CartItemCard";
-// import { menuItems } from "@/lib/data";
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import {
   addItemAction,
-  clearCartAction,
   removeItemAction,
 } from "@/store/cart/cartSlice";
 import { useMemo, useState, useCallback, useEffect } from "react";
@@ -20,8 +18,6 @@ import { setCartAction, updateItemNoteAction } from "@/store/cart/cartSlice";
 import ApiLoader from "@/components/ApiLoader";
 import { CartItem, getCartKey } from "@/types/cart-types";
 import { toast } from "sonner";
-
-// 🔽 ADD HERE (top of file, before CartView component)
 
 const mapOrdersToCart = (orders: any): Record<string, CartItem> => {
   const cartItems: Record<string, CartItem> = {};
@@ -37,7 +33,6 @@ const mapOrdersToCart = (orders: any): Record<string, CartItem> => {
             .map((e: any) => ({
               id: e.subMenuItem.id || e.subMenuItem.subMenuItemId,
               name: e.subMenuItem.name,
-              // price: Number(e.unitPrice), // ✅ FIXED
               price: Number(
                 e.unitPrice && Number(e.unitPrice) > 0
                   ? e.unitPrice
@@ -56,8 +51,8 @@ const mapOrdersToCart = (orders: any): Record<string, CartItem> => {
           name: item.menuItem.name,
           description: "",
           price: Number(
-            item.unitPrice ?? item.menuItem?.price ?? 0, // ✅ FIX
-          ), // ✅ FIXED
+            item.unitPrice ?? item.menuItem?.price ?? 0,
+          ),
           quantity: item.quantity,
           originalQuantity: item.quantity,
           orderItemId: item.orderItemId,
@@ -101,7 +96,6 @@ const CartView = () => {
 
   const cart = useSelector((state: RootState) => state.cart?.items ?? {});
 
-  // ✅ Convert cart → UI items (optimized)
   const items = useMemo(() => {
     return Object.values(cart);
   }, [cart]);
@@ -130,9 +124,6 @@ const CartView = () => {
 
     setOrderError("");
     try {
-      // Build payload: only include
-      // - new items (no orderItemId)
-      // - existing items that were changed (quantity changed / cancelled / marked updated)
       const orderItemsPayload = items
         .filter((item) => {
           const isCancelled = item.quantity === 0;
@@ -174,19 +165,16 @@ const CartView = () => {
         notes: orderNotes || undefined,
         orderItems: orderItemsPayload,
       });
-      // dispatch(clearCartAction());
 
       await clearCartDB(tableToken ?? undefined);
       await refetchActiveOrders();
       toast.success("Order placed successfully.");
-      // router.push(`/customer?tableToken=${tableToken}`);
     } catch (err: any) {
       toast.error(err?.message ?? "Failed to place order. Please try again.");
       setOrderSuccess("");
     }
   }, [items, placeOrder, tableId, router, orderNotes]);
 
-  // ✅ Derived values (memoized)
   const { subtotal, totalQty } = useMemo(() => {
     
     return items.reduce(
@@ -197,7 +185,6 @@ const CartView = () => {
           (item.extras?.reduce((sum, e) => sum + e.price * e.quantity, 0) ||
             0) / item.quantity;
 
-        // ✅ NO MULTIPLY HERE
         const itemTotal = (item.price + extrasPerItem) * item.quantity;
 
         acc.subtotal += itemTotal;
@@ -209,7 +196,6 @@ const CartView = () => {
     );
   }, [items]);
 
-  // Load cart for this tableToken from IndexedDB on mount / when token changes
   useEffect(() => {
     if (!hasMounted) return;
     let mounted = true;
@@ -227,10 +213,8 @@ const CartView = () => {
     };
   }, [tableToken, hasMounted]);
 
-  // Persist cart to IndexedDB when it changes (per tableToken)
   useEffect(() => {
     if (!hasMounted) return;
-    // debounce not necessary for now
     saveCartToDB(cart, tableToken ?? undefined);
   }, [cart, tableToken, hasMounted]);
 
@@ -244,7 +228,6 @@ const CartView = () => {
 
   return (
     <div className="flex flex-col xl:flex-row gap-8 pt-6 lg:pt-8">
-      {/* 🧾 Items */}
       <div className="flex-1 space-y-4">
         {items.map((item) => (
           <CartItemCard
@@ -254,7 +237,7 @@ const CartView = () => {
               dispatch(
                 addItemAction({
                   ...item,
-                  quantity: 1, // ✅ ONLY increment by 1
+                  quantity: 1,
                 }),
               )
             }
@@ -273,7 +256,6 @@ const CartView = () => {
         )}
       </div>
 
-      {/* 📊 Summary */}
       <div className="w-full xl:w-80 shrink-0">
         <OrderSummary
           itemCount={totalQty}

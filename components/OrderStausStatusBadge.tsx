@@ -1,6 +1,5 @@
 import { OrderStatus, STATUS_STYLES } from '@/types/order-status-types'
-import React from 'react'
-import { Badge } from './ui/badge'
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 const OrderStausStatusBadge = ({ status }: { status: OrderStatus }) => {

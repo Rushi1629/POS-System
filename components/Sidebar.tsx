@@ -1,17 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Settings,
   ChevronLeft,
   ChevronRight,
   LogOut,
-  Bell,
 } from "lucide-react";
 import Image from "next/image";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppDispatch } from "@/store/hooks";
 import { useLogout, useProfile } from "@/client/hooks/useAuth";
 import { clearUser } from "@/store/auth/authSlice";
 import {
@@ -38,7 +36,6 @@ export default function Sidebar() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const logoutMutation = useLogout();
-  // const user = useAppSelector((state) => state.auth.user);
   const queryClient = useQueryClient();
   const {
     data: user,
@@ -96,7 +93,6 @@ export default function Sidebar() {
     h-full z-20
   `}
       >
-        {/* Logo */}
         <div
           className={`flex items-center gap-3 px-4 py-4 border-b border-stone-800 ${collapsed ? "justify-center px-2" : ""}`}
         >
@@ -109,29 +105,10 @@ export default function Sidebar() {
             style={{ width: "auto", height: "auto" }}
             priority
           />
-          {/* {!collapsed && (
-          <span className="font-semibold text-white text-base tracking-tight truncate">
-            Cafe POS
-          </span>
-        )} */}
         </div>
 
-        {/* Shift indicator */}
-        {/* {!collapsed && (
-          <div className="mx-3 mt-3 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-            <p className="text-xs text-amber-400 font-medium">
-              Morning Shift Active
-            </p>
-            <p className="text-xs text-stone-400 mt-0.5">
-              Started 06:00 AM · 2h 01m
-            </p>
-          </div>
-        )} */}
-
-        {/* Navigation */}
         <nav className="flex-1 px-2 py-3 overflow-y-auto custom-scrollbar">
           {groups.map((group) => {
-            // const items = navItems.filter((n) => n.group === group);
             const items = navItems.filter(
               (n) => n.group === group && hasAccess(n.roles),
             );
@@ -192,10 +169,8 @@ export default function Sidebar() {
           })}
         </nav>
 
-        {/* Bottom actions */}
         <div className="border-t border-stone-800 p-2">
 
-          {/* User profile */}
           <div
             className={`flex items-center gap-2 px-2 py-2 mt-1 rounded-lg bg-stone-800 ${collapsed ? "justify-center" : ""}`}
           >
@@ -245,7 +220,6 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="absolute -right-3 top-15 w-6 h-6 bg-stone-700 border border-stone-600 rounded-full flex items-center justify-center text-stone-300 hover:bg-stone-600 transition-all duration-150 shadow-md z-30"

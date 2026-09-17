@@ -1,10 +1,9 @@
 "use client";
 import { ItemStatus, KOrder, NEXT, STATUS_STYLES } from "@/types/chef-types";
-import React from "react";
-import { Badge } from "./ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Check, Clock, Loader2, StickyNote, X } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 const ChefCard = ({
   order,
@@ -25,7 +24,6 @@ const ChefCard = ({
   const headerTone = STATUS_STYLES[order.status as ItemStatus];
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
-      {/* Accent bar */}
       <div
         className={cn(
           "absolute inset-x-0 top-0 h-[0.9px] bg-linear-to-r",
@@ -33,7 +31,6 @@ const ChefCard = ({
         )}
       />
 
-      {/* Header */}
       <div className="flex items-start justify-between gap-3 px-5 pt-5">
         <div>
           <div className="flex items-center gap-2">
@@ -52,7 +49,6 @@ const ChefCard = ({
         </div>
       </div>
 
-      {/* Items */}
       <div className="mt-4 space-y-2 px-5">
         {order.items.map((item) => {
           const s = STATUS_STYLES[item.status];
@@ -101,23 +97,8 @@ const ChefCard = ({
               <Badge variant="outline" className={cn("border", s.chip)}>
                 {s.label}
               </Badge>
-              {/* {!isCancelled && next ? (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-7 w-7 rounded-full hover:bg-primary/10 hover:text-primary"
-                  onClick={() => onAdvance(item.id)}
-                >
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              ) : (
-                <div className="flex h-7 w-7 items-center justify-center text-muted-foreground">
-                  <Check className="h-4 w-4" />
-                </div>
-              )} */}
               <div className="flex items-center gap-1">
                 {!isCancelled && (
-                  // 🔴 Cancel button
                   <Button
                     disabled={!!loadingItems[item.id]}
                     size="icon"
@@ -134,7 +115,6 @@ const ChefCard = ({
                 )}
 
                 {next && (
-                  // 🟢 Forward button (still visible even if cancelled)
                   <Button
                     disabled={!!loadingItems[item.id]}
                     size="icon"
@@ -151,7 +131,6 @@ const ChefCard = ({
                 )}
 
                 {!next && !isCancelled && (
-                  // ✅ Only show check if NOT cancelled
                   <div className="flex h-7 w-7 items-center justify-center text-muted-foreground">
                     <Check className="h-4 w-4" />
                   </div>
@@ -162,7 +141,6 @@ const ChefCard = ({
         })}
       </div>
 
-      {/* Footer */}
       <div className="mt-4 flex items-center justify-between border-t border-border/60 px-5 py-3">
         <p className="text-xs text-muted-foreground">
           {order.items.length} items

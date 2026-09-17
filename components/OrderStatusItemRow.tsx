@@ -7,8 +7,7 @@ import {
   OrderStatus,
 } from "@/types/order-status-types";
 import { ChevronRight, Flame, Leaf, X } from "lucide-react";
-import React from "react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import OrderStausStatusBadge from "./OrderStausStatusBadge";
 import { UserRole } from "@/types/types";
 

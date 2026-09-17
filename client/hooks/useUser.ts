@@ -15,7 +15,6 @@ export const useCreateUser = () => {
   return useMutation({
     mutationFn: createUser,
     onSuccess: () => {
-      // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
     onError: (err) => {

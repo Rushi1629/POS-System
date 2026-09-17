@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Receipt } from "lucide-react";
-import { Badge } from "./ui/badge";
+import { Badge } from "@/components/ui/badge";
 import InfoTile from "./InfoTile";
 import { fmt } from "@/utils/utils";
 import { cn } from "@/lib/utils";

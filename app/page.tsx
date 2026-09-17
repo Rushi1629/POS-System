@@ -1,9 +1,5 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import Footer from "@/components/Footer";
 import { useRouter } from "next/navigation";
 import HomePage from "@/components/home/Home";
 

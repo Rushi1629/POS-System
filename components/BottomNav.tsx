@@ -17,7 +17,6 @@ export default function BottomNav() {
   const searchParams = useSearchParams();
   const tableToken = searchParams?.get("tableToken");
 
-  // Preserve the existing customer view behavior exactly.
   if (pathname.startsWith("/customer")) {
     const {
       data: tableData,
@@ -75,7 +74,6 @@ export default function BottomNav() {
     );
   }
 
-  // For all non-customer dashboard screens, mirror the sidebar entries as bottom tabs.
   const { data: user } = useProfile();
   const role = normalizeRole(user?.role?.name);
 

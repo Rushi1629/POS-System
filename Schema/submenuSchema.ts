@@ -7,5 +7,4 @@ export const submenuSchema = z.object({
   description: z.string().optional(),
 });
 
-// ✅ ADD THIS
 export type SubmenuFormValues = z.input<typeof submenuSchema>;

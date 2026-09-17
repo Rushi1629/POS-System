@@ -6,13 +6,13 @@ export type CartItem = {
   price: number;
   isUpdated?: boolean;
   quantity: number;
-  originalQuantity?: number; // Track the starting quantity for update detection
+  originalQuantity?: number;
   menuType?: "Veg" | "NonVeg";
   isBest?: boolean;
   imageUrl: string;
   isCancelled?: boolean;
   notes?: string;
-  orderItemId?: string; // Existing order item identifier
+  orderItemId?: string;
   extras?: {
     id: string;
     name: string;
@@ -22,17 +22,7 @@ export type CartItem = {
 };
 export const getCartKey = (
   id: string,
-  // extras?: { id: number }[],
-  // menuType?: "Veg" | "NonVeg",
 ) => {
-  // const typeKey = menuType || "notype";
-
-  // const extrasKey =
-  //   extras
-  //     ?.map((e) => e.id) // ✅ ONLY ID, NOT quantity
-  //     .sort()
-  //     .join("|") || "noextra";
-
   return `${id}`;
 };
 
@@ -58,17 +48,8 @@ export const normalizeCartItems = (
     if (normalized[cartKey]) {
       const existing = normalized[cartKey];
 
-      // ✅ merge quantity
       existing.quantity += normalizedItem.quantity;
 
-      // preserve orderItemId / notes when duplicates merge
-      // existing.orderItemId = existing.orderItemId ?? normalizedItem.orderItemId;
-      // existing.notes = existing.notes ?? normalizedItem.notes;
-      // existing.isCancelled = existing.isCancelled ?? normalizedItem.isCancelled;
-      // existing.originalQuantity =
-      //   existing.originalQuantity ?? normalizedItem.originalQuantity ?? normalizedItem.quantity;
-
-      // ✅ merge extras
       const extrasMap = new Map();
 
       [...(existing.extras || []), ...(normalizedItem.extras || [])].forEach(

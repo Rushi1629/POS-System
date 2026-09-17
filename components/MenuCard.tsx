@@ -1,9 +1,8 @@
-import React from "react";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import StatusPill from "./StatusPill";
 import VegBadge from "./VegBadge";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { FetchMenuResponse } from "@/types/menu-types";
 

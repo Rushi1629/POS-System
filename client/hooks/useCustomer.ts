@@ -53,7 +53,6 @@ export const useEditTableSessionCustomer = () => {
   return useMutation({
     mutationFn: editTableSessionCustomer,
     onSuccess: () => {
-      // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
     onError: (err) => {

@@ -5,7 +5,6 @@ import { CircleDot, Clock, Receipt, Soup } from "lucide-react";
 import {
   ActiveTarget,
   getAllowedTransitions,
-  OrderItem,
   OrderStatus,
   TableOrders,
 } from "@/types/order-status-types";
@@ -49,7 +48,6 @@ export default function page() {
         totalAmount: order.totalAmount,
         notes: order.notes,
 
-        // 🔥 IMPORTANT: filter cancelled items
         items: order.items
           .filter((item: any) => !item.isCancelled)
           .map((item: any) => ({
@@ -70,7 +68,6 @@ export default function page() {
               menuType: item.menuItem.menuType,
             },
 
-            // 🔥 filter cancelled sub items
             orderSubMenuItems:
               item.orderSubMenuItems
                 ?.filter((sub: any) => !sub.isCancelled)

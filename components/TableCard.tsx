@@ -10,15 +10,9 @@ import {
   LogOut,
   CheckCircle,
   CircleX,
-  CalendarClock,
   BookmarkPlus,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  seatGuests,
-  clearTable,
-  updateTableStatus,
-} from "@/store/table/tableSlice";
 
 import {
   Dialog,
@@ -31,24 +25,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  categoryLabels,
   statusBg,
   statusLabels,
   statusStyles,
   Table,
 } from "@/types/types";
-import { useAppDispatch } from "@/store/hooks";
-import { formatDuration, formatMinutes } from "@/utils/utils";
+import {formatMinutes } from "@/utils/utils";
 import {
-  useEditTable,
-  useEditTableSession,
   useFetchLiveCharge,
 } from "@/client/hooks/useTable";
 import {
   EditTableSessionPayload,
   FetchTableResponse,
 } from "@/types/table-types";
-import { Switch } from "./ui/switch";
+import { Switch } from "@/components/ui/switch";
 
 export function TableCard({
   table,
@@ -66,14 +56,6 @@ export function TableCard({
   const [, setTick] = useState(0);
   const [seatDialog, setSeatDialog] = useState(false);
   const [guestInput, setGuestInput] = useState("");
-
-  // const [rushMode, setRushMode] = useState<boolean>(false);
-
-  // useEffect(() => {
-  //   if (table) {
-  //     setRushMode(table.rushMode);
-  //   }
-  // }, [table]);
 
   useEffect(() => {
     if (table.enableTimeRate) {
@@ -125,7 +107,6 @@ export function TableCard({
                 : "border-[#f59f0a]/30"
         }`}
       >
-        {/* Top color strip */}
         <div
           className={`absolute top-0 left-0 right-0 h-[0.9px] ${
             table.tableStatus === "AVAILABLE"
@@ -139,7 +120,6 @@ export function TableCard({
         />
 
         <CardContent className="p-4 pt-5">
-          {/* Header */}
           <div className="flex items-start justify-between mb-3">
             <div>
               <h3 className="font-semibold text-lg">{table.name}</h3>
@@ -154,7 +134,6 @@ export function TableCard({
             </Badge>
           </div>
 
-          {/* Guests + Timer */}
           <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
             <span className="flex items-center gap-1">
               <Users className="h-3 w-3" />
@@ -185,9 +164,7 @@ export function TableCard({
             )}
           </div>
 
-          {/* Actions */}
           <div className="flex gap-1.5 flex-wrap justify-between">
-            {/* 🟢 Available */}
             {table.tableStatus === "AVAILABLE" && (
               <>
                 <Button
@@ -224,7 +201,6 @@ export function TableCard({
               </>
             )}
 
-            {/* 🔴 Occupied */}
             {table.tableStatus === "OCCUPIED" && (
               <Button
                 size="sm"
@@ -250,7 +226,6 @@ export function TableCard({
               </Button>
             )}
 
-            {/* 🔵 Reserved */}
             {table.tableStatus === "RESERVED" && (
               <>
                 <Button
@@ -287,7 +262,6 @@ export function TableCard({
               </>
             )}
 
-            {/* 🟡 Cleaning */}
             {table.tableStatus === "CLEANING" && (
               <Button
                 size="sm"
@@ -323,7 +297,6 @@ export function TableCard({
         </CardContent>
       </Card>
 
-      {/* 🧾 Seat Guests Dialog */}
       <Dialog open={seatDialog} onOpenChange={setSeatDialog}>
         <DialogContent
           className="sm:max-w-sm"

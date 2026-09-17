@@ -54,7 +54,6 @@ import {
   useGenerateBill,
   usePayBill,
 } from "@/client/hooks/useBilling";
-import { OrderAdminChef } from "@/types/order-types";
 import { useFetchTables } from "@/client/hooks/useTable";
 import { useFetchDiscounts } from "@/client/hooks/useDiscount";
 import { PaginationState } from "@tanstack/react-table";
@@ -159,7 +158,7 @@ export default function BillingPage() {
       notes: notes || "n/a",
     });
 
-    await refetchBills(); // 👈 IMPORTANT
+    await refetchBills();
 
     return response;
   };
@@ -228,7 +227,6 @@ export default function BillingPage() {
   return (
     <div className="">
       <div className="space-y-8">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-xs font-medium text-primary uppercase tracking-wider">
@@ -261,7 +259,6 @@ export default function BillingPage() {
           </Dialog>
         </div>
 
-        {/* Stats */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Total Bills"
@@ -289,7 +286,6 @@ export default function BillingPage() {
           />
         </div>
 
-        {/* Toolbar */}
         <Card className="border-border/60 shadow-soft">
           <CardContent className="p-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
             <div className="relative w-full md:max-w-sm">
@@ -321,7 +317,6 @@ export default function BillingPage() {
           </CardContent>
         </Card>
 
-        {/* Table */}
         {isLoadingBills ? (
           <>
             <Card className="border-border/60 shadow-soft overflow-hidden">
@@ -517,7 +512,6 @@ export default function BillingPage() {
         )}
       </div>
 
-      {/* Pay dialog */}
       <Dialog open={!!payTarget} onOpenChange={(o) => !o && setPayTarget(null)}>
         {payTarget && (
           <PayBillDialog
@@ -529,7 +523,6 @@ export default function BillingPage() {
         )}
       </Dialog>
 
-      {/* View dialog */}
       <Dialog
         open={!!viewTarget}
         onOpenChange={(o) => !o && setViewTarget(null)}

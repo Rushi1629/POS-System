@@ -49,7 +49,6 @@ export interface FetchTableResponse {
   rushMode: boolean;
   qrCodeImageUrl?: string;
   tableToken?: string | null;
-  // startTime?: string;
 }
 
 export interface TablePagination {

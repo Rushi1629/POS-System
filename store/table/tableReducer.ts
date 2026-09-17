@@ -29,12 +29,12 @@ export const handleSeatGuests = (
   id: string,
   count: number
 ): Table[] => {
-  return tables.map((t): Table => {   // 👈 IMPORTANT
+  return tables.map((t): Table => {
     if (t.id !== id) return t;
 
     return {
       ...t,
-      status: "occupied", // ✅ now correctly inferred
+      status: "occupied",
       guestCount: count,
       timerStart: new Date().toISOString(),
     };
@@ -45,12 +45,12 @@ export const handleClearTable = (
   tables: Table[],
   id: string
 ): Table[] => {
-  return tables.map((t): Table => {   // 👈 IMPORTANT
+  return tables.map((t): Table => {
     if (t.id !== id) return t;
 
     return {
       ...t,
-      status: "cleaning", // ✅ now treated as TableStatus
+      status: "cleaning",
       guestCount: undefined,
       timerStart: undefined,
     };

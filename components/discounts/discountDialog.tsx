@@ -11,8 +11,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -21,16 +21,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Textarea } from "../ui/textarea";
-import { Switch } from "../ui/switch";
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/input";
 
 const DiscountDialog = ({
@@ -159,7 +159,7 @@ const DiscountDialog = ({
                           step="0.01"
                           className="pl-7"
                           {...field}
-                          value={field.value as number | ""} // ✅ FIX
+                          value={field.value as number | ""}
                           onChange={(e) =>
                             field.onChange(
                               e.target.value === ""

@@ -15,15 +15,6 @@ export interface StatusTransition {
   roles: UserRole[];
 }
 
-// export const STATUS_TRANSITIONS: StatusTransition[] = [
-//   { from: "PENDING", to: "ACCEPTED", roles: ["Admin", "Super Admin"] },
-//   { from: "ACCEPTED", to: "PREPARING", roles: ["Chef", "Super Admin"] },
-//   { from: "PREPARING", to: "READY", roles: ["Chef", "Super Admin"] },
-//   { from: "READY", to: "SERVED", roles: ["Waiter", "Super Admin"] },
-//   { from: "SERVED", to: "COMPLETED", roles: ["Admin", "Super Admin"] },
-//   { from: "ANY", to: "CANCELLED", roles: ["Admin", "Waiter", "Super Admin"] },
-// ];
-
 export const STATUS_TRANSITIONS: StatusTransition[] = [
   {
     from: "PENDING",
@@ -76,7 +67,7 @@ export function getAllowedTransitions(
   return STATUS_TRANSITIONS.filter(
     (t) =>
       (t.from === current || t.from === "ANY") &&
-      t.roles.includes(role) && // ✅ STRICT ROLE CHECK
+      t.roles.includes(role) &&
       t.to !== current,
   ).map((t) => t.to);
 }

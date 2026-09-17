@@ -1,21 +1,19 @@
 import {
   ActiveTarget,
-  getAllowedTransitions,
   labelFor,
   OrderStatus,
 } from "@/types/order-status-types";
-import React from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
+} from "@/components/ui/dialog";
 import OrderStausStatusBadge from "./OrderStausStatusBadge";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import OrderStatusWorkflow from "./OrderStatusWorkflow";
 import { UserRole } from "@/types/types";
 
@@ -45,7 +43,7 @@ const OrderStatusUpdateDialog = ({
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
         className={cn(
-          "w-[95vw] sm:max-w-[560px]", // mobile full width
+          "w-[95vw] sm:max-w-140",
           "max-h-[90vh] flex flex-col overflow-hidden",
           "p-0",
         )}

@@ -1,7 +1,7 @@
 import { statusMap } from "@/types/table-types";
 
 import type { TableStatus } from "@/types/table-types";
-import { Badge } from "./ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 const TableStatusCustom = ({ status }: { status: TableStatus }) => {
   const config = statusMap[status];

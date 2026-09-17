@@ -1,14 +1,11 @@
-import React from 'react'
 import { Skeleton } from "@/components/ui/skeleton";
 
 const MenuItemSkeleton = () => {
     return (
         <div className="bg-card rounded-2xl border border-border/60 overflow-hidden flex flex-col">
 
-            {/* Image Skeleton */}
             <Skeleton className="h-36 w-full" />
 
-            {/* Content */}
             <div className="p-3.5 flex flex-col gap-2">
                 <Skeleton className="h-4 w-3/4 rounded-md" />
                 <Skeleton className="h-3 w-full rounded-md" />

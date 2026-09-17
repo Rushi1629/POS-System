@@ -1,7 +1,6 @@
 "use client";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import React from "react";
 import { CartItem } from "@/types/cart-types";
@@ -35,7 +34,6 @@ const CartItemCard = ({
   return (
     <div className="group relative rounded-xl border border-border bg-card p-5 transition-all hover:shadow-md hover:border-primary/20">
       <div className="flex items-start gap-4">
-        {/* ✅ IMAGE */}
         <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-muted">
           {item.imageUrl ? (
             <img
@@ -52,7 +50,6 @@ const CartItemCard = ({
           )}
         </div>
 
-        {/* CONTENT */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
@@ -109,20 +106,13 @@ const CartItemCard = ({
               </div>
             </div>
 
-            {/* PRICE */}
             <div className="text-right shrink-0">
               <p className="text-lg font-bold tabular-nums text-primary">
                 ₹{total || 0}
               </p>
-              {/* {item.quantity > 1 && (
-                <p className="text-xs text-muted-foreground">
-                  ₹{singleItemTotal} × {item.quantity}
-                </p>
-              )} */}
             </div>
           </div>
 
-          {/* ACTIONS */}
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/60">
             <button
               onClick={onRemove}

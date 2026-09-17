@@ -57,12 +57,9 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import {
-  apiDeleteInventory,
-  apiUpdateInventory,
   CreateInventoryRequest,
   InventoryItem,
   InventoryStatusFilter,
-  MOCK_INVENTORY,
   stockState,
 } from "@/types/inventory-types";
 import StatCard from "@/components/inventory/StatCard";

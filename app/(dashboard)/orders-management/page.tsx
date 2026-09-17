@@ -115,7 +115,6 @@ const page = () => {
         </Button>
       </div>
       <div className="mt-7">
-        {/* Stat cards */}
         <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <OrderStatusCard
             label="TOTAL ORDERS"
@@ -143,7 +142,6 @@ const page = () => {
           />
         </div>
 
-        {/* Filter bar */}
         <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -191,7 +189,6 @@ const page = () => {
           </Button>
         </div>
 
-        {/* Orders list */}
         <div className="space-y-4">
           {filtered.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border bg-card/40 p-16 text-center">

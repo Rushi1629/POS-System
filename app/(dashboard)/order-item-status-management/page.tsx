@@ -6,21 +6,15 @@ import {
   Timer,
   CheckCheck,
   Search,
-  RotateCcw,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import StatCard from "@/components/StatCard";
 import {
-  ItemStatus,
   KOrder,
-  NEXT,
   OrderStatus,
-  STATUS_STYLES,
-  TableOrder,
 } from "@/types/chef-types";
 import ChefCard from "@/components/ChefCard";
 import { Card, CardContent } from "@/components/ui/card";

@@ -1,5 +1,4 @@
 import { InventoryItem, stockState } from "@/types/inventory-types";
-import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,13 +6,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import { Package } from "lucide-react";
 import StockBadge from "./StockBadge";
 import { cn } from "@/lib/utils";
 import Detail from "./Detail";
-import { Badge } from "../ui/badge";
-import { Button } from "../button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/button";
 
 const ViewItemDialog = ({
   item,

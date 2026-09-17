@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import React from "react";
 
 const StockBadge = ({ state }: { state: "OUT" | "LOW" | "OK" }) => {
   const map = {

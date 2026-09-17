@@ -2,33 +2,19 @@
 import { useMemo, useState } from "react";
 import {
   ArrowLeft,
-  ChefHat,
   CheckCheck,
-  CircleDot,
-  Clock,
   Flame,
-  Hash,
-  Leaf,
-  Drumstick,
-  MapPin,
   Receipt,
   ShoppingBag,
-  Sparkles,
-  StickyNote,
-  Truck,
   Utensils,
-  XCircle,
-  RotateCcw,
-  Phone,
   Star,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useFetchActiveOrders } from "@/client/hooks/useOrder";
-import { Order, STEPS } from "@/types/customer-order-types";
+import { Order } from "@/types/customer-order-types";
 import EmptyEmptyState from "@/components/EmptyState";
 import SummaryCard from "@/components/SummaryCard";
 import OrderCardCustomer from "@/components/OrderCardCustomer";
@@ -73,7 +59,6 @@ export default function CustomerOrdersPage() {
       id: apiOrder.orderId || Date.now(),
       tableId: apiOrder.tableId,
 
-      // ✅ FIX: use correct field name
       orderStatus: apiOrder.orderStatus,
 
       orderNumber: apiOrder.orderNumber,
@@ -97,7 +82,6 @@ export default function CustomerOrdersPage() {
         totalPrice: item.totalPrice,
         notes: item.notes,
 
-        // ✅ FIX: required in OrderItem
         orderItemStatus: item.orderItemStatus,
 
         isCancelled: item.isCancelled,
@@ -108,7 +92,6 @@ export default function CustomerOrdersPage() {
             id: e.subMenuItem.id,
             name: e.subMenuItem.name,
 
-            // ✅ FIX submenu price issue
             price:
               Number(e.unitPrice) > 0
                 ? Number(e.unitPrice)
@@ -152,7 +135,6 @@ export default function CustomerOrdersPage() {
 
   return (
     <div className="pt-6 lg:pt-8">
-        {/* Header */}
         <div className="border-b border-border bg-card/40">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -184,7 +166,6 @@ export default function CustomerOrdersPage() {
             </div>
           </div>
 
-          {/* Mini summary cards */}
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <SummaryCard
               icon={<Flame className="h-4 w-4" />}
@@ -222,7 +203,6 @@ export default function CustomerOrdersPage() {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="my-5">
           <div className="inline-flex rounded-full border border-border bg-card p-1">
             {(["active", "past"] as const).map((t) => (
@@ -244,7 +224,6 @@ export default function CustomerOrdersPage() {
           </div>
         </div>
 
-        {/* List */}
         <div className="space-y-5">
           {list.length === 0 ? (
             <EmptyEmptyState tab={tab} />

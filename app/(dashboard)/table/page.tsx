@@ -1,13 +1,10 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   type ColumnDef,
   type PaginationState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import {
@@ -22,14 +19,9 @@ import {
   CheckCircle2,
   Users,
   Table2,
-  MoreHorizontal,
   Timer,
   Power,
-  X,
-  Rotate3D,
-  RotateCcw,
   RotateCw,
-  Check,
   TimerIcon,
   User2,
   Shuffle,
@@ -117,7 +109,6 @@ function Tables() {
   const { mutateAsync: updateTable, isPending: isEditing } = useEditTable();
   const { mutateAsync: deleteTable, isPending: isDeleting } = useDeleteTable();
 
-  // const [items, setItems] = useState<FetchTableResponse[]>(seed);
   const items = tables;
   const [search, setSearch] = useState("");
 
@@ -298,7 +289,7 @@ function Tables() {
               variant="ghost"
               onClick={async () => {
                 try {
-                  setLoadingId(row.original.id); // start loading
+                  setLoadingId(row.original.id);
 
                   await updateTable({
                     id: row.original.id,
@@ -309,7 +300,7 @@ function Tables() {
                 } catch {
                   toast.error("Failed to regenerate ❌");
                 } finally {
-                  setLoadingId(null); // stop loading
+                  setLoadingId(null);
                 }
               }}
               className="h-9 w-9 text-chart-3 hover:bg-chart-3/10 hover:text-chart-3"

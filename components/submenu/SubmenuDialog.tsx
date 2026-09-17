@@ -14,12 +14,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { Label } from "../ui/label";
-import { Input } from "../input";
-import { Textarea } from "../ui/textarea";
-import { Switch } from "../ui/switch";
-import { Button } from "../button";
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/button";
 
 function SubmenuDialog({
   open,
@@ -36,7 +36,6 @@ function SubmenuDialog({
     watch,
     formState: { errors },
   } = useForm<SubmenuFormValues>({
-    // ✅ FIX HERE
     resolver: zodResolver(submenuSchema),
     defaultValues: {
       name: "",
@@ -50,7 +49,6 @@ function SubmenuDialog({
     if (!open) return;
 
     if (initial) {
-      // EDIT MODE
       reset({
         name: initial.name,
         price: initial.price,
@@ -58,7 +56,6 @@ function SubmenuDialog({
         description: initial.description || "",
       });
     } else {
-      // CREATE MODE
       reset({
         name: "",
         price: 0,
@@ -74,7 +71,7 @@ function SubmenuDialog({
 
       await onSave({
         ...parsed,
-        price: String(parsed.price), // ✅ match backend
+        price: String(parsed.price),
       });
     } catch (err) {
       toast.error("Failed to save submenu");
@@ -92,7 +89,6 @@ function SubmenuDialog({
         </DialogHeader>
 
         <div className="grid gap-4 py-3 overflow-y-auto px-2 no-scrollbar">
-          {/* Name */}
           <div className="grid gap-2">
             <Label>Name</Label>
             <div className="relative">
@@ -104,7 +100,6 @@ function SubmenuDialog({
             )}
           </div>
 
-          {/* Price */}
           <div className="grid gap-2">
             <Label>Price</Label>
             <div className="relative">
@@ -116,13 +111,11 @@ function SubmenuDialog({
             )}
           </div>
 
-          {/* Description */}
           <div className="grid gap-2">
             <Label>Description</Label>
             <Textarea placeholder="Description" {...register("description")} rows={3} />
           </div>
 
-          {/* Available */}
           <div
             className="flex items-center justify-between border p-3 rounded-lg cursor-pointer"
             onClick={() => setValue("available", !watch("available"))}

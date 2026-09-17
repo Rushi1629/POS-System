@@ -63,9 +63,6 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
@@ -135,26 +132,6 @@ function CategoriesPage() {
     setDialogOpen(true);
   }, []);
 
-  // const filtered = useMemo(() => {
-  //   return categories
-  //     .filter((c) =>
-  //       statusFilter === "all"
-  //         ? true
-  //         : statusFilter === "active"
-  //           ? c.isActive
-  //           : !c.isActive,
-  //     )
-  //     .filter(
-  //       (c) =>
-  //         (c.name ?? "").toLowerCase().includes(search.toLowerCase()) ||
-  //         (c.description ?? "").toLowerCase().includes(search.toLowerCase()),
-  //     )
-  //     .sort(
-  //       (a, b) =>
-  //         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  //     );
-  // }, [categories, search, statusFilter]);
-
   const stats = useMemo(
     () => ({
       total: categories.length,
@@ -171,11 +148,6 @@ function CategoriesPage() {
         header: "Image",
         cell: ({ row }) => (
           <Thumb src={row.original.imageUrl} name={row.original.name} />
-          // <img
-          //   src={row.original.imageUrl || "/placeholder.png"}
-          //   alt={row.original.name}
-          //   className="h-11 w-11 rounded-lg object-cover ring-1 ring-border"
-          // />
         ),
       },
       {
@@ -321,7 +293,6 @@ function CategoriesPage() {
 
   return (
     <div className="">
-      {/* Title row */}
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
@@ -341,7 +312,6 @@ function CategoriesPage() {
         </Button>
       </div>
 
-      {/* Stats */}
       <div className="mt-7 grid grid-cols-1 gap-5 md:grid-cols-3">
         <StatCard
           label="TOTAL CATEGORIES"
@@ -363,7 +333,6 @@ function CategoriesPage() {
         />
       </div>
 
-      {/* Toolbar card */}
       <Card className="mt-7 border-border/70 shadow-sm">
         <CardContent className="flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between">
           <div className="relative w-full md:max-w-md">
@@ -413,7 +382,6 @@ function CategoriesPage() {
         </CardContent>
       </Card>
 
-      {/* Content */}
       {categories.length === 0 ? (
         <Card className="mt-6 border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">

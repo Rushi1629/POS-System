@@ -22,7 +22,7 @@ const toneMap = {
 export function KpiCard({ label, value, delta, hint, icon: Icon, tone = "primary" }: Props) {
   const positive = (delta ?? 0) >= 0;
   return (
-    <Card className="overflow-hidden border-border/60 shadow-[var(--shadow-card)] transition-all hover:shadow-[var(--shadow-elevated)]">
+    <Card className="overflow-hidden border-border/60 shadow-(--shadow-card) transition-all hover:shadow-(--shadow-elevated)">
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div>

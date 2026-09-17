@@ -3,27 +3,25 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "./ui/collapsible";
+} from "@/components/ui/collapsible";
 import {
   ChevronDown,
   CreditCard,
   Drumstick,
   Eye,
-  Hash,
   Leaf,
-  Printer,
   Receipt,
   StickyNote,
   Table2,
   Utensils,
   XCircle,
 } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { fmt } from "@/utils/utils";
 import { OrderAdminChef, PAY_META, STATUS_META, TYPE_META } from "@/types/order-types";
-import { Badge } from "./ui/badge";
-import BillRow from "./BillRow";
+import { Badge } from "@/components/ui/badge";
+import BillRow from "@/components/BillRow";
 
 function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => void }) {
   const [open, setOpen] = useState(false);
@@ -38,7 +36,6 @@ function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => voi
       className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="flex flex-col gap-4 p-5 lg:flex-row lg:items-center">
-        {/* Left: Identity */}
         <div className="flex items-center gap-4 lg:w-70">
           <div
             className={cn(
@@ -50,8 +47,6 @@ function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => voi
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
-              {/* <Hash className="h-3 w-3" /> */}
-              {/* <span className="truncate">{order.orderNumber}</span> */}
             </div>
             <p className="mt-0.5 text-base font-bold">{order.orderNumber}</p>
             <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
@@ -60,7 +55,6 @@ function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => voi
           </div>
         </div>
 
-        {/* Middle: badges */}
         <div className="flex flex-wrap items-center gap-2 lg:flex-1">
           <Badge
             variant="outline"
@@ -98,7 +92,6 @@ function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => voi
           )}
         </div>
 
-        {/* Right: total + actions */}
         <div className="flex items-center justify-between gap-3 lg:justify-end">
           <div className="text-right">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -118,14 +111,6 @@ function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => voi
             >
               <Eye className="h-4 w-4" />
             </Button>
-            {/* <Button
-              size="icon"
-              variant="ghost"
-              className="h-9 w-9 rounded-lg"
-              title="Print"
-            >
-              <Printer className="h-4 w-4" />
-            </Button> */}
             <CollapsibleTrigger asChild>
               <Button
                 size="icon"
@@ -147,7 +132,6 @@ function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => voi
       <CollapsibleContent>
         <div className="border-t border-border bg-muted/30 p-5">
           <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-            {/* Items */}
             <div className="space-y-2">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Items
@@ -251,7 +235,6 @@ function OrderCard({ order, onView }: { order: OrderAdminChef; onView: () => voi
               )}
             </div>
 
-            {/* Summary */}
             <div className="rounded-xl border border-border bg-card p-4">
               <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Bill Summary

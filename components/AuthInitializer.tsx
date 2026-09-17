@@ -18,8 +18,6 @@ export default function AuthInitializer({ children }: Props) {
   const dispatch = useAppDispatch();
   const [authorizedPath, setAuthorizedPath] = useState<string | null>(null);
 
-  // Disable profile fetch for public customer routes (QR-based sessions)
-  // Profile is only needed for authenticated staff routes
   const isPublicCustomerRoute = pathname.startsWith("/customer");
 
   const {
@@ -44,15 +42,12 @@ export default function AuthInitializer({ children }: Props) {
     roleName === "Chef" || roleName === "Waiter";
 
   useEffect(() => {
-    // Public customer/register routes never redirect based on staff profile.
     const publicPaths = ["/customer", "/register"];
     if (publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
       setAuthorizedPath(pathname);
       return;
     }
 
-    // Home and login are auth entry points: keep them public when signed out,
-    // but send an existing session to its role-appropriate landing page.
     if (pathname === "/" || pathname === "/login") {
       if (isLoading) return;
 
@@ -68,13 +63,8 @@ export default function AuthInitializer({ children }: Props) {
 
     setAuthorizedPath(null);
 
-    // Trigger the profile fetch when on protected routes.
-    // refetch();
-
-    // 🚫 Wait until loading finishes
     if (isLoading) return;
 
-    // 🧠 Wait until we know user OR confirmed error
     if (!user && !isError) return;
 
     if (isError && !user) {
@@ -83,21 +73,10 @@ export default function AuthInitializer({ children }: Props) {
       return;
     }
 
-
-    // ❌ No user → redirect (only when not on login/register)
-    // if (!user) {
-    //   if (pathname !== "/login" && pathname !== "/register") {
-    //     router.replace("/login");
-    //   }
-    //   return;
-    // }
-
-    // ✅ Set user in store
     if (user) {
       dispatch(setUser(user));
     }
 
-    // ✅ Role-based route protection
     const findNavItem = navItems.find((item) => pathname.startsWith(item.href));
 
     if (

@@ -10,13 +10,7 @@ import { LowStockAlerts } from "@/components/LowStockAlerts";
 import { RecentOrders } from "@/components/RecentOrders";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
 import { Field, FieldLabel } from "@/components/ui/field";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Boxes,
@@ -28,7 +22,7 @@ import {
   TrendingUp,
   Utensils,
 } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDashboard } from "@/client/hooks/useDashboard";
 import type {
   DashboardGroupBy,
@@ -36,7 +30,6 @@ import type {
 } from "@/types/dashboard-types";
 import {
   formatCurrency,
-  formatDateInput,
   formatDashboardDate,
   numberValue,
   parseDateInput,
@@ -91,7 +84,6 @@ const page = () => {
     value == null ? undefined : numberValue(value);
   return (
     <div className="custom-space-y">
-      {/* Header */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-sm font-medium text-primary">
@@ -149,7 +141,6 @@ const page = () => {
         </div>
       </div>
 
-      {/* KPI row */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           label="Today's Revenue"
@@ -184,7 +175,6 @@ const page = () => {
         />
       </div>
 
-      {/* Secondary KPI row */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           label="Time Charges"
@@ -219,7 +209,6 @@ const page = () => {
         />
       </div>
 
-      {/* Sales + Orders */}
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2 border-border/60 shadow-[--shadow-card]">
           <CardHeader className="flex flex-row items-center justify-between">
@@ -269,7 +258,6 @@ const page = () => {
         </Card>
       </div>
 
-      {/* Top items + Payments + Inventory */}
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="border-border/60 shadow-[--shadow-card]">
           <CardHeader>
@@ -306,7 +294,6 @@ const page = () => {
         </Card>
       </div>
 
-      {/* Recent orders + Low stock */}
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <RecentOrders orders={dashboard.recentOrders} />
@@ -314,7 +301,6 @@ const page = () => {
         <LowStockAlerts items={dashboard.lowStock} />
       </div>
 
-      {/* Revenue vs Orders */}
       <Card className="border-border/60 shadow-[--shadow-card]">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>

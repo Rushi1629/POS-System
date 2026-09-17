@@ -1,5 +1,5 @@
 import { FileText } from "lucide-react";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const StatCard = ({

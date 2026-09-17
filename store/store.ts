@@ -14,6 +14,5 @@ export const store = configureStore({
     getDefaultMiddleware().concat(cartSyncMiddleware),
 });
 
-// types (very important for TS)
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

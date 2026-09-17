@@ -2,7 +2,6 @@ import { ItemStatus, STATUS_TRANSITIONS } from "@/types/chef-types";
 import { Order, STEPS } from "@/types/customer-order-types";
 import { UserRole } from "@/types/types";
 
-// 🧠 Timer formatter
 function formatDuration(startTime: string) {
   const start = new Date(startTime).getTime();
   const now = Date.now();
@@ -38,7 +37,6 @@ function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-// 🧠 Format minutes to "X hr Y min" format
 function formatMinutes(minutes: number): string {
   if (minutes < 60) {
     return `${minutes} min`;
@@ -66,7 +64,7 @@ function getNextStatus(
     (t) =>
       (t.from === current || t.from === "ANY") &&
       t.roles.includes(role) &&
-      t.to !== "CANCELLED", // 🔥 ignore cancel here
+      t.to !== "CANCELLED",
   );
 
   return transition ? (transition.to as ItemStatus) : null;
@@ -169,6 +167,26 @@ function statusTone(code: number) {
   return "bg-green-500/10 text-green-600 ring-green-500/20";
 }
 
+function initials(name?: string) {
+  if (!name) return "NA";
+
+  return name
+    .split(" ")
+    .map((p) => p[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+function userFormatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-GB", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 export {
   formatDuration,
   getPageNumbers,
@@ -189,4 +207,6 @@ export {
   methodTone,
   formatDate,
   statusTone,
+  initials,
+  userFormatDate,
 };

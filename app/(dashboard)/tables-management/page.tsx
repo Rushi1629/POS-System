@@ -1,7 +1,7 @@
 "use client";
 
 import { TableCard } from "@/components/TableCard";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   useEditTable,
@@ -13,7 +13,6 @@ import {
   TABLE_TYPES,
   TableType,
   EditTableSessionPayload,
-  TableStatus,
 } from "@/types/table-types";
 import { useQueryClient } from "@tanstack/react-query";
 import { PaginationState } from "@tanstack/react-table";
@@ -82,7 +81,6 @@ export default function TablesManagement() {
   }));  
 
   const handleToggleRushMode = async (tableId: string, value: boolean) => {
-    // optimistic update
     queryClient.setQueryData(["tables"], (old: any) =>
       old?.map((t: any) => (t.id === tableId ? { ...t, rushMode: value } : t)),
     );
@@ -93,7 +91,6 @@ export default function TablesManagement() {
         data: { rushMode: value },
       });
     } catch (err) {
-      // rollback
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     }
   };
@@ -115,9 +112,7 @@ export default function TablesManagement() {
   );
   return (
     <div className="space-y-6">
-      {/* 🔘 Category Filters */}
       <div className="flex items-center gap-2 flex-wrap">
-        {/* ✅ ALL BUTTON */}
         <Button
           variant={filter === "ALL" ? "default" : "outline"}
           size="sm"
@@ -131,7 +126,6 @@ export default function TablesManagement() {
           All
         </Button>
 
-        {/* ✅ TABLE TYPE BUTTONS */}
         {TABLE_TYPES.map((type) => (
           <Button
             key={type}
@@ -149,7 +143,6 @@ export default function TablesManagement() {
         ))}
       </div>
 
-      {/* 🟢 Status Legend */}
       <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-[#2eb860]" />
@@ -169,9 +162,7 @@ export default function TablesManagement() {
         </span>
       </div>
 
-      {/* 🪑 TABLE VIEW */}
       {filter === "ALL" ? (
-        // ✅ GROUPED VIEW (ONLY ALL)
         <div className="space-y-8">
           {TABLE_TYPES.map((type) => {
             const tables = groupedTables[type];
@@ -180,12 +171,10 @@ export default function TablesManagement() {
 
             return (
               <div key={type} className="space-y-3">
-                {/* Category Title */}
                 <h2 className="text-sm font-semibold text-muted-foreground capitalize">
                   {TABLE_TYPE_LABELS[type]} ({tables.length})
                 </h2>
 
-                {/* Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {tables.map((table) => (
                     <TableCard

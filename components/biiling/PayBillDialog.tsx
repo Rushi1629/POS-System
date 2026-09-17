@@ -4,7 +4,6 @@ import {
   PAYMENT_LABELS,
   PaymentMethod,
 } from "@/types/billing-types";
-import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -13,16 +12,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import { CheckCircle2, IndianRupee } from "lucide-react";
 import Row from "./Row";
-import { Separator } from "../ui/separator";
+import { Separator } from "@/components/ui/separator";
 import { inr } from "@/utils/utils";
-import { Label } from "../ui/label";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Textarea } from "../ui/textarea";
-import { Button } from "../ui/button";
-import { Input } from "../input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/input";
 
 interface PayBillFormData {
   method: PaymentMethod;

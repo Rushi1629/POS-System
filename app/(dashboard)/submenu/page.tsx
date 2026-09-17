@@ -18,8 +18,6 @@ import {
   Trash2,
   UtensilsCrossed,
   CheckCircle2,
-  Leaf,
-  Drumstick,
   ChevronsRight,
   ChevronRight,
   ChevronLeft,
@@ -111,7 +109,6 @@ function SubmenuPage() {
   async function handleSaveSubmenu(data: SubmenuItemPayload): Promise<void> {
     try {
       if (submenuEditing) {
-        // ✅ UPDATE
         await updateSubmenu({
           id: submenuEditing.id,
           data: {
@@ -124,7 +121,6 @@ function SubmenuPage() {
 
         toast.success("Submenu updated ✏️");
       } else {
-        // ✅ CREATE
         await createSubmenu({
           name: data.name,
           price: String(data.price),
@@ -159,17 +155,14 @@ function SubmenuPage() {
     () => ({
       total: submenuResponse?.pagination?.total ?? items.length,
       available: items.filter((m) => m.available).length,
-      // veg: items.filter((m) => m.menuType === "Veg").length,
-      // nonVeg: items.filter((m) => m.menuType === "NonVeg").length,
     }),
     [items, submenuResponse?.pagination?.total],
   );
 
-  // ✅ TABLE COLUMNS
   const columns = useMemo<ColumnDef<FetchSubmenuItem>[]>(
     () => [
       {
-        accessorKey: "name", // ✅ FIX
+        accessorKey: "name",
         header: "Name",
         cell: ({ row }) => (
           <Badge variant="secondary" className="rounded-full font-medium">
@@ -199,7 +192,6 @@ function SubmenuPage() {
         header: () => <div className="text-right">Actions</div>,
         cell: ({ row }) => (
           <div className="flex justify-end gap-1">
-            {/* EDIT */}
             <Button
               size="icon"
               variant="ghost"
@@ -209,7 +201,6 @@ function SubmenuPage() {
               <Pencil className="h-4 w-4" />
             </Button>
 
-            {/* DELETE */}
             <Button
               size="icon"
               variant="ghost"
@@ -272,18 +263,6 @@ function SubmenuPage() {
           icon={<CheckCircle2 className="h-5 w-5" />}
           tint="emerald"
         />
-        {/* <StatCard
-          label="VEGETARIAN"
-          value={stats.veg}
-          icon={<Leaf className="h-5 w-5" />}
-          tint="muted"
-        />
-        <StatCard
-          label="NON-VEGETARIAN"
-          value={stats.nonVeg}
-          icon={<Drumstick className="h-5 w-5" />}
-          tint="nonveg"
-        /> */}
       </div>
 
       <Card className="mt-7 border-border/70 shadow-sm">
@@ -507,7 +486,7 @@ function SubmenuPage() {
           if (!o) setSubmenuEditing(null);
         }}
         initial={submenuEditing}
-        onSave={handleSaveSubmenu} // ✅ FIXED
+        onSave={handleSaveSubmenu}
         loading={isCreatingSubmenu}
       />
 

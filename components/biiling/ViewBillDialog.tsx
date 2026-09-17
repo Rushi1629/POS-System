@@ -1,17 +1,16 @@
 import { BillListItem, STATUS_STYLES } from "@/types/billing-types";
-import React from "react";
 import {
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import { Receipt } from "lucide-react";
 import InfoTile from "../InfoTile";
 import { fmtDate, inr } from "@/utils/utils";
 import Row from "./Row";
-import { Separator } from "../ui/separator";
-import { Badge } from "../ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const ViewBillDialog = ({ bill }: { bill: BillListItem }) => {

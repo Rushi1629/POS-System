@@ -20,11 +20,6 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
 
     existingItem.quantity = newQuantity;
 
-    // preserve item metadata from the existing cart line
-    // existingItem.orderItemId = existingItem.orderItemId ?? item.orderItemId;
-    // existingItem.notes = existingItem.notes ?? item.notes;
-
-    // merge extras
     const extrasMap = new Map<string | number, any>();
 
     [...(existingItem.extras || []), ...(item.extras || [])].forEach((extra) => {
@@ -52,7 +47,6 @@ export const addItem = (state: CartState, action: PayloadAction<CartItem>) => {
       cartKey,
       quantity: item.quantity || 1,
       originalQuantity: item.originalQuantity ?? (item.quantity || 1),
-      // originalQuantity: item.quantity || 1,
       extras:
         item.extras?.map((e) => ({
           ...e,
@@ -70,15 +64,12 @@ export const removeItem = (state: CartState, action: PayloadAction<string>) => {
 
   const newQuantity = existingItem.quantity - 1;
 
-  // ✅ DO NOT DELETE — keep item for cancellation tracking
   existingItem.quantity = Math.max(newQuantity, 0);
 
-  // ✅ Ensure originalQuantity exists
   if (existingItem.originalQuantity === undefined) {
     existingItem.originalQuantity = existingItem.quantity + 1;
   }
 
-  // ✅ Mark updated
   existingItem.isUpdated =
     existingItem.quantity !== existingItem.originalQuantity;
 };

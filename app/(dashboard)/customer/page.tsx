@@ -39,7 +39,6 @@ import { Label } from "@/components/ui/label";
 import ApiLoader from "@/components/ApiLoader";
 import { useProfile } from "@/client/hooks/useAuth";
 import { getCartKey } from "@/types/cart-types";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export default function CustomerDashboard() {
@@ -64,7 +63,6 @@ export default function CustomerDashboard() {
     refetch: refetchTable,
   } = useFetchTableByTokenCustomer(tableToken);
 
-  // Only fetch profile if NOT a public QR customer session
   const { data: profile } = useProfile({ enabled: !tableToken });
 
   const isAdmin =
@@ -112,7 +110,6 @@ export default function CustomerDashboard() {
   );
   const menuItems = menusResponse?.data ?? [];
 
-  // ✅ redux state
   const dispatch = useDispatch();
 
   const cart = useSelector((state: RootState) => state.cart.items);
@@ -163,8 +160,6 @@ export default function CustomerDashboard() {
         id: selectedItem.id,
         cartKey: getCartKey(
           selectedItem.id,
-          // selectedExtras,
-          // selectedItem.menuType,
         ),
         name: selectedItem.name,
         price: Number(selectedItem.price),
@@ -218,7 +213,6 @@ export default function CustomerDashboard() {
     );
   }, [cart]);
 
-  // ✅ Filter logic
   const filteredItems = useMemo(() => {
     const search = searchQuery.trim().toLowerCase();
 
@@ -260,7 +254,6 @@ export default function CustomerDashboard() {
           notes: "Guest count updated from customer",
         });
 
-        // 🔥 THIS LINE FIXES EVERYTHING
         await refetchTable();
 
         setGuestCountDialog(false);
@@ -318,7 +311,6 @@ export default function CustomerDashboard() {
       if (!existing) return prev;
 
       if (existing.quantity === 1) {
-        // remove completely
         return prev.filter((e) => e.id !== extra.id);
       }
 
@@ -472,7 +464,6 @@ export default function CustomerDashboard() {
   return (
     <>
       <div className="sticky top-0 z-30 bg-(--background) border-b border-border/30 -mt-6">
-        {/* 🔍 SEARCH + RESET */}
         <div className="flex items-center gap-2 px-0 py-3">
           <div className="relative flex-1 min-w-65 max-w-2xl">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -502,7 +493,6 @@ export default function CustomerDashboard() {
           </motion.div>
         </div>
 
-        {/* 📂 CATEGORY */}
         {!searchQuery && (
           <div
             ref={categoryScrollRef}
@@ -521,9 +511,7 @@ export default function CustomerDashboard() {
       </div>
 
       <div className="bg-(--background) flex flex-col w-full relative">
-        {/* 📂 Category Scroll */}
 
-        {/* 🍽️ Menu Items */}
         <div className="lg:px-3 sm:px-4 pb-24">
           <button
             onClick={() => setExpandedSection(!expandedSection)}
@@ -543,7 +531,6 @@ export default function CustomerDashboard() {
             )}
           </button>
 
-          {/* <AnimatePresence> */}
           {expandedSection && (
             <motion.div
               layout="position"
@@ -554,7 +541,6 @@ export default function CustomerDashboard() {
               className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4"
             >
               {isLoading ? (
-                // 🔥 Skeleton Loader Grid
                 Array.from({ length: 8 }).map((_, i) => (
                   <MenuItemSkeleton key={i} />
                 ))
@@ -585,11 +571,8 @@ export default function CustomerDashboard() {
               )}
             </motion.div>
           )}
-          {/* </AnimatePresence> */}
         </div>
 
-        {/* 🛒 Cart Footer */}
-        {/* <AnimatePresence> */}
         {totalCartItems > 0 && (
           <motion.div
             initial={{ y: 80 }}
@@ -620,7 +603,6 @@ export default function CustomerDashboard() {
             </div>
           </motion.div>
         )}
-        {/* </AnimatePresence> */}
       </div>
 
       <Dialog

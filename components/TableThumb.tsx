@@ -10,7 +10,7 @@ function TableThumb({ name, type }: { name: string; type: TableType }) {
         : "from-accent/40 to-accent/10 text-foreground";
   return (
     <div
-      className={`flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br ${tint} ring-1 ring-border`}
+      className={`flex h-11 w-11 items-center justify-center rounded-lg bg-linear-to-br ${tint} ring-1 ring-border`}
       title={name}
     >
       <Armchair className="h-5 w-5" />

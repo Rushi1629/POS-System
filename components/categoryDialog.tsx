@@ -12,12 +12,12 @@ import {
 } from "./ui/dialog";
 import { Label } from "./ui/label";
 import { AlignLeft, ImagePlus, Loader2, Type } from "lucide-react";
-import { Switch } from "./ui/switch";
-import { Button } from "./ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "./input";
-import { Textarea } from "./ui/textarea";
+import { Input } from "@/components/input";
+import { Textarea } from "@/components/ui/textarea";
 import z from "zod";
 
 function CategoryDialog({
@@ -25,7 +25,7 @@ function CategoryDialog({
   onOpenChange,
   initial,
   onSave,
-  loading, // ✅ include it
+  loading,
 }: CategoryDialogProps) {
   type FormData = z.infer<typeof categorySchema>;
 
@@ -46,7 +46,6 @@ function CategoryDialog({
     },
   });
   const isActive = watch("isActive");
-  // const [image, setImage] = useState<string | undefined>(undefined);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -63,7 +62,7 @@ function CategoryDialog({
       setImageFile(null);
       setPreview(initial?.imageUrl ?? "");
     }
-  }, [open, initial, reset]); // ✅ ADD reset
+  }, [open, initial, reset]);
 
   function handleFile(file: File | null) {
     if (!file) return;
@@ -78,22 +77,18 @@ function CategoryDialog({
       return;
     }
 
-    setValue("imageFile", file); // ✅ VERY IMPORTANT
+    setValue("imageFile", file);
 
-    // ✅ store actual file
     setImageFile(file);
 
-    // ✅ create preview URL (separate state)
     const imageUrl = URL.createObjectURL(file);
     setPreview(imageUrl);
 
-    // optional: clear error
   }
 
   const onSubmit = async (data: FormData) => {
     if (loading) return;
 
-    // ✅ enforce required only on CREATE
     if (!initial && !data.imageFile) {
       toast.error("Image is required");
       return;
@@ -104,7 +99,6 @@ function CategoryDialog({
     formData.append("description", data.description);
     formData.append("isActive", String(data.isActive));
 
-    // ✅ ONLY append if exists
     if (data.imageFile) {
       formData.append("imageFile", data.imageFile);
     }
@@ -122,7 +116,7 @@ function CategoryDialog({
     <Dialog
       open={open}
       onOpenChange={(o) => {
-        if (!loading) onOpenChange(o); // ✅ block close while saving
+        if (!loading) onOpenChange(o);
       }}
     >
       <DialogContent

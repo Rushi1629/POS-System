@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 import { OrderStatus, STATUS_ORDER, STATUS_STYLES } from "@/types/order-status-types";
 import { ChevronRight } from "lucide-react";
-import React from "react";
 
 const OrderStatusWorkflow = ({
   current,

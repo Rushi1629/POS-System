@@ -8,8 +8,7 @@ import { Suspense, useEffect } from "react";
 import SecretCafeLoader from "@/components/SecretCafeLoader";
 import { useAppDispatch } from "@/store/hooks";
 import { loadCartFromDB } from "@/lib/db";
-import { setCartAction } from "../../store/cart/cartSlice";
-import { store } from "../../store/store";
+import { setCartAction } from "@/store/cart/cartSlice";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useFetchTableByTokenCustomer } from "@/client/hooks/useCustomer";
 import { cn } from "@/lib/utils";
@@ -45,7 +44,6 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Sidebar - Desktop only */}
       {showSidebar && (
         <div className="hidden md:block">
           <Sidebar />
@@ -70,7 +68,6 @@ export default function DashboardLayout({
           </Suspense>
         </main>
 
-        {/* Mobile Bottom Navigation */}
         <div className="md:hidden">
           <BottomNav />
         </div>

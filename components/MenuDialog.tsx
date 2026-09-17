@@ -6,8 +6,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
-import { Label } from "./ui/label";
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import {
   AlignLeft,
   Drumstick,
@@ -27,9 +27,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Textarea } from "./ui/textarea";
-import { Switch } from "./ui/switch";
-import { Button } from "./ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import { SubFormRow, SubMenuItem } from "@/types/types";
 import { menuSchema } from "@/Schema/menuScheme";
 import { Input } from "@/components/input";
@@ -89,13 +89,10 @@ function MenuDialog({
       return;
     }
 
-    // ✅ set in RHF
     setValue("imageFile", file);
 
-    // ✅ store file
     setImageFile(file);
 
-    // ✅ preview
     const url = URL.createObjectURL(file);
     setPreview(url);
   }
@@ -103,10 +100,9 @@ function MenuDialog({
   const menuType = watch("menuType");
 
   useEffect(() => {
-    if (!open) return; // ✅ only run when dialog opens
+    if (!open) return;
 
     if (initial) {
-      // 👉 EDIT MODE
       const mappedSubmenu =
         initial.subMenuItems?.map((s: SubMenuItem) => ({
           subMenuItemId: s.id,
@@ -131,12 +127,11 @@ function MenuDialog({
       setPreview(initial.imageUrl ?? "");
       setImageFile(null);
     } else {
-      // 👉 CREATE MODE (IMPORTANT 🔥)
       reset({
         name: "",
         description: "",
         price: 0,
-        categoryId: "", // ✅ important
+        categoryId: "",
         available: true,
         menuType: "Veg",
         submenu: [],
@@ -202,7 +197,6 @@ function MenuDialog({
     });
   }
 
-  // ✅ Submit handler → convert to FormData
   const onSubmit = async (values: FormValues) => {
     
     try {
@@ -210,7 +204,6 @@ function MenuDialog({
         toast.error("Please select a category");
         return;
       }
-      // ✅ FIX HERE
       const payload: MenuPayload = {
         name: values.name,
         description: values.description || "",
@@ -239,7 +232,7 @@ function MenuDialog({
       formData.append("data", JSON.stringify(payload));
 
       if (values.imageFile) {
-        formData.append("imageFile", values.imageFile); // ✅ FIX
+        formData.append("imageFile", values.imageFile);
       }
 
       await onSave(formData);
@@ -253,7 +246,7 @@ function MenuDialog({
     <Dialog
       open={open}
       onOpenChange={(o) => {
-        if (!loading) onOpenChange(o); // ✅ block close while saving
+        if (!loading) onOpenChange(o);
       }}
     >
       <DialogContent
@@ -435,11 +428,10 @@ function MenuDialog({
             <Switch
               checked={watch("available")}
               onCheckedChange={(v) => setValue("available", v)}
-              onClick={(e) => e.stopPropagation()} // ✅ IMPORTANT
+              onClick={(e) => e.stopPropagation()}
             />
           </div>
 
-          {/* Submenu / add-ons */}
           <div className="grid gap-3">
             <div className="flex items-center justify-between">
               <div>

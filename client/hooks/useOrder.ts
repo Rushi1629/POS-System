@@ -9,7 +9,6 @@ export const useCreateOrder = () => {
   return useMutation({
     mutationFn: createOrder,
     onSuccess: () => {
-      // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["Orders"] });
     },
     onError: (err) => {
@@ -69,7 +68,6 @@ export const useUpdateItemOrderStatus = () => {
     mutationFn: updateOrderItemStatus,
 
     onSuccess: () => {
-      // 🔥 Refetch orders after update
       queryClient.invalidateQueries({ queryKey: ["orders-table-wise"] });
     },
 
@@ -85,7 +83,6 @@ export const useUpdateOrderStatus = () => {
     mutationFn: updateOrderStatus,
 
     onSuccess: () => {
-      // 🔥 Refetch orders after update
       queryClient.invalidateQueries({ queryKey: ["orders-table-wise"] });
     },
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { Menu, Table } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Table } from "lucide-react";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import Sidebar from "./Sidebar";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";

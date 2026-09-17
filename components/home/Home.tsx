@@ -95,7 +95,6 @@ const highlights = [
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Navigation */}
       <header className="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2">
@@ -133,7 +132,6 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero */}
       <section className="relative overflow-hidden pt-16">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-2 lg:py-28">
           <motion.div variants={stagger} initial="hidden" animate="show">
@@ -209,7 +207,6 @@ export default function HomePage() {
           </motion.div>
         </div>
 
-        {/* Marquee strip */}
         <div className="border-y border-border bg-espresso py-3">
           <motion.div
             initial={{ x: 0 }}
@@ -239,7 +236,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Menu */}
       <section id="menu" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-24">
         <motion.div
           variants={stagger}
@@ -307,7 +303,6 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* About / highlights */}
       <section
         id="about"
         className="scroll-mt-24 border-y border-border bg-secondary/60"
@@ -354,7 +349,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Visit / address */}
       <section id="visit" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-24">
         <motion.div
           variants={stagger}
@@ -416,7 +410,6 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-10 text-sm text-muted-foreground sm:flex-row">
           <p className="flex items-center gap-2">

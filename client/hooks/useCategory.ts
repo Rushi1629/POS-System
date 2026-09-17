@@ -14,7 +14,6 @@ export const useCreateCategory = () => {
   return useMutation({
     mutationFn: createCategory,
     onSuccess: () => {
-      // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (err) => {

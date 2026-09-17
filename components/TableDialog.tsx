@@ -1,9 +1,7 @@
 import {
   FetchTableResponse,
-  TABLE_STATUS,
   TABLE_TYPES,
   TableFormValues,
-  TableStatus,
   TableType,
 } from "@/types/table-types";
 import {
@@ -13,12 +11,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
+} from "@/components/ui/dialog";
 
 import { Input } from "@/components/input";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { tableSchema } from "@/Schema/tableSchema";
-import { Label } from "./ui/label";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -26,8 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Switch } from "./ui/switch";
-import { Button } from "./ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { Loader2, Pencil, Plus } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -58,13 +56,11 @@ function TableDialog({
     defaultValues: {
       name: "",
       type: "FAMILY",
-      // status: "AVAILABLE",
       capacity: 4,
       enableTimeRate: false,
       ratePerMinute: 0,
       isActive: true,
       chargePerPerson: false,
-      // guestCount: 1,
     },
   });
 
@@ -75,25 +71,21 @@ function TableDialog({
       reset({
         name: initial.name,
         type: initial.type,
-        // status: initial.status,
         capacity: initial.capacity,
         enableTimeRate: initial.enableTimeRate,
         ratePerMinute: Number(initial.ratePerMinute) || 0,
         isActive: initial.isActive,
         chargePerPerson: initial.chargePerPerson ?? false,
-        // guestCount: Number(initial.guestCount) || 0,
       });
     } else {
       reset({
         name: "",
         type: "FAMILY",
-        // status: "AVAILABLE",
         capacity: 4,
         enableTimeRate: false,
         ratePerMinute: 0,
         isActive: true,
         chargePerPerson: false,
-        // guestCount: 1,
       });
     }
   }, [open, initial, reset]);

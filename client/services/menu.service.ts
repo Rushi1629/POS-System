@@ -75,7 +75,7 @@ export const editMenuById = async (
 ): Promise<FetchMenuResponse> => {
   const res = await fetcher(`/menu/${id}`, {
     method: "PATCH",
-    body: data, // ✅ FormData
+    body: data,
   });
 
   return res.data;

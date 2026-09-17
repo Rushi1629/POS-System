@@ -2,7 +2,7 @@ import { Category } from '@/types/types';
 import React from 'react'
 import { Card, CardContent } from './ui/card';
 import StatusPill from './StatusPill';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
 
 function CategoryCard({
@@ -16,7 +16,7 @@ function CategoryCard({
 }) {
   return (
     <Card className="group overflow-hidden border-border/70 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg">
-      <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-[#f77f00]/10 to-accent">
+      <div className="relative aspect-16/10 overflow-hidden bg-linear-to-br from-[#f77f00]/10 to-accent">
         {category.imageUrl ? (
           <img
             src={category.imageUrl}

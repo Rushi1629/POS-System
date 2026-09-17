@@ -1,12 +1,13 @@
 import React from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { MenuItem } from "@/types/types";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import StatusPill from "../StatusPill";
 import VegBadge from "../VegBadge";
-import { Badge } from "../ui/badge";
-import { Button } from "../button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/button";
 import { FetchSubmenuItem } from "@/types/submenu-types";
+
 
 function SubMenuCard({
   item,

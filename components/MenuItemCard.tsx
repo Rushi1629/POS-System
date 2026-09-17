@@ -1,9 +1,7 @@
-// import { MenuItem } from "@/lib/data";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import VegBadge from "./VegBadge";
-import { Badge } from "./ui/badge";
-import { Minus, Plus, Star } from "lucide-react";
-import { Button } from "./ui/button";
+import { Minus, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import React from "react";
 import { FetchMenuResponse } from "@/types/menu-types";
 
@@ -26,7 +24,6 @@ const MenuItemCard = ({
       exit={{ opacity: 0, scale: 0.95 }}
       className="bg-card rounded-2xl border border-border/60 hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group"
     >
-      {/* Image placeholder / colored header */}
       <div className="relative aspect-16/10 overflow-hidden bg-linear-to-br from-primary/10 to-accent">
         {item.imageUrl ? (
           <img
@@ -43,18 +40,9 @@ const MenuItemCard = ({
         )}
         <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
           <VegBadge isVeg={item.menuType === "Veg"} />
-          {/* {item.isBestseller && (
-            <Badge
-              variant="secondary"
-              className="bg-[#e25f28] text-primary-foreground border-0 text-[10px] px-1.5 py-0 font-semibold gap-0.5 shadow-sm"
-            >
-              <Star className="w-2.5 h-2.5 fill-primary-foreground" /> Best
-            </Badge>
-          )} */}
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex flex-col flex-1 p-3.5">
         <h3 className="font-heading text-sm font-semibold text-foreground leading-snug line-clamp-2">
           {item.name}

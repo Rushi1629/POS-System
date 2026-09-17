@@ -1,6 +1,5 @@
-import { Order, OrderItem, OrderStatus, TableOrders } from "@/types/order-status-types";
+import { Order, TableOrders } from "@/types/order-status-types";
 import { UserRole } from "@/types/types";
-import React from "react";
 import OrderStausStatusBadge from "./OrderStausStatusBadge";
 import { cn } from "@/lib/utils";
 

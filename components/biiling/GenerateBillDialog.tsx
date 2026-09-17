@@ -5,7 +5,6 @@ import {
   GenerateBillData,
   GenerateBillRequest,
 } from "@/types/billing-types";
-import { OrderAdminChef } from "@/types/order-types";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -16,13 +15,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 
 import { Check, ChevronsUpDown, Plus, Receipt } from "lucide-react";
-import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
-import { Button } from "../ui/button";
-import { Input } from "../input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/input";
 
 import {
   Select,
@@ -30,10 +29,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import { FetchTableResponse } from "@/types/table-types";
-import { Checkbox } from "../ui/checkbox";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const GenerateBillDialog = ({
   open,
@@ -82,12 +81,6 @@ const GenerateBillDialog = ({
       });
     }
   }, [open, reset]);
-  // set default tableId
-  // useEffect(() => {
-  //   if (tables?.length > 0) {
-  //     setValue("tableId", tables[0].id);
-  //   }
-  // }, [tables, setValue]);
 
   const submit = async (values: GenerateBillRequest) => {
     if (!values.tableId || values.tableId === "0") {
@@ -143,7 +136,6 @@ const GenerateBillDialog = ({
         onSubmit={handleSubmit(submit)}
         className="space-y-4 py-2 px-3 overflow-y-auto no-scrollbar"
       >
-        {/* Table ID */}
         <div className="grid gap-2">
           <Label>Table Name</Label>
 
@@ -182,24 +174,16 @@ const GenerateBillDialog = ({
           )}
         </div>
 
-        {/* Mobile */}
         <div className="grid gap-2">
           <Label>Mobile Number</Label>
           <Input {...register("mobileNumber", {})} placeholder="9167939647" />
-          {/* {errors.mobileNumber && (
-            <p className="text-sm text-red-500">
-              {errors.mobileNumber.message}
-            </p>
-          )} */}
         </div>
 
-        {/* Notes */}
         <div className="grid gap-2">
           <Label>Notes</Label>
           <Textarea {...register("notes")} placeholder="Optional notes" />
         </div>
 
-        {/* Discounts */}
         <div className="grid gap-2">
           <Label>Discounts</Label>
 
@@ -215,7 +199,6 @@ const GenerateBillDialog = ({
                 );
 
                 if (exists) {
-                  // Remove discount
                   const updated = selectedDiscounts
                     .filter((item) => item.discountId !== discountId)
                     .map((item, index) => ({
@@ -225,7 +208,6 @@ const GenerateBillDialog = ({
 
                   field.onChange(updated);
                 } else {
-                  // Add discount
                   field.onChange([
                     ...selectedDiscounts,
                     {
@@ -312,7 +294,6 @@ const GenerateBillDialog = ({
           />
         </div>
 
-        {/* Footer */}
         <DialogFooter>
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel

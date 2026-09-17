@@ -1,15 +1,9 @@
-// ============================================================
-// Billing API TypeScript Interfaces
-// One interface set per API endpoint (Generate / Pay / Get All)
-// ============================================================
-
 import { Banknote, CircleDollarSign, CreditCard, IndianRupee, Smartphone, Wallet } from "lucide-react";
 
 export type PaymentStatus = "PAID" | "UNPAID" | "PARTIAL" | "REFUNDED";
 export type PaymentMethod = "CASH" | "CARD" | "UPI" | "CASH_ONLINE" | "OTHER";
 export type TableType = "FAMILY" | "COUPLE" | "HALL" | "OUTDOOR" | "PRIVATE";
 
-// ---------- Shared sub-shapes ----------
 export interface BillSession {
   id?: string;
   tableId: string;
@@ -49,10 +43,6 @@ export interface BillOrder {
   orderNumber: string;
   items: BillOrderItem[];
 }
-
-// ============================================================
-// 1) Generate Bill API   →  POST /bills/generate
-// ============================================================
 
 export interface Discount {
   id: string;
@@ -101,10 +91,6 @@ export interface GenerateBillResponse {
   message: string;
   data: GenerateBillData;
 }
-
-// ============================================================
-// 2) Pay Bill API   →  POST /bills/pay
-// ============================================================
 export interface PayBillRequest {
   billingId: string;
   paymentMethod: PaymentMethod;
@@ -142,10 +128,6 @@ export interface PayBillResponse {
   message: string;
   data: PayBillData;
 }
-
-// ============================================================
-// 3) Get All Bills API   →  GET /bills
-// ============================================================
 export interface BillListItem {
   billingId: string;
   billNumber: string;
@@ -208,6 +190,6 @@ export const PAYMENT_LABELS: Record<PaymentMethod, string> = {
   CASH: "Cash",
   CARD: "Card",
   UPI: "UPI",
-  CASH_ONLINE: "Cash + Online", // 👈 UI label
+  CASH_ONLINE: "Cash + Online",
   OTHER: "Other",
 };

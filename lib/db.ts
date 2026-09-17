@@ -31,7 +31,6 @@ const getCartDBKey = (tableToken?: string | null) => {
   return token ? `cartItems:${token}` : null;
 };
 
-// ✅ Save full cart
 export const saveCartToDB = async (
   items: Record<string, CartItem>,
   tableToken?: string,
@@ -74,7 +73,6 @@ export const loadCartFromDB = async (
   }
 };
 
-// ✅ Clear DB
 export const clearCartDB = async (tableToken?: string) => {
   if (typeof window === "undefined") return;
 

@@ -16,7 +16,7 @@ export type SubmenuDialogProps = {
 export type FetchSubmenuItem = {
   id: string;
   name: string;
-  price: string; // ⚠️ API returns string, not number
+  price: string;
   available: boolean;
   description: string;
   imageUrl: string | null;

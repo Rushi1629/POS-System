@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import {
-  Plus,
   Users as UsersIcon,
   Loader2,
   UserPlus,
@@ -40,7 +39,6 @@ import ApiLoader from "@/components/ApiLoader";
 import { delay } from "@/utils/utils";
 
 export default function UsersPage() {
-  // const [users, setUsers] = useState<User[]>(seedUsers);
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [editing, setEditing] = useState<User | null>(null);
@@ -156,19 +154,18 @@ export default function UsersPage() {
         return;
       }
 
-      // 🔥 CHECK IF ANYTHING CHANGED
       const isSame =
         editing.name === values.name &&
         editing.username === values.username &&
         editing.email === values.email &&
         editing.phoneNumber === values.phoneNumber &&
         editing.role === values.role &&
-        editing.isActive === values.isActive; // ✅ ADD THIS
+        editing.isActive === values.isActive;
 
       if (isSame) {
         toast.info("No changes detected - nothing to update 🤔");
         setFormOpen(false);
-        return; // 🚫 STOP API CALL
+        return;
       }
 
       const payload = {
@@ -324,7 +321,7 @@ export default function UsersPage() {
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
-                confirmDelete(); // 👈 HERE
+                confirmDelete();
               }}
               disabled={deleting}
               className="bg-destructive text-white hover:bg-destructive/90"

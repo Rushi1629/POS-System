@@ -19,7 +19,7 @@ export const categorySchema = z.object({
     .any()
     .optional()
     .refine(
-      (file) => !file || file instanceof File, // ✅ allow undefined OR File
+      (file) => !file || file instanceof File,
       { message: "Invalid file" }
     ),
 });

@@ -1,5 +1,5 @@
 import { TableType } from "@/types/table-types";
-import { Badge } from "./ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 function TypeBadge({ type }: { type: TableType }) {
   return (

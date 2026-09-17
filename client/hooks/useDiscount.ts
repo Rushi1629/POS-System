@@ -18,7 +18,6 @@ export const useCreateDiscount = () => {
   return useMutation({
     mutationFn: createDiscount,
     onSuccess: () => {
-      // ✅ Automatically refetch users
       queryClient.invalidateQueries({ queryKey: ["Discounts"] });
     },
     onError: (err) => {
