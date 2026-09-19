@@ -8,6 +8,11 @@ input:-internal-autofill-selected {
   background-color: transparent !important;
 }
 
+html, body {
+  /* Prevents the default browser pull-to-refresh and bounce effect */
+  overscroll-behavior-y: contain;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

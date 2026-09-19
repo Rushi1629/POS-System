@@ -12,6 +12,8 @@ import { setCartAction } from "@/store/cart/cartSlice";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useFetchTableByTokenCustomer } from "@/client/hooks/useCustomer";
 import { cn } from "@/lib/utils";
+import { PullToRefresh } from "@/components/PullToRefresh";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function DashboardLayout({
   children,
@@ -21,6 +23,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const showSidebar = !pathname.startsWith("/customer");
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
 
   const searchParams = useSearchParams();
   const tableToken = searchParams?.get("tableToken");
@@ -42,6 +45,11 @@ export default function DashboardLayout({
     load();
   }, [tableToken]);
 
+  const handleRefresh = async () => {
+    // Refreshes all active data currently shown on screen (orders, tables, etc.)
+    await queryClient.invalidateQueries();
+  };
+
   return (
     <div className="flex h-screen overflow-hidden">
       {showSidebar && (
@@ -61,11 +69,13 @@ export default function DashboardLayout({
               : "p-6 pb-24 lg:p-8 lg:pb-24",
           )}
         >
-          <Suspense
-            fallback={<SecretCafeLoader message="Loading dashboard..." />}
-          >
-            {children}
-          </Suspense>
+          <PullToRefresh onRefresh={handleRefresh}>
+            <Suspense
+              fallback={<SecretCafeLoader message="Loading dashboard..." />}
+            >
+              {children}
+            </Suspense>
+          </PullToRefresh>
         </main>
 
         <div className="md:hidden">

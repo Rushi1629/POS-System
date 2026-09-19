@@ -9,7 +9,7 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["192.168.0.100"],
+  allowedDevOrigins: ["192.168.0.103"],
   output: 'export',
   images: {
     unoptimized: true,
