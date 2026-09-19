@@ -91,7 +91,7 @@ const DiscountDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[540px] max-h-[85vh] flex flex-col">
+      <DialogContent className="sm:max-w-135 max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{isEditing ? "Edit discount" : "Create discount"}</DialogTitle>
           <DialogDescription>
