@@ -1,4 +1,4 @@
-package com.example.app;
+package com.secretcafe.pos;
 
 import com.getcapacitor.BridgeActivity;
 
