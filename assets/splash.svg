@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2732" height="2732" viewBox="0 0 2732 2732">
+  <!-- Splash screen source (pre-Android-12 drawable, plus iOS). Cream ground to match the
+       app's light background; the maroon cloche sits at ~31% of the canvas width.
+       854 = (2732 / 2) - (1024 / 2), so the mark keeps its 1024-unit coordinates. -->
+  <rect width="2732" height="2732" fill="#FFF4D1"/>
+  <g fill="#6B0C0A" transform="translate(854,854)">
+    <path d="M154,712 A358,420 0 0 1 870,712 Z"/>
+    <circle cx="512" cy="292" r="50"/>
+    <rect x="82" y="712" width="860" height="70" rx="35"/>
+  </g>
+</svg>

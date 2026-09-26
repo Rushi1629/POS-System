@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Legacy / pre-API-26 launcher tile (ic_launcher.png, ic_launcher_round.png).
+       The mark is pulled in to ~72% of the tile because legacy icons get no adaptive
+       safe zone - the round variant is masked down to an inscribed circle. -->
+  <rect width="1024" height="1024" rx="210" ry="210" fill="#6B0C0A"/>
+  <g fill="#FFF4D1" transform="translate(512,512) scale(0.857) translate(-512,-512)">
+    <path d="M154,712 A358,420 0 0 1 870,712 Z"/>
+    <circle cx="512" cy="292" r="50"/>
+    <rect x="82" y="712" width="860" height="70" rx="35"/>
+  </g>
+</svg>

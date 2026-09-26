@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Simplified serving-cloche mark derived from the Secret Cafe badge. The badge itself is
+       too text-heavy to survive a 48dp launcher icon, so only the cloche motif is kept.
+
+       Sizing note: @capacitor/assets wraps both adaptive layers in
+       <inset android:inset="16.7%"/>, which scales the artwork to 66.6% of the 108dp canvas
+       (the maximum area any launcher mask can reveal). This mark spans ~84% of the source
+       canvas, so it lands at ~56% of the final icon - clear of the circular mask edge. -->
+  <g fill="#FFF4D1">
+    <!-- dome -->
+    <path d="M154,712 A358,420 0 0 1 870,712 Z"/>
+    <!-- knob -->
+    <circle cx="512" cy="292" r="50"/>
+    <!-- plate -->
+    <rect x="82" y="712" width="860" height="70" rx="35"/>
+  </g>
+</svg>

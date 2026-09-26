@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">secretcafe</string>
-    <string name="title_activity_main">secretcafe</string>
+    <string name="app_name">The Secret Cafe</string>
+    <string name="title_activity_main">The Secret Cafe</string>
     <string name="package_name">com.secretcafe.pos</string>
     <string name="custom_url_scheme">com.secretcafe.pos</string>
 </resources>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2732" height="2732" viewBox="0 0 2732 2732">
+  <!-- Dark-mode splash (night-qualified drawable). Maroon ground with the cream mark. -->
+  <rect width="2732" height="2732" fill="#6B0C0A"/>
+  <g fill="#FFF4D1" transform="translate(854,854)">
+    <path d="M154,712 A358,420 0 0 1 870,712 Z"/>
+    <circle cx="512" cy="292" r="50"/>
+    <rect x="82" y="712" width="860" height="70" rx="35"/>
+  </g>
+</svg>
