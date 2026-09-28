@@ -1,19 +1,142 @@
+"use client";
+
 import { BillListItem, STATUS_STYLES } from "@/types/billing-types";
 import {
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Receipt } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Printer as PrinterIcon, Receipt } from "lucide-react";
 import InfoTile from "../InfoTile";
 import { fmtDate, inr } from "@/utils/utils";
 import Row from "./Row";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { toast } from "sonner";
+
+type ThermalSerialPort = {
+  open: (options: { baudRate: number }) => Promise<void>;
+  close: () => Promise<void>;
+  writable?: {
+    getWriter: () => {
+      write: (data: Uint8Array) => Promise<void>;
+      releaseLock: () => void;
+    };
+  };
+};
+
+type ThermalSerial = {
+  requestPort: () => Promise<ThermalSerialPort>;
+};
+
+const receiptAmount = (value: string | number | null | undefined) =>
+  `Rs. ${Number(value ?? 0).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
 const ViewBillDialog = ({ bill }: { bill: BillListItem }) => {
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const printBill = async () => {
+    const serial = (navigator as Navigator & { serial?: ThermalSerial }).serial;
+    if (!serial) {
+      toast.error("Thermal printing requires a browser with Web Serial support.");
+      return;
+    }
+
+    setIsPrinting(true);
+    let port: ThermalSerialPort | undefined;
+    let writer: ReturnType<NonNullable<ThermalSerialPort["writable"]>["getWriter"]> | undefined;
+
+    try {
+      port = await serial.requestPort();
+      await port.open({ baudRate: 9600 });
+      if (!port.writable) {
+        throw new Error("The selected printer does not provide a writable connection.");
+      }
+      writer = port.writable.getWriter();
+
+      const { Br, Cut, Line, Printer, Row, Text, render } = await import(
+        "react-thermal-printer"
+      );
+      const data = await render(
+        <Printer type="epson" width={42}>
+          <Text align="center" bold>
+            BILL RECEIPT
+          </Text>
+          <Line />
+          <Row left="Bill No." right={bill.billNumber} />
+          <Row left="Date" right={fmtDate(bill.createdAt)} />
+          <Row
+            left="Table"
+            right={`${bill.session?.tableName ?? "—"} (${bill.session?.tableType ?? "—"})`}
+          />
+          <Row left="Guests" right={String(bill.session?.guestCount ?? "—")} />
+          <Row left="Mobile" right={bill.mobileNumber || "—"} />
+          <Line />
+          <Text bold>ITEMS</Text>
+          {bill.order?.items.map((item, itemIndex) => (
+            <div key={`item-${itemIndex}`}>
+              <Row
+                left={`${item.quantity} x ${item.menuItemName}`}
+                right={receiptAmount(item.totalPrice)}
+              />
+              {item.subMenuItems.map((subItem, subItemIndex) => (
+                <Row
+                  key={`item-${itemIndex}-sub-${subItemIndex}`}
+                  left={`  + ${subItem.subMenuItemName} x ${subItem.quantity}`}
+                  right={receiptAmount(subItem.totalPrice)}
+                />
+              ))}
+              {item.notes && item.notes !== "n/a" && (
+                <Text>{`  Note: ${item.notes}`}</Text>
+              )}
+            </div>
+          ))}
+          <Line />
+          <Row left="Subtotal" right={receiptAmount(bill.subtotal)} />
+          <Row
+            left="Time Charge"
+            right={receiptAmount(bill.timeChargeAmount)}
+          />
+          <Row left="Tax" right={receiptAmount(bill.taxAmount)} />
+          <Row
+            left="Discount"
+            right={`- ${receiptAmount(bill.discountAmount)}`}
+          />
+          <Row left="Service Charge" right={receiptAmount(bill.serviceCharge)} />
+          <Line />
+          <Row
+            left={<Text bold>TOTAL</Text>}
+            right={<Text bold>{receiptAmount(bill.totalAmount)}</Text>}
+          />
+          <Row left="Status" right={bill.paymentStatus} />
+          <Row left="Payment" right={bill.paymentMethod ?? "—"} />
+          <Br />
+          <Text align="center">Thank you</Text>
+          <Cut />
+        </Printer>,
+      );
+
+      await writer.write(data);
+      toast.success("Bill sent to the printer.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not print bill.");
+    } finally {
+      writer?.releaseLock();
+      if (port) {
+        await port.close().catch(() => undefined);
+      }
+      setIsPrinting(false);
+    }
+  };
+
   return (
     <DialogContent className="sm:max-w-lg flex flex-col max-h-[80vh]">
       <DialogHeader className="pb-2">
@@ -105,6 +228,18 @@ const ViewBillDialog = ({ bill }: { bill: BillListItem }) => {
           </div>
         </div>
       </div>
+
+      <DialogFooter>
+        <Button
+          type="button"
+          onClick={printBill}
+          disabled={isPrinting}
+          className="gap-2"
+        >
+          <PrinterIcon className="h-4 w-4" />
+          {isPrinting ? "Printing…" : "Print bill"}
+        </Button>
+      </DialogFooter>
     </DialogContent>
   );
 };
