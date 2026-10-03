@@ -29,8 +29,8 @@ android/keystore.properties
 Put both in a password manager or encrypted cloud folder. If you lose them you cannot publish an
 update under the same listing without filing a *reset upload key* request with Google Play support.
 
-The keystore was generated with the password `SecretCafeUpload2026-Kp7Wv3Nq9Rt`. To use your own
-instead, delete both files and regenerate:
+Use unique passwords stored in a password manager. Never put actual signing passwords in this
+runbook or in source control. To replace the upload key, generate a new one:
 
 ```bat
 mkdir android\keystore
