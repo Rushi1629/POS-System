@@ -40,6 +40,8 @@ import ApiLoader from "@/components/ApiLoader";
 import { useProfile } from "@/client/hooks/useAuth";
 import { getCartKey } from "@/types/cart-types";
 import { toast } from "sonner";
+import { AutoSizer, Grid, WindowScroller } from "react-virtualized";
+import type { GridCellProps } from "react-virtualized";
 
 export default function CustomerDashboard() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -48,6 +50,8 @@ export default function CustomerDashboard() {
   const [guestCountDialog, setGuestCountDialog] = useState(false);
   const [guestInput, setGuestInput] = useState("");
   const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const [menuScrollElement, setMenuScrollElement] =
+    useState<HTMLElement | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const tableToken = searchParams?.get("tableToken");
@@ -236,6 +240,21 @@ export default function CustomerDashboard() {
   const activeCategoryData = useMemo(() => {
     return categories.find((c) => c.id === activeCategory);
   }, [categories, activeCategory]);
+
+  const registerMenuGrid = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+
+    let scrollElement: HTMLElement | null = node.parentElement;
+    while (scrollElement) {
+      const overflowY = window.getComputedStyle(scrollElement).overflowY;
+      if (overflowY === "auto" || overflowY === "scroll") break;
+      scrollElement = scrollElement.parentElement;
+    }
+
+    setMenuScrollElement((current) =>
+      current === scrollElement ? current : scrollElement,
+    );
+  }, []);
 
   function resetFilters() {
     setSearchQuery("");
@@ -538,29 +557,107 @@ export default function CustomerDashboard() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4"
+              ref={registerMenuGrid}
+              className="w-full"
             >
               {isLoading ? (
-                Array.from({ length: 8 }).map((_, i) => (
-                  <MenuItemSkeleton key={i} />
-                ))
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <MenuItemSkeleton key={i} />
+                  ))}
+                </div>
               ) : (
                 <>
-                  {filteredItems.map((item) => (
-                    <MenuItemCard
-                      key={item.id}
-                      item={item}
-                      quantity={Object.values(cart)
-                        .filter(
-                          (cartItem) =>
-                            String(cartItem.id) === String(item.id) &&
-                            cartItem.menuType === item.menuType,
-                        )
-                        .reduce((sum, cartItem) => sum + cartItem.quantity, 0)}
-                      onAdd={() => handleAdd(item)}
-                      onRemove={() => removeFromCart(item.id, item.menuType)}
-                    />
-                  ))}
+                  {filteredItems.length > 0 && menuScrollElement && (
+                    <WindowScroller scrollElement={menuScrollElement}>
+                      {({
+                        height,
+                        isScrolling,
+                        onChildScroll,
+                        scrollTop,
+                      }) => (
+                        <AutoSizer disableHeight>
+                          {({ width }) => {
+                            const columns =
+                              width >= 1280 ? 5 : width >= 768 ? 3 : 2;
+                            const columnGap = 16;
+                            const cardWidth =
+                              (width - columnGap * (columns - 1)) / columns;
+                            const rowHeight = Math.ceil(
+                              cardWidth * (10 / 16) + 150 + columnGap,
+                            );
+                            const rowCount = Math.ceil(
+                              filteredItems.length / columns,
+                            );
+
+                            const renderRow = ({
+                              key,
+                              rowIndex,
+                              style,
+                            }: GridCellProps) => (
+                              <div
+                                key={key}
+                                style={{
+                                  ...style,
+                                  boxSizing: "border-box",
+                                  display: "grid",
+                                  gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                                  gap: columnGap,
+                                  paddingBottom: columnGap,
+                                }}
+                              >
+                                {filteredItems
+                                  .slice(
+                                    rowIndex * columns,
+                                    (rowIndex + 1) * columns,
+                                  )
+                                  .map((item) => (
+                                    <MenuItemCard
+                                      key={item.id}
+                                      item={item}
+                                      quantity={Object.values(cart)
+                                        .filter(
+                                          (cartItem) =>
+                                            String(cartItem.id) ===
+                                              String(item.id) &&
+                                            cartItem.menuType === item.menuType,
+                                        )
+                                        .reduce(
+                                          (sum, cartItem) =>
+                                            sum + cartItem.quantity,
+                                          0,
+                                        )}
+                                      onAdd={() => handleAdd(item)}
+                                      onRemove={() =>
+                                        removeFromCart(item.id, item.menuType)
+                                      }
+                                    />
+                                  ))}
+                              </div>
+                            );
+
+                            return (
+                              <Grid
+                                aria-label="Menu items"
+                                autoHeight
+                                cellRenderer={renderRow}
+                                columnCount={1}
+                                columnWidth={width}
+                                height={height}
+                                isScrolling={isScrolling}
+                                overscanRowCount={2}
+                                onScroll={onChildScroll}
+                                rowCount={rowCount}
+                                rowHeight={rowHeight}
+                                scrollTop={scrollTop}
+                                width={width}
+                              />
+                            );
+                          }}
+                        </AutoSizer>
+                      )}
+                    </WindowScroller>
+                  )}
 
                   {filteredItems.length === 0 && (
                     <div className="text-center py-12 text-muted-foreground text-sm w-full">
