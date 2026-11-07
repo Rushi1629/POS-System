@@ -111,7 +111,7 @@ function StaffBottomNav({ pathname }: { pathname: string }) {
               className={[
                 "flex min-w-18 shrink-0 flex-col items-center justify-center gap-1 rounded-xl px-2 py-1 text-[11px] transition-colors",
                 isActive
-                  ? "bg-amber-500/15 text-amber-500"
+                  ? "bg-transparent text-amber-500"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               ].join(" ")}
             >
